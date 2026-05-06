@@ -1,9 +1,9 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { supabase, verifyUserToken } from '../supabase.js'
-import { edgeTTS, defaultVoiceForLanguage } from '../edge-tts.js'
+import { defaultVoiceForLanguage, edgeTTS } from '../edge-tts.js'
 import { elevenLabsTTS } from '../elevenlabs.js'
 import { synthesizeAndStore } from '../piper.js'
+import { supabase, verifyUserToken } from '../supabase.js'
 
 const SynthesizeV2Schema = z.object({
   text: z.string().min(1).max(5000),
@@ -28,7 +28,6 @@ const SynthesizeV2Schema = z.object({
  * Default: edge — kaliteli + ücretsiz
  */
 export async function synthesizeV2Routes(fastify: FastifyInstance) {
-
   fastify.post('/api/voice/synthesize/v2', async (req, reply) => {
     const userId = await verifyUserToken(req.headers.authorization)
     if (!userId) return reply.code(401).send({ error: 'unauthorized' })
@@ -56,7 +55,7 @@ export async function synthesizeV2Routes(fastify: FastifyInstance) {
 
     try {
       let audioBuffer: Buffer
-      let contentType = 'audio/mpeg'
+      const contentType = 'audio/mpeg'
 
       switch (engine) {
         case 'edge': {

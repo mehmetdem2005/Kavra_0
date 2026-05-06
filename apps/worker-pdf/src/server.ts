@@ -1,8 +1,8 @@
 import 'dotenv/config'
-import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import helmet from '@fastify/helmet'
 import rateLimit from '@fastify/rate-limit'
+import Fastify from 'fastify'
 import { pdfRoutes } from './routes/pdf.js'
 
 const isDev = process.env.NODE_ENV !== 'production'
@@ -10,9 +10,7 @@ const isDev = process.env.NODE_ENV !== 'production'
 const app = Fastify({
   logger: {
     level: process.env.LOG_LEVEL ?? 'info',
-    transport: isDev
-      ? { target: 'pino-pretty', options: { colorize: true } }
-      : undefined,
+    transport: isDev ? { target: 'pino-pretty', options: { colorize: true } } : undefined,
   },
   bodyLimit: 50 * 1024 * 1024, // 50MB (büyük PDF + base64 image)
 })

@@ -1,5 +1,5 @@
 import type { Logger } from 'pino'
-import { supabase, sendExpoPushBatch } from '../supabase.js'
+import { sendExpoPushBatch, supabase } from '../supabase.js'
 
 interface JobContext {
   logger: Logger
@@ -72,9 +72,10 @@ export async function runStreakWarning({ logger }: JobContext): Promise<void> {
             to: t.token,
             sound: 'default',
             title: '🔥 Serini koru!',
-            body: c.current_streak === 1
-              ? 'Bugün hiç çalışmadın'
-              : `${c.current_streak} günlük serini bitirme — 5 dakikalık tek bir kart yeter`,
+            body:
+              c.current_streak === 1
+                ? 'Bugün hiç çalışmadın'
+                : `${c.current_streak} günlük serini bitirme — 5 dakikalık tek bir kart yeter`,
             data: { type: 'streak_warning', streak: c.current_streak },
           })
         }

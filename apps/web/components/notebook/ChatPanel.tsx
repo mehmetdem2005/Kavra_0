@@ -1,12 +1,23 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiFetch } from '../../lib/api'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Send, Sparkles } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
+import * as React from 'react'
+import { useEffect, useRef, useState } from 'react'
+import ReactMarkdownImport from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-interface Source { id: string; title: string; source_type: string; youtube_video_id?: string }
+const ReactMarkdown = ReactMarkdownImport as unknown as React.ComponentType<{
+  children?: React.ReactNode
+  remarkPlugins?: unknown[]
+}>
+import { apiFetch } from '../../lib/api'
+
+interface Source {
+  id: string
+  title: string
+  source_type: string
+  youtube_video_id?: string
+}
 interface Citation {
   chunk_id: string
   source_id: string
@@ -49,10 +60,11 @@ export function ChatPanel({ notebookId, sources }: { notebookId: string; sources
   }, [messages.length])
 
   const sendMut = useMutation({
-    mutationFn: (message: string) => apiFetch(`/api/notebooks/${notebookId}/chat`, {
-      method: 'POST',
-      body: JSON.stringify({ message }),
-    }),
+    mutationFn: (message: string) =>
+      apiFetch(`/api/notebooks/${notebookId}/chat`, {
+        method: 'POST',
+        body: JSON.stringify({ message }),
+      }),
     onMutate: async (message) => {
       // Optimistic
       const optimistic: Message = {
@@ -91,9 +103,18 @@ export function ChatPanel({ notebookId, sources }: { notebookId: string; sources
                 </div>
                 <div className="flex-1 pt-1.5">
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span
+                      className="w-2 h-2 rounded-full bg-amber-400 animate-bounce"
+                      style={{ animationDelay: '0ms' }}
+                    />
+                    <span
+                      className="w-2 h-2 rounded-full bg-amber-400 animate-bounce"
+                      style={{ animationDelay: '150ms' }}
+                    />
+                    <span
+                      className="w-2 h-2 rounded-full bg-amber-400 animate-bounce"
+                      style={{ animationDelay: '300ms' }}
+                    />
                   </div>
                 </div>
               </div>
@@ -143,7 +164,10 @@ export function ChatPanel({ notebookId, sources }: { notebookId: string; sources
   )
 }
 
-function EmptyChat({ sources, onSelectSuggestion }: { sources: Source[]; onSelectSuggestion: (s: string) => void }) {
+function EmptyChat({
+  sources,
+  onSelectSuggestion,
+}: { sources: Source[]; onSelectSuggestion: (s: string) => void }) {
   const sourceCount = sources.filter((s: any) => s.status === 'ready').length
 
   return (
@@ -212,7 +236,11 @@ function MessageBubble({ message, sources }: { message: Message; sources: Source
   )
 }
 
-function CitationCard({ index, citation, sources }: { index: number; citation: Citation; sources: Source[] }) {
+function CitationCard({
+  index,
+  citation,
+  sources,
+}: { index: number; citation: Citation; sources: Source[] }) {
   const source = sources.find((s) => s.id === citation.source_id)
   const isYoutube = source?.source_type === 'youtube' && citation.start_time_ms != null
 
@@ -225,7 +253,9 @@ function CitationCard({ index, citation, sources }: { index: number; citation: C
         <p className="text-[11px] text-ink-900 font-semibold truncate">
           {citation.source_title}
           {citation.page_number && ` · s.${citation.page_number}`}
-          {isYoutube && citation.start_time_ms != null && ` · ${formatTimestamp(citation.start_time_ms)}`}
+          {isYoutube &&
+            citation.start_time_ms != null &&
+            ` · ${formatTimestamp(citation.start_time_ms)}`}
         </p>
         <p className="text-[10px] text-slate-600 mt-0.5 line-clamp-2">{citation.snippet}</p>
       </div>

@@ -1,6 +1,6 @@
-import * as Speech from 'expo-speech'
 import { Audio } from 'expo-av'
 import Constants from 'expo-constants'
+import * as Speech from 'expo-speech'
 import { supabase } from '../supabase'
 
 const VOICE_URL =
@@ -38,9 +38,7 @@ class TTSManager {
 
     await this.stop()
 
-    const useDevice =
-      mode === 'device' ||
-      (mode === 'auto' && opts.text.length < AUTO_THRESHOLD)
+    const useDevice = mode === 'device' || (mode === 'auto' && opts.text.length < AUTO_THRESHOLD)
 
     if (useDevice) {
       this.speakDevice(opts)
@@ -99,12 +97,9 @@ class TTSManager {
         throw new Error(`TTS server: ${err}`)
       }
 
-      const { url } = await res.json() as { url: string }
+      const { url } = (await res.json()) as { url: string }
 
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: url },
-        { shouldPlay: true },
-      )
+      const { sound } = await Audio.Sound.createAsync({ uri: url }, { shouldPlay: true })
       this.currentSound = sound
 
       sound.setOnPlaybackStatusUpdate((status) => {
@@ -126,7 +121,9 @@ class TTSManager {
 
   async stop(): Promise<void> {
     if (this.isSpeaking) {
-      try { Speech.stop() } catch {}
+      try {
+        Speech.stop()
+      } catch {}
       if (this.currentSound) {
         try {
           await this.currentSound.stopAsync()

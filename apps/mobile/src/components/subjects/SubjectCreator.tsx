@@ -1,18 +1,38 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import {
-  View, Text, ScrollView, Pressable, Modal, TextInput, Alert,
-  ActivityIndicator, KeyboardAvoidingView, Platform,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
 } from 'react-native'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { Button } from '../ui/Button'
-import { Input } from '../ui/Input'
 import { Icon, type IconName } from '../ui/Icon'
+import { Input } from '../ui/Input'
 
 const COLOR_PALETTE = [
-  '#1E1B4B', '#7C3AED', '#059669', '#0891B2', '#B4452D',
-  '#CA8A04', '#0F172A', '#DB2777', '#92400E', '#0E7490',
-  '#7C2D12', '#1E40AF', '#9333EA', '#475569', '#15803D',
+  '#1E1B4B',
+  '#7C3AED',
+  '#059669',
+  '#0891B2',
+  '#B4452D',
+  '#CA8A04',
+  '#0F172A',
+  '#DB2777',
+  '#92400E',
+  '#0E7490',
+  '#7C2D12',
+  '#1E40AF',
+  '#9333EA',
+  '#475569',
+  '#15803D',
 ]
 
 const ICON_OPTIONS: Array<{ name: IconName; label: string }> = [
@@ -88,7 +108,9 @@ export function SubjectCreator({ visible, onClose, onCreated }: Props) {
                 onPress={() => setTab('suggested')}
                 className={`flex-1 py-2 rounded-lg ${tab === 'suggested' ? 'bg-white' : ''}`}
               >
-                <Text className={`text-center text-xs font-semibold ${tab === 'suggested' ? 'text-ink-900' : 'text-slate-500'}`}>
+                <Text
+                  className={`text-center text-xs font-semibold ${tab === 'suggested' ? 'text-ink-900' : 'text-slate-500'}`}
+                >
                   Önerilen
                 </Text>
               </Pressable>
@@ -96,16 +118,28 @@ export function SubjectCreator({ visible, onClose, onCreated }: Props) {
                 onPress={() => setTab('custom')}
                 className={`flex-1 py-2 rounded-lg ${tab === 'custom' ? 'bg-white' : ''}`}
               >
-                <Text className={`text-center text-xs font-semibold ${tab === 'custom' ? 'text-ink-900' : 'text-slate-500'}`}>
+                <Text
+                  className={`text-center text-xs font-semibold ${tab === 'custom' ? 'text-ink-900' : 'text-slate-500'}`}
+                >
                   Kendim eklerim
                 </Text>
               </Pressable>
             </View>
 
             {tab === 'suggested' ? (
-              <SuggestedTab onCreated={(id) => { onCreated?.(id); onClose() }} />
+              <SuggestedTab
+                onCreated={(id) => {
+                  onCreated?.(id)
+                  onClose()
+                }}
+              />
             ) : (
-              <CustomTab onCreated={(id) => { onCreated?.(id); onClose() }} />
+              <CustomTab
+                onCreated={(id) => {
+                  onCreated?.(id)
+                  onClose()
+                }}
+              />
             )}
           </View>
         </View>
@@ -163,7 +197,11 @@ function SuggestedTab({ onCreated }: { onCreated: (id: string) => void }) {
   }
 
   if (isLoading) {
-    return <View className="p-8 items-center"><ActivityIndicator color="#1E1B4B" /></View>
+    return (
+      <View className="p-8 items-center">
+        <ActivityIndicator color="#1E1B4B" />
+      </View>
+    )
   }
 
   const featured = suggested?.filter((s) => s.is_featured) ?? []
@@ -183,7 +221,11 @@ function SuggestedTab({ onCreated }: { onCreated: (id: string) => void }) {
                 onPress={() => handleCreate(s)}
                 disabled={creating !== null}
                 className="bg-white border border-slate-100 rounded-2xl p-3 flex-row items-center gap-2"
-                style={{ width: '48.5%', borderColor: creating === s.id ? s.color : undefined, borderWidth: creating === s.id ? 2 : 1 }}
+                style={{
+                  width: '48.5%',
+                  borderColor: creating === s.id ? s.color : undefined,
+                  borderWidth: creating === s.id ? 2 : 1,
+                }}
               >
                 <View
                   className="w-10 h-10 rounded-xl items-center justify-center"
@@ -198,9 +240,13 @@ function SuggestedTab({ onCreated }: { onCreated: (id: string) => void }) {
                   )}
                 </View>
                 <View className="flex-1">
-                  <Text className="font-semibold text-ink-900 text-xs" numberOfLines={1}>{s.name}</Text>
+                  <Text className="font-semibold text-ink-900 text-xs" numberOfLines={1}>
+                    {s.name}
+                  </Text>
                   {s.description && (
-                    <Text className="text-[10px] text-slate-500" numberOfLines={1}>{s.description}</Text>
+                    <Text className="text-[10px] text-slate-500" numberOfLines={1}>
+                      {s.description}
+                    </Text>
                   )}
                 </View>
                 {creating === s.id && <ActivityIndicator size="small" color={s.color} />}
@@ -230,7 +276,11 @@ function SuggestedTab({ onCreated }: { onCreated: (id: string) => void }) {
                   {s.emoji ? (
                     <Text style={{ fontSize: 20 }}>{s.emoji}</Text>
                   ) : (
-                    <Icon name={(s.icon_name ?? 'book-open') as IconName} size={18} color={s.color} />
+                    <Icon
+                      name={(s.icon_name ?? 'book-open') as IconName}
+                      size={18}
+                      color={s.color}
+                    />
                   )}
                 </View>
                 <View className="flex-1">
@@ -274,7 +324,7 @@ function CustomTab({ onCreated }: { onCreated: (id: string) => void }) {
           name: name.trim(),
           description: description.trim() || null,
           color,
-          emoji: useEmoji ? (emoji || null) : null,
+          emoji: useEmoji ? emoji || null : null,
           custom_icon_name: useEmoji ? null : iconName,
           is_custom: true,
         })
@@ -307,14 +357,26 @@ function CustomTab({ onCreated }: { onCreated: (id: string) => void }) {
         </View>
         <View className="flex-1">
           <Text className="font-serif text-lg text-ink-900">{name || 'Konunun ismi'}</Text>
-          <Text className="text-xs text-slate-500" numberOfLines={1}>{description || 'Kısa açıklama'}</Text>
+          <Text className="text-xs text-slate-500" numberOfLines={1}>
+            {description || 'Kısa açıklama'}
+          </Text>
         </View>
       </View>
 
-      <Input label="İSİM" value={name} onChangeText={setName} placeholder="Örn: Almanca A2, YDS 2026..." />
+      <Input
+        label="İSİM"
+        value={name}
+        onChangeText={setName}
+        placeholder="Örn: Almanca A2, YDS 2026..."
+      />
 
       <View className="mt-3">
-        <Input label="AÇIKLAMA (OPS.)" value={description} onChangeText={setDescription} placeholder="Hedefin nedir?" />
+        <Input
+          label="AÇIKLAMA (OPS.)"
+          value={description}
+          onChangeText={setDescription}
+          placeholder="Hedefin nedir?"
+        />
       </View>
 
       {/* Icon vs Emoji toggle */}
@@ -323,7 +385,9 @@ function CustomTab({ onCreated }: { onCreated: (id: string) => void }) {
           onPress={() => setUseEmoji(false)}
           className={`flex-1 py-2 rounded-lg ${!useEmoji ? 'bg-white' : ''}`}
         >
-          <Text className={`text-center text-xs font-semibold ${!useEmoji ? 'text-ink-900' : 'text-slate-500'}`}>
+          <Text
+            className={`text-center text-xs font-semibold ${!useEmoji ? 'text-ink-900' : 'text-slate-500'}`}
+          >
             İkon
           </Text>
         </Pressable>
@@ -331,7 +395,9 @@ function CustomTab({ onCreated }: { onCreated: (id: string) => void }) {
           onPress={() => setUseEmoji(true)}
           className={`flex-1 py-2 rounded-lg ${useEmoji ? 'bg-white' : ''}`}
         >
-          <Text className={`text-center text-xs font-semibold ${useEmoji ? 'text-ink-900' : 'text-slate-500'}`}>
+          <Text
+            className={`text-center text-xs font-semibold ${useEmoji ? 'text-ink-900' : 'text-slate-500'}`}
+          >
             Emoji
           </Text>
         </Pressable>
@@ -339,7 +405,9 @@ function CustomTab({ onCreated }: { onCreated: (id: string) => void }) {
 
       {!useEmoji ? (
         <View>
-          <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mb-2">İKON</Text>
+          <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mb-2">
+            İKON
+          </Text>
           <View className="flex-row flex-wrap gap-2 mb-4">
             {ICON_OPTIONS.map((opt) => (
               <Pressable
@@ -355,7 +423,9 @@ function CustomTab({ onCreated }: { onCreated: (id: string) => void }) {
         </View>
       ) : (
         <View>
-          <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mb-2">EMOJİ</Text>
+          <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mb-2">
+            EMOJİ
+          </Text>
           <TextInput
             value={emoji}
             onChangeText={(v) => setEmoji(v.slice(0, 2))}
@@ -371,7 +441,9 @@ function CustomTab({ onCreated }: { onCreated: (id: string) => void }) {
       )}
 
       {/* Color */}
-      <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mb-2 mt-2">RENK</Text>
+      <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mb-2 mt-2">
+        RENK
+      </Text>
       <View className="flex-row flex-wrap gap-2 mb-4">
         {COLOR_PALETTE.map((c) => (
           <Pressable
@@ -386,7 +458,13 @@ function CustomTab({ onCreated }: { onCreated: (id: string) => void }) {
       </View>
 
       <View className="mt-2">
-        <Button title="Konuyu Oluştur" onPress={handleCreate} loading={loading} disabled={!name.trim()} fullWidth />
+        <Button
+          title="Konuyu Oluştur"
+          onPress={handleCreate}
+          loading={loading}
+          disabled={!name.trim()}
+          fullWidth
+        />
       </View>
     </ScrollView>
   )

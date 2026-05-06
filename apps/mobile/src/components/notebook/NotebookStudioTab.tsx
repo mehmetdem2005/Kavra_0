@@ -1,6 +1,11 @@
-import { View, Text, ScrollView, Pressable, Alert, ActivityIndicator } from 'react-native'
 import { useRouter } from 'expo-router'
-import { useGenerateContent, type Notebook, type NotebookSource, type GeneratedContent } from '../../hooks/useNotebooks'
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import {
+  type GeneratedContent,
+  type Notebook,
+  type NotebookSource,
+  useGenerateContent,
+} from '../../hooks/useNotebooks'
 import { Icon, type IconName } from '../ui/Icon'
 
 interface Props {
@@ -36,10 +41,10 @@ export function NotebookStudioTab({ notebook, sources, generatedContent }: Props
       if (e.message?.includes('pro_required')) {
         Alert.alert('Pro Gerekli', e.message, [
           { text: 'İptal', style: 'cancel' },
-          { text: 'Pro\'ya Geç', onPress: () => router.push('/upgrade') },
+          { text: "Pro'ya Geç", onPress: () => router.push('/upgrade') },
         ])
       } else if (e.message?.includes('free_limit')) {
-        Alert.alert('Aylık Limit', 'Free aylık 10 üretim. Pro\'da sınırsız.')
+        Alert.alert('Aylık Limit', "Free aylık 10 üretim. Pro'da sınırsız.")
       } else {
         Alert.alert('Hata', e.message)
       }
@@ -127,17 +132,28 @@ export function NotebookStudioTab({ notebook, sources, generatedContent }: Props
                 onPress={() => router.push(`/notebook/${notebook.id}/studio/${g.id}`)}
                 className="bg-white border border-slate-100 rounded-2xl p-3 flex-row items-center gap-3"
               >
-                <View className="w-10 h-10 rounded-xl items-center justify-center" style={{ backgroundColor: contentTypeBg(g.content_type) }}>
-                  <Icon name={contentTypeIcon(g.content_type)} size={18} color={contentTypeColor(g.content_type)} />
+                <View
+                  className="w-10 h-10 rounded-xl items-center justify-center"
+                  style={{ backgroundColor: contentTypeBg(g.content_type) }}
+                >
+                  <Icon
+                    name={contentTypeIcon(g.content_type)}
+                    size={18}
+                    color={contentTypeColor(g.content_type)}
+                  />
                 </View>
                 <View className="flex-1">
-                  <Text className="font-semibold text-ink-900 text-sm" numberOfLines={1}>{g.title}</Text>
+                  <Text className="font-semibold text-ink-900 text-sm" numberOfLines={1}>
+                    {g.title}
+                  </Text>
                   <View className="flex-row items-center gap-2 mt-0.5">
                     {g.status === 'ready' ? (
                       <>
                         <Icon name="check-circle" size={10} color="#10B981" />
                         <Text className="text-[10px] text-emerald-700">
-                          {g.duration_seconds ? `${Math.round(g.duration_seconds / 60)} dk` : 'Hazır'}
+                          {g.duration_seconds
+                            ? `${Math.round(g.duration_seconds / 60)} dk`
+                            : 'Hazır'}
                         </Text>
                       </>
                     ) : g.status === 'failed' ? (
@@ -161,10 +177,23 @@ export function NotebookStudioTab({ notebook, sources, generatedContent }: Props
 }
 
 function CreateCard({
-  icon, bgColor, iconColor, title, desc, badge, loading, onPress,
+  icon,
+  bgColor,
+  iconColor,
+  title,
+  desc,
+  badge,
+  loading,
+  onPress,
 }: {
-  icon: IconName; bgColor: string; iconColor: string;
-  title: string; desc: string; badge?: string; loading?: boolean; onPress: () => void
+  icon: IconName
+  bgColor: string
+  iconColor: string
+  title: string
+  desc: string
+  badge?: string
+  loading?: boolean
+  onPress: () => void
 }) {
   return (
     <Pressable
@@ -178,14 +207,18 @@ function CreateCard({
       </View>
       <View className="flex-1">
         <View className="flex-row items-center gap-1.5">
-          <Text className="font-serif text-base" style={{ color: iconColor }}>{title}</Text>
+          <Text className="font-serif text-base" style={{ color: iconColor }}>
+            {title}
+          </Text>
           {badge && (
             <View className="bg-ink-900 rounded px-1.5 py-0.5">
               <Text className="text-[8px] text-amber-500 font-bold">{badge}</Text>
             </View>
           )}
         </View>
-        <Text className="text-[11px] mt-0.5" style={{ color: iconColor, opacity: 0.7 }}>{desc}</Text>
+        <Text className="text-[11px] mt-0.5" style={{ color: iconColor, opacity: 0.7 }}>
+          {desc}
+        </Text>
       </View>
       <Icon name="chevron-right" size={16} color={iconColor} />
     </Pressable>
@@ -193,28 +226,43 @@ function CreateCard({
 }
 
 function contentTypeIcon(t: string): IconName {
-  return t === 'audio_overview' ? 'headphones'
-       : t === 'flashcards' ? 'layers'
-       : t === 'quiz' ? 'check-circle'
-       : t === 'slides' ? 'image'
-       : t === 'infographic' ? 'image'
-       : 'file'
+  return t === 'audio_overview'
+    ? 'headphones'
+    : t === 'flashcards'
+      ? 'layers'
+      : t === 'quiz'
+        ? 'check-circle'
+        : t === 'slides'
+          ? 'image'
+          : t === 'infographic'
+            ? 'image'
+            : 'file'
 }
 
 function contentTypeColor(t: string): string {
-  return t === 'audio_overview' ? '#1E1B4B'
-       : t === 'flashcards' ? '#065F46'
-       : t === 'quiz' ? '#991B1B'
-       : t === 'slides' ? '#92400E'
-       : t === 'infographic' ? '#6B21A8'
-       : '#374151'
+  return t === 'audio_overview'
+    ? '#1E1B4B'
+    : t === 'flashcards'
+      ? '#065F46'
+      : t === 'quiz'
+        ? '#991B1B'
+        : t === 'slides'
+          ? '#92400E'
+          : t === 'infographic'
+            ? '#6B21A8'
+            : '#374151'
 }
 
 function contentTypeBg(t: string): string {
-  return t === 'audio_overview' ? '#E0E7FF'
-       : t === 'flashcards' ? '#D1FAE5'
-       : t === 'quiz' ? '#FEE2E2'
-       : t === 'slides' ? '#FEF3C7'
-       : t === 'infographic' ? '#F3E8FF'
-       : '#E5E7EB'
+  return t === 'audio_overview'
+    ? '#E0E7FF'
+    : t === 'flashcards'
+      ? '#D1FAE5'
+      : t === 'quiz'
+        ? '#FEE2E2'
+        : t === 'slides'
+          ? '#FEF3C7'
+          : t === 'infographic'
+            ? '#F3E8FF'
+            : '#E5E7EB'
 }

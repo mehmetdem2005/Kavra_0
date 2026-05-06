@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { supabase } from '../lib/supabase'
 
 export interface Theme {
@@ -86,10 +86,7 @@ export function useSetTheme() {
       // Server tarafa yaz
       const { error } = await supabase
         .from('user_preferences')
-        .upsert(
-          { user_id: userData.user.id, theme_id: theme.id },
-          { onConflict: 'user_id' },
-        )
+        .upsert({ user_id: userData.user.id, theme_id: theme.id }, { onConflict: 'user_id' })
       if (error) throw error
       return theme
     },

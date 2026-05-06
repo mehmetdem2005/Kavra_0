@@ -1,12 +1,12 @@
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router'
-import { useNotebook } from '../../src/hooks/useNotebooks'
-import { Icon } from '../../src/components/ui/Icon'
-import { NotebookSourcesTab } from '../../src/components/notebook/NotebookSourcesTab'
 import { NotebookChatTab } from '../../src/components/notebook/NotebookChatTab'
+import { NotebookSourcesTab } from '../../src/components/notebook/NotebookSourcesTab'
 import { NotebookStudioTab } from '../../src/components/notebook/NotebookStudioTab'
+import { Icon } from '../../src/components/ui/Icon'
+import { useNotebook } from '../../src/hooks/useNotebooks'
 
 type Tab = 'sources' | 'chat' | 'studio'
 
@@ -79,13 +79,23 @@ export default function NotebookDetail() {
       {/* Content */}
       {tab === 'sources' && <NotebookSourcesTab notebook={data.notebook} sources={data.sources} />}
       {tab === 'chat' && <NotebookChatTab notebook={data.notebook} sources={data.sources} />}
-      {tab === 'studio' && <NotebookStudioTab notebook={data.notebook} sources={data.sources} generatedContent={data.generatedContent} />}
+      {tab === 'studio' && (
+        <NotebookStudioTab
+          notebook={data.notebook}
+          sources={data.sources}
+          generatedContent={data.generatedContent}
+        />
+      )}
     </SafeAreaView>
   )
 }
 
 function TabBtn({
-  active, icon, label, badge, onPress,
+  active,
+  icon,
+  label,
+  badge,
+  onPress,
 }: { active: boolean; icon: any; label: string; badge?: number; onPress: () => void }) {
   return (
     <Pressable

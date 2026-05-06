@@ -46,11 +46,7 @@ export function useSubject(id: string | null) {
     queryKey: ['subject', id],
     enabled: !!id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('subjects')
-        .select('*')
-        .eq('id', id!)
-        .single()
+      const { data, error } = await supabase.from('subjects').select('*').eq('id', id!).single()
       if (error) throw error
       return data as Subject
     },

@@ -24,7 +24,10 @@ const CreateClanSchema = z.object({
   slug: z.string().regex(/^[a-z0-9-]{3,30}$/),
   description: z.string().max(500).optional(),
   emoji: z.string().max(10).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
   isPublic: z.boolean().optional().default(true),
 })
 
@@ -32,7 +35,10 @@ const UpdateClanSchema = z.object({
   name: z.string().min(3).max(40).optional(),
   description: z.string().max(500).optional(),
   emoji: z.string().max(10).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
   isPublic: z.boolean().optional(),
 })
 
@@ -42,7 +48,6 @@ const PostMessageSchema = z.object({
 })
 
 export async function clansRoutes(fastify: FastifyInstance) {
-
   /** POST /api/clans (klan kur) */
   fastify.post('/api/clans', async (req, reply) => {
     const userId = await verifyUserToken(req.headers.authorization)
@@ -58,7 +63,10 @@ export async function clansRoutes(fastify: FastifyInstance) {
       .eq('founder_id', userId)
 
     const { data: ent } = await supabase
-      .from('user_entitlements').select('is_pro').eq('user_id', userId).single()
+      .from('user_entitlements')
+      .select('is_pro')
+      .eq('user_id', userId)
+      .single()
     const maxFounded = ent?.is_pro ? 5 : 1
 
     if ((foundedCount ?? 0) >= maxFounded) {
@@ -113,12 +121,15 @@ export async function clansRoutes(fastify: FastifyInstance) {
     })
 
     // Achievement
-    await supabase.from('user_achievements').upsert({
-      user_id: userId,
-      achievement_id: 'clan-founder',
-      is_unlocked: true,
-      progress: 1,
-    }, { onConflict: 'user_id,achievement_id' })
+    await supabase.from('user_achievements').upsert(
+      {
+        user_id: userId,
+        achievement_id: 'clan-founder',
+        is_unlocked: true,
+        progress: 1,
+      },
+      { onConflict: 'user_id,achievement_id' },
+    )
 
     return { clan }
   })
@@ -141,11 +152,13 @@ export async function clansRoutes(fastify: FastifyInstance) {
   fastify.get<{ Querystring: { search?: string; limit?: string } }>(
     '/api/clans/discover',
     async (req, reply) => {
-      const limit = Math.min(parseInt(req.query.limit ?? '20'), 50)
+      const limit = Math.min(Number.parseInt(req.query.limit ?? '20'), 50)
 
       let q = supabase
         .from('clans')
-        .select('id, name, slug, description, emoji, color, member_count, max_members, total_streak_days')
+        .select(
+          'id, name, slug, description, emoji, color, member_count, max_members, total_streak_days',
+        )
         .eq('is_public', true)
         .order('member_count', { ascending: false })
         .limit(limit)
@@ -182,9 +195,7 @@ export async function clansRoutes(fastify: FastifyInstance) {
       .order('weekly_reviews', { ascending: false })
 
     // Kullanıcı üye mi?
-    const isMember = userId
-      ? !!(members ?? []).find((m: any) => m.profiles?.id === userId)
-      : false
+    const isMember = userId ? !!(members ?? []).find((m: any) => m.profiles?.id === userId) : false
 
     return { clan, members: members ?? [], isMember }
   })
@@ -221,7 +232,10 @@ export async function clansRoutes(fastify: FastifyInstance) {
         .eq('user_id', userId)
 
       const { data: ent } = await supabase
-        .from('user_entitlements').select('is_pro').eq('user_id', userId).single()
+        .from('user_entitlements')
+        .select('is_pro')
+        .eq('user_id', userId)
+        .single()
       const maxJoinable = ent?.is_pro ? 10 : 3
 
       if ((joinedCount ?? 0) >= maxJoinable) {
@@ -257,50 +271,46 @@ export async function clansRoutes(fastify: FastifyInstance) {
       })
 
       // Achievement
-      await supabase.from('user_achievements').upsert({
-        user_id: userId,
-        achievement_id: 'first-clan',
-        is_unlocked: true,
-        progress: 1,
-      }, { onConflict: 'user_id,achievement_id' })
+      await supabase.from('user_achievements').upsert(
+        {
+          user_id: userId,
+          achievement_id: 'first-clan',
+          is_unlocked: true,
+          progress: 1,
+        },
+        { onConflict: 'user_id,achievement_id' },
+      )
 
       return { ok: true }
     },
   )
 
   /** DELETE /api/clans/:id/leave */
-  fastify.delete<{ Params: { id: string } }>(
-    '/api/clans/:id/leave',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.delete<{ Params: { id: string } }>('/api/clans/:id/leave', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      // Founder ayrılırsa klan dağılır mı? Hayır — başkasına devret veya silinir
-      const { data: member } = await supabase
-        .from('clan_members')
-        .select('role')
-        .eq('clan_id', req.params.id)
-        .eq('user_id', userId)
-        .single()
+    // Founder ayrılırsa klan dağılır mı? Hayır — başkasına devret veya silinir
+    const { data: member } = await supabase
+      .from('clan_members')
+      .select('role')
+      .eq('clan_id', req.params.id)
+      .eq('user_id', userId)
+      .single()
 
-      if (!member) return reply.code(404).send({ error: 'not_member' })
+    if (!member) return reply.code(404).send({ error: 'not_member' })
 
-      if (member.role === 'founder') {
-        return reply.code(400).send({
-          error: 'founder_cannot_leave',
-          message: 'Önce başka birine kurucu rolünü ver veya klanı sil.',
-        })
-      }
+    if (member.role === 'founder') {
+      return reply.code(400).send({
+        error: 'founder_cannot_leave',
+        message: 'Önce başka birine kurucu rolünü ver veya klanı sil.',
+      })
+    }
 
-      await supabase
-        .from('clan_members')
-        .delete()
-        .eq('clan_id', req.params.id)
-        .eq('user_id', userId)
+    await supabase.from('clan_members').delete().eq('clan_id', req.params.id).eq('user_id', userId)
 
-      return { ok: true }
-    },
-  )
+    return { ok: true }
+  })
 
   /** GET /api/clans/:id/messages */
   fastify.get<{ Params: { id: string }; Querystring: { before?: string; limit?: string } }>(
@@ -319,7 +329,7 @@ export async function clansRoutes(fastify: FastifyInstance) {
 
       if (!member) return reply.code(403).send({ error: 'not_member' })
 
-      const limit = Math.min(parseInt(req.query.limit ?? '50'), 100)
+      const limit = Math.min(Number.parseInt(req.query.limit ?? '50'), 100)
       let q = supabase
         .from('clan_messages')
         .select(`
@@ -338,40 +348,37 @@ export async function clansRoutes(fastify: FastifyInstance) {
   )
 
   /** POST /api/clans/:id/messages */
-  fastify.post<{ Params: { id: string } }>(
-    '/api/clans/:id/messages',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.post<{ Params: { id: string } }>('/api/clans/:id/messages', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      const parsed = PostMessageSchema.safeParse(req.body)
-      if (!parsed.success) return reply.code(400).send({ error: parsed.error.format() })
+    const parsed = PostMessageSchema.safeParse(req.body)
+    if (!parsed.success) return reply.code(400).send({ error: parsed.error.format() })
 
-      const { data: member } = await supabase
-        .from('clan_members')
-        .select('clan_id')
-        .eq('clan_id', req.params.id)
-        .eq('user_id', userId)
-        .single()
+    const { data: member } = await supabase
+      .from('clan_members')
+      .select('clan_id')
+      .eq('clan_id', req.params.id)
+      .eq('user_id', userId)
+      .single()
 
-      if (!member) return reply.code(403).send({ error: 'not_member' })
+    if (!member) return reply.code(403).send({ error: 'not_member' })
 
-      const { data: msg, error } = await supabase
-        .from('clan_messages')
-        .insert({
-          clan_id: req.params.id,
-          user_id: userId,
-          content: parsed.data.content,
-          reply_to: parsed.data.replyTo,
-        })
-        .select(`
+    const { data: msg, error } = await supabase
+      .from('clan_messages')
+      .insert({
+        clan_id: req.params.id,
+        user_id: userId,
+        content: parsed.data.content,
+        reply_to: parsed.data.replyTo,
+      })
+      .select(`
           id, content, message_type, reply_to, created_at,
           profiles(id, username, full_name, avatar_url)
         `)
-        .single()
+      .single()
 
-      if (error) return reply.code(500).send({ error: error.message })
-      return { message: msg }
-    },
-  )
+    if (error) return reply.code(500).send({ error: error.message })
+    return { message: msg }
+  })
 }

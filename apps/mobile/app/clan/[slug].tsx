@@ -1,10 +1,21 @@
-import { useState, useEffect, useRef } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator, TextInput, Alert, KeyboardAvoidingView, Platform, FlatList } from 'react-native'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { useEffect, useRef, useState } from 'react'
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiFetch } from '../../src/lib/api'
 import { Icon } from '../../src/components/ui/Icon'
+import { apiFetch } from '../../src/lib/api'
 
 export default function ClanDetailScreen() {
   const router = useRouter()
@@ -22,7 +33,7 @@ export default function ClanDetailScreen() {
     queryKey: ['clan-messages', data?.clan?.id],
     queryFn: () => apiFetch<{ messages: any[] }>(`/api/clans/${data.clan.id}/messages`),
     enabled: tab === 'chat' && data?.isMember,
-    refetchInterval: tab === 'chat' ? 5000 : false,            // 5sn polling
+    refetchInterval: tab === 'chat' ? 5000 : false, // 5sn polling
   })
 
   const joinMut = useMutation({
@@ -45,10 +56,11 @@ export default function ClanDetailScreen() {
 
   const [messageText, setMessageText] = useState('')
   const sendMut = useMutation({
-    mutationFn: () => apiFetch(`/api/clans/${data.clan.id}/messages`, {
-      method: 'POST',
-      body: JSON.stringify({ content: messageText }),
-    }),
+    mutationFn: () =>
+      apiFetch(`/api/clans/${data.clan.id}/messages`, {
+        method: 'POST',
+        body: JSON.stringify({ content: messageText }),
+      }),
     onSuccess: () => {
       setMessageText('')
       qc.invalidateQueries({ queryKey: ['clan-messages', data.clan.id] })
@@ -85,10 +97,12 @@ export default function ClanDetailScreen() {
           </Pressable>
           {data.isMember && (
             <Pressable
-              onPress={() => Alert.alert('Klandan Ayrıl?', 'Tekrar katılmak için davet kodu gerekebilir.', [
-                { text: 'Vazgeç', style: 'cancel' },
-                { text: 'Ayrıl', style: 'destructive', onPress: () => leaveMut.mutate() },
-              ])}
+              onPress={() =>
+                Alert.alert('Klandan Ayrıl?', 'Tekrar katılmak için davet kodu gerekebilir.', [
+                  { text: 'Vazgeç', style: 'cancel' },
+                  { text: 'Ayrıl', style: 'destructive', onPress: () => leaveMut.mutate() },
+                ])
+              }
               hitSlop={8}
             >
               <Icon name="more-horizontal" size={18} color="#FBF8F0" />
@@ -125,7 +139,9 @@ export default function ClanDetailScreen() {
           onPress={() => setTab('members')}
           className={`flex-1 py-2 rounded-full ${tab === 'members' ? 'bg-ink-900' : 'bg-white border border-slate-200'}`}
         >
-          <Text className={`text-center text-xs font-bold ${tab === 'members' ? 'text-cream-50' : 'text-slate-600'}`}>
+          <Text
+            className={`text-center text-xs font-bold ${tab === 'members' ? 'text-cream-50' : 'text-slate-600'}`}
+          >
             Liderlik
           </Text>
         </Pressable>
@@ -134,7 +150,9 @@ export default function ClanDetailScreen() {
             onPress={() => setTab('chat')}
             className={`flex-1 py-2 rounded-full ${tab === 'chat' ? 'bg-ink-900' : 'bg-white border border-slate-200'}`}
           >
-            <Text className={`text-center text-xs font-bold ${tab === 'chat' ? 'text-cream-50' : 'text-slate-600'}`}>
+            <Text
+              className={`text-center text-xs font-bold ${tab === 'chat' ? 'text-cream-50' : 'text-slate-600'}`}
+            >
               Sohbet
             </Text>
           </Pressable>
@@ -148,13 +166,21 @@ export default function ClanDetailScreen() {
           </Text>
 
           {data.members.map((m: any, i: number) => (
-            <View key={m.profiles?.id} className="bg-white border border-slate-100 rounded-2xl p-3 mb-2 flex-row items-center gap-3">
-              <View className={`w-8 h-8 rounded-full items-center justify-center ${
-                i === 0 ? 'bg-amber-500'
-                  : i === 1 ? 'bg-slate-300'
-                  : i === 2 ? 'bg-orange-300'
-                  : 'bg-slate-100'
-              }`}>
+            <View
+              key={m.profiles?.id}
+              className="bg-white border border-slate-100 rounded-2xl p-3 mb-2 flex-row items-center gap-3"
+            >
+              <View
+                className={`w-8 h-8 rounded-full items-center justify-center ${
+                  i === 0
+                    ? 'bg-amber-500'
+                    : i === 1
+                      ? 'bg-slate-300'
+                      : i === 2
+                        ? 'bg-orange-300'
+                        : 'bg-slate-100'
+                }`}
+              >
                 <Text className="font-bold text-xs text-ink-900">{i + 1}</Text>
               </View>
               <View className="w-8 h-8 rounded-full bg-ink-900 items-center justify-center">
@@ -171,12 +197,16 @@ export default function ClanDetailScreen() {
                     <Text className="text-[9px] text-amber-600 font-bold">KURUCU</Text>
                   )}
                   {m.current_streak > 0 && (
-                    <Text className="text-[9px] text-orange-500 font-bold">🔥 {m.current_streak}</Text>
+                    <Text className="text-[9px] text-orange-500 font-bold">
+                      🔥 {m.current_streak}
+                    </Text>
                   )}
                 </View>
               </View>
               <View className="items-end">
-                <Text className="font-mono text-base text-ink-900 font-bold">{m.weekly_reviews}</Text>
+                <Text className="font-mono text-base text-ink-900 font-bold">
+                  {m.weekly_reviews}
+                </Text>
                 <Text className="text-[9px] text-slate-500">tekrar</Text>
               </View>
             </View>
@@ -201,11 +231,15 @@ export default function ClanDetailScreen() {
                   <View className="flex-row gap-2">
                     <View className="w-7 h-7 rounded-full bg-ink-900 items-center justify-center">
                       <Text className="text-amber-500 text-[10px] font-bold">
-                        {(m.profiles?.full_name ?? m.profiles?.username ?? '?').slice(0, 1).toUpperCase()}
+                        {(m.profiles?.full_name ?? m.profiles?.username ?? '?')
+                          .slice(0, 1)
+                          .toUpperCase()}
                       </Text>
                     </View>
                     <View className="flex-1 bg-white rounded-2xl p-2.5 border border-slate-100">
-                      <Text className="text-[10px] font-bold text-ink-900">@{m.profiles?.username}</Text>
+                      <Text className="text-[10px] font-bold text-ink-900">
+                        @{m.profiles?.username}
+                      </Text>
                       <Text className="text-sm text-ink-900 mt-0.5">{m.content}</Text>
                     </View>
                   </View>

@@ -1,9 +1,9 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { parsePDF, chunkText } from '../pdf-parser.js'
 import { embedTexts } from '../embeddings.js'
 import { groqChatJSON, groqVision } from '../groq.js'
-import { supabase, verifyUserToken, getActiveGroqKey } from '../supabase.js'
+import { chunkText, parsePDF } from '../pdf-parser.js'
+import { getActiveGroqKey, supabase, verifyUserToken } from '../supabase.js'
 
 const ProcessSchema = z.object({
   documentId: z.string().uuid(),
@@ -71,10 +71,13 @@ export async function pdfRoutes(fastify: FastifyInstance) {
 
       if (!pdfData.hasText) {
         // Tarama PDF'i — şimdilik vision'a yönlendir, ya da hata
-        await supabase.from('documents').update({
-          status: 'failed',
-          error_message: 'PDF metni çıkarılamadı (taranmış olabilir). OCR Faz 4\'te.',
-        }).eq('id', documentId)
+        await supabase
+          .from('documents')
+          .update({
+            status: 'failed',
+            error_message: "PDF metni çıkarılamadı (taranmış olabilir). OCR Faz 4'te.",
+          })
+          .eq('id', documentId)
         return reply.code(422).send({ error: 'no_text', message: 'PDF metin içermiyor' })
       }
 
@@ -107,7 +110,10 @@ export async function pdfRoutes(fastify: FastifyInstance) {
         .update({
           status: 'ready',
           page_count: pdfData.pageCount,
-          extracted_text: pdfData.pages.map((p) => p.text).join('\n\n').slice(0, 50000),
+          extracted_text: pdfData.pages
+            .map((p) => p.text)
+            .join('\n\n')
+            .slice(0, 50000),
         })
         .eq('id', documentId)
 
@@ -276,7 +282,13 @@ Türkçe yaz. Tarihler, formüller, tanımlar, isimler için ideal.`,
    * Resim + task → AI cevap. Storage path veya base64 alır.
    */
   fastify.post<{
-    Body: { storagePath?: string; imageBase64?: string; mimeType?: string; task: string; lessonId?: string }
+    Body: {
+      storagePath?: string
+      imageBase64?: string
+      mimeType?: string
+      task: string
+      lessonId?: string
+    }
   }>('/api/vision/analyze', async (req, reply) => {
     const userId = await verifyUserToken(req.headers.authorization)
     if (!userId) return reply.code(401).send({ error: 'unauthorized' })
@@ -309,12 +321,9 @@ Türkçe yaz. Tarihler, formüller, tanımlar, isimler için ideal.`,
         'Bu bir matematik sorusu. Çöz ve adım adım açıkla. Türkçe. LaTeX kullanabilirsin ($...$).',
       extract_text:
         'Bu resimdeki tüm metni olduğu gibi (el yazısı dahil) çıkar. Sadece metin, başka açıklama yok.',
-      describe:
-        'Bu resmi detaylıca açıkla. Eğitim amaçlı bir öğrenciye gösterilecek.',
-      analyze_diagram:
-        'Bu bir diyagram veya şema. Ne anlattığını parça parça açıkla. Türkçe.',
-      explain_handwriting:
-        'Bu el yazısı not. Önce metni transcribe et, sonra konuyu açıkla.',
+      describe: 'Bu resmi detaylıca açıkla. Eğitim amaçlı bir öğrenciye gösterilecek.',
+      analyze_diagram: 'Bu bir diyagram veya şema. Ne anlattığını parça parça açıkla. Türkçe.',
+      explain_handwriting: 'Bu el yazısı not. Önce metni transcribe et, sonra konuyu açıkla.',
     }
     const prompt = taskPrompts[task] ?? task
 

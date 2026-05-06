@@ -1,6 +1,6 @@
+import crypto from 'node:crypto'
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import crypto from 'node:crypto'
 import { supabase, verifyUserToken } from '../supabase.js'
 
 /**
@@ -25,8 +25,8 @@ const LookupWordSchema = z.object({
   word: z.string().min(1).max(50).trim(),
   sourceLang: z.string().length(2).default('en'),
   targetLang: z.string().length(2).default('tr'),
-  context: z.string().max(500).optional(),    // bağlam cümle (daha iyi çeviri için)
-  bookId: z.string().uuid().optional(),       // hangi kitaptan geldi
+  context: z.string().max(500).optional(), // bağlam cümle (daha iyi çeviri için)
+  bookId: z.string().uuid().optional(), // hangi kitaptan geldi
   sentenceText: z.string().max(500).optional(),
   saveToVocab: z.boolean().default(true),
 })
@@ -35,7 +35,7 @@ const TranslateSentenceSchema = z.object({
   text: z.string().min(1).max(2000),
   sourceLang: z.string().length(2).default('en'),
   targetLang: z.string().length(2).default('tr'),
-  literary: z.boolean().default(false),       // Pro: edebi mod
+  literary: z.boolean().default(false), // Pro: edebi mod
 })
 
 const BatchLookupSchema = z.object({
@@ -67,7 +67,7 @@ async function fetchFreeDictionary(word: string, lang = 'en'): Promise<Partial<D
   try {
     const res = await fetch(`${FREE_DICT_API}/${lang}/${encodeURIComponent(word)}`)
     if (!res.ok) return null
-    const data: any[] = await res.json()
+    const data = (await res.json()) as any[]
     if (!data.length) return null
 
     const first = data[0]
@@ -156,7 +156,11 @@ Kelime: "${word}"`
 
 // ===== Cache helpers =====
 
-async function getCached(word: string, sourceLang: string, targetLang: string): Promise<DictResult | null> {
+async function getCached(
+  word: string,
+  sourceLang: string,
+  targetLang: string,
+): Promise<DictResult | null> {
   const { data } = await supabase
     .from('dictionary_cache')
     .select('*')
@@ -184,7 +188,11 @@ async function getCached(word: string, sourceLang: string, targetLang: string): 
   }
 }
 
-async function saveToCache(result: DictResult, sourceLang: string, targetLang: string): Promise<void> {
+async function saveToCache(
+  result: DictResult,
+  sourceLang: string,
+  targetLang: string,
+): Promise<void> {
   await supabase.from('dictionary_cache').upsert(
     {
       word: result.word.toLowerCase(),
@@ -204,7 +212,6 @@ async function saveToCache(result: DictResult, sourceLang: string, targetLang: s
 // ===== Routes =====
 
 export async function dictionaryRoutes(fastify: FastifyInstance) {
-
   /**
    * POST /api/dictionary/lookup
    * Tek sözcük lookup. Tap-to-translate için ana endpoint.
@@ -313,7 +320,10 @@ export async function dictionaryRoutes(fastify: FastifyInstance) {
     const { data: cached } = await supabase
       .from('dictionary_cache')
       .select('*')
-      .in('word', words.map((w) => w.toLowerCase()))
+      .in(
+        'word',
+        words.map((w) => w.toLowerCase()),
+      )
       .eq('source_lang', sourceLang)
       .eq('target_lang', targetLang)
 
@@ -371,14 +381,22 @@ export async function dictionaryRoutes(fastify: FastifyInstance) {
     // Pro check for literary mode
     if (literary) {
       const { data: ent } = await supabase
-        .from('user_entitlements').select('is_pro').eq('user_id', userId).single()
+        .from('user_entitlements')
+        .select('is_pro')
+        .eq('user_id', userId)
+        .single()
       if (!ent?.is_pro) {
-        return reply.code(403).send({ error: 'pro_required', message: 'Edebi çeviri Pro üyeler için' })
+        return reply
+          .code(403)
+          .send({ error: 'pro_required', message: 'Edebi çeviri Pro üyeler için' })
       }
     }
 
     // Cache check
-    const hash = crypto.createHash('sha256').update(`${text}|${sourceLang}|${targetLang}`).digest('hex')
+    const hash = crypto
+      .createHash('sha256')
+      .update(`${text}|${sourceLang}|${targetLang}`)
+      .digest('hex')
     const { data: cached } = await supabase
       .from('sentence_translation_cache')
       .select('*')
@@ -403,8 +421,15 @@ export async function dictionaryRoutes(fastify: FastifyInstance) {
     if (!GEMINI_API_KEY) return reply.code(500).send({ error: 'gemini_not_configured' })
 
     const langNames: Record<string, string> = {
-      en: 'İngilizce', tr: 'Türkçe', de: 'Almanca', fr: 'Fransızca', es: 'İspanyolca',
-      it: 'İtalyanca', ja: 'Japonca', ar: 'Arapça', ru: 'Rusça',
+      en: 'İngilizce',
+      tr: 'Türkçe',
+      de: 'Almanca',
+      fr: 'Fransızca',
+      es: 'İspanyolca',
+      it: 'İtalyanca',
+      ja: 'Japonca',
+      ar: 'Arapça',
+      ru: 'Rusça',
     }
 
     const prompt = literary
@@ -483,7 +508,7 @@ Metin: ${text}`
         .select('*')
         .eq('user_id', userId)
         .order('last_seen_at', { ascending: false })
-        .limit(Math.min(parseInt(req.query.limit ?? '50'), 200))
+        .limit(Math.min(Number.parseInt(req.query.limit ?? '50'), 200))
 
       if (req.query.status) query = query.eq('status', req.query.status)
       if (req.query.lang) query = query.eq('language', req.query.lang)
@@ -523,7 +548,7 @@ Metin: ${text}`
         .select('*')
         .eq('language', req.params.lang)
         .order('rank', { ascending: true })
-        .limit(Math.min(parseInt(req.query.limit ?? '500'), 5000))
+        .limit(Math.min(Number.parseInt(req.query.limit ?? '500'), 5000))
 
       if (req.query.cefr) query = query.eq('cefr_level', req.query.cefr)
 

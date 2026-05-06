@@ -13,9 +13,21 @@ export default function AdminHome() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 mt-8">
-          <Panel title="Teknik Yönetimi" desc="150 tekniğin prompt'larını düzenle" href="/admin/techniques" />
-          <Panel title="Model Kataloğu" desc="Groq modellerini manuel senkronize et" href="/admin/models" />
-          <Panel title="Kullanıcılar" desc="Kullanıcı listesi ve kullanım istatistikleri" href="/admin/users" />
+          <Panel
+            title="Teknik Yönetimi"
+            desc="150 tekniğin prompt'larını düzenle"
+            href="/admin/techniques"
+          />
+          <Panel
+            title="Model Kataloğu"
+            desc="Groq modellerini manuel senkronize et"
+            href="/admin/models"
+          />
+          <Panel
+            title="Kullanıcılar"
+            desc="Kullanıcı listesi ve kullanım istatistikleri"
+            href="/admin/users"
+          />
           <Panel title="Analitik" desc="PostHog funnel + retention" href="/admin/analytics" />
         </div>
 

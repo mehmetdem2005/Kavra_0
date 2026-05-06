@@ -1,23 +1,28 @@
-import { useEffect, useRef, useState } from 'react'
-import { View, Text, Pressable, Alert, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router'
-import { Reader, useReader, type Themes } from '@epubjs-react-native/core'
+import { Reader, useReader } from '@epubjs-react-native/core'
 import { useFileSystem } from '@epubjs-react-native/expo-file-system'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import * as FileSystem from 'expo-file-system'
-import { useBook, useUpdateBookProgress, useStartReadingSession, useEndReadingSession } from '../../src/hooks/useBooks'
-import { Icon } from '../../src/components/ui/Icon'
-import { WordPopup } from '../../src/components/reader/WordPopup'
-import { SentenceTranslator } from '../../src/components/reader/SentenceTranslator'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { useEffect, useRef, useState } from 'react'
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { ReaderToolbar } from '../../src/components/reader/ReaderToolbar'
+import { SentenceTranslator } from '../../src/components/reader/SentenceTranslator'
+import { WordPopup } from '../../src/components/reader/WordPopup'
+import { Icon } from '../../src/components/ui/Icon'
+import {
+  useBook,
+  useEndReadingSession,
+  useStartReadingSession,
+  useUpdateBookProgress,
+} from '../../src/hooks/useBooks'
 import { supabase } from '../../src/lib/supabase'
 
-const THEMES: Themes = {
+const THEMES = {
   light: { body: { background: '#FBF8F0', color: '#1E1B4B' } },
   dark: { body: { background: '#0F0E1F', color: '#FBF8F0' } },
   sepia: { body: { background: '#F5F1E8', color: '#1E1B4B' } },
-}
+} as const
 
 export default function EPUBReader() {
   const router = useRouter()
@@ -75,7 +80,9 @@ export default function EPUBReader() {
       }
     })()
 
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [book?.id, book?.storage_path])
 
   // Start reading session
@@ -83,7 +90,11 @@ export default function EPUBReader() {
     if (!book) return
     startSession.mutate(
       { bookId: book.id, startPosition: book.current_position ?? 0 },
-      { onSuccess: (r) => { sessionIdRef.current = r.session.id } },
+      {
+        onSuccess: (r) => {
+          sessionIdRef.current = r.session.id
+        },
+      },
     )
 
     return () => {
@@ -108,7 +119,7 @@ export default function EPUBReader() {
       const now = Date.now()
       const lastSave = (handleLocationChange as any)._lastSave ?? 0
       if (now - lastSave > 30_000) {
-        (handleLocationChange as any)._lastSave = now
+        ;(handleLocationChange as any)._lastSave = now
         updateProgress.mutate({
           bookId: book.id,
           currentCfi: currentLoc.start.cfi,
@@ -151,7 +162,10 @@ export default function EPUBReader() {
         <Text className="mt-3 text-slate-700 text-center">
           Bu format ({book.format}) için PDF okuyucu kullan
         </Text>
-        <Pressable onPress={() => router.replace(`/reader-pdf/${book.id}`)} className="mt-4 bg-ink-900 rounded-full px-5 py-2.5">
+        <Pressable
+          onPress={() => router.replace(`/reader-pdf/${book.id}`)}
+          className="mt-4 bg-ink-900 rounded-full px-5 py-2.5"
+        >
           <Text className="text-cream-50 font-semibold">PDF Okuyucu Aç</Text>
         </Pressable>
       </View>
@@ -173,11 +187,18 @@ export default function EPUBReader() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView edges={['top']} className="flex-1" style={{ backgroundColor: theme === 'dark' ? '#0F0E1F' : '#FBF8F0' }}>
+      <SafeAreaView
+        edges={['top']}
+        className="flex-1"
+        style={{ backgroundColor: theme === 'dark' ? '#0F0E1F' : '#FBF8F0' }}
+      >
         <Stack.Screen options={{ headerShown: false }} />
 
         {/* Top bar */}
-        <View className="flex-row items-center px-4 py-2" style={{ backgroundColor: theme === 'dark' ? '#0F0E1F' : '#FBF8F0' }}>
+        <View
+          className="flex-row items-center px-4 py-2"
+          style={{ backgroundColor: theme === 'dark' ? '#0F0E1F' : '#FBF8F0' }}
+        >
           <Pressable onPress={() => router.back()} hitSlop={12}>
             <Icon name="chevron-left" size={26} color={theme === 'dark' ? '#FBF8F0' : '#1E1B4B'} />
           </Pressable>
@@ -190,7 +211,10 @@ export default function EPUBReader() {
               {book.title}
             </Text>
             {book.author && (
-              <Text className="text-[10px]" style={{ color: theme === 'dark' ? '#94A3B8' : '#64748B' }}>
+              <Text
+                className="text-[10px]"
+                style={{ color: theme === 'dark' ? '#94A3B8' : '#64748B' }}
+              >
                 {book.author}
               </Text>
             )}
@@ -235,10 +259,16 @@ export default function EPUBReader() {
           className="px-4 py-2 flex-row items-center gap-3"
           style={{ backgroundColor: theme === 'dark' ? '#0F0E1F' : '#FBF8F0' }}
         >
-          <Text className="font-mono text-[10px]" style={{ color: theme === 'dark' ? '#94A3B8' : '#64748B' }}>
+          <Text
+            className="font-mono text-[10px]"
+            style={{ color: theme === 'dark' ? '#94A3B8' : '#64748B' }}
+          >
             %{progressPct}
           </Text>
-          <View className="flex-1 h-0.5" style={{ backgroundColor: theme === 'dark' ? '#2D2A5C' : '#E2E8F0' }}>
+          <View
+            className="flex-1 h-0.5"
+            style={{ backgroundColor: theme === 'dark' ? '#2D2A5C' : '#E2E8F0' }}
+          >
             <View className="h-full bg-amber-500" style={{ width: `${progressPct}%` }} />
           </View>
         </View>
@@ -265,8 +295,12 @@ export default function EPUBReader() {
             targetLang="tr"
             bookId={book.id}
             onClose={() => setSelectedWord(null)}
-            onSavedToVocab={() => { wordsAddedRef.current++ }}
-            onLookedUp={() => { wordsLookedUpRef.current++ }}
+            onSavedToVocab={() => {
+              wordsAddedRef.current++
+            }}
+            onLookedUp={() => {
+              wordsLookedUpRef.current++
+            }}
           />
         )}
 
@@ -277,7 +311,9 @@ export default function EPUBReader() {
             sourceLang={book.language}
             targetLang="tr"
             onClose={() => setSelectedSentence(null)}
-            onTranslated={() => { sentencesTranslatedRef.current++ }}
+            onTranslated={() => {
+              sentencesTranslatedRef.current++
+            }}
           />
         )}
       </SafeAreaView>

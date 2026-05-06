@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
-import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { type FlashcardChoice, previewIntervals } from '@kavra/engine'
 import { Stack, useRouter } from 'expo-router'
-import { useDueFlashcards, useGradeFlashcard, type DueFlashcard } from '../../src/hooks/useReview'
-import { previewIntervals, type FlashcardChoice } from '@kavra/engine'
+import { useEffect, useRef, useState } from 'react'
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { type DueFlashcard, useDueFlashcards, useGradeFlashcard } from '../../src/hooks/useReview'
 
 export default function ReviewSession() {
   const router = useRouter()
@@ -163,9 +163,7 @@ export default function ReviewSession() {
                 disabled={grade.isPending}
               />
             </View>
-            <Text className="text-center text-slate-400 text-xs mt-3">
-              Sonraki tekrar
-            </Text>
+            <Text className="text-center text-slate-400 text-xs mt-3">Sonraki tekrar</Text>
           </View>
         )}
       </View>
@@ -174,7 +172,11 @@ export default function ReviewSession() {
 }
 
 function GradeButton({
-  label, interval, color, onPress, disabled,
+  label,
+  interval,
+  color,
+  onPress,
+  disabled,
 }: {
   label: string
   interval: string

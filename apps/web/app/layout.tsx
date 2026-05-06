@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { QueryProvider } from '../lib/query-provider'
 import { Toaster } from 'sonner'
+import { QueryProvider } from '../lib/query-provider'
 
 export const metadata: Metadata = {
   title: 'Kavra — Kavra. Her şeyi.',

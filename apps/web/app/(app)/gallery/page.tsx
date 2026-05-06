@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
-import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
+import { Bookmark, Eye, FileText } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
 import { apiFetch } from '../../../lib/api'
-import { Eye, Bookmark, FileText } from 'lucide-react'
 
 const CATEGORIES = [
   { value: null, label: 'Hepsi', emoji: '✨' },
@@ -28,11 +28,12 @@ const SORTS = [
 
 export default function GalleryPage() {
   const [category, setCategory] = useState<string | null>(null)
-  const [sort, setSort] = useState<typeof SORTS[number]['value']>('popular')
+  const [sort, setSort] = useState<(typeof SORTS)[number]['value']>('popular')
 
   const { data, isLoading } = useQuery({
     queryKey: ['gallery', category, sort],
-    queryFn: () => apiFetch<any>(`/api/gallery?sort=${sort}${category ? `&category=${category}` : ''}`),
+    queryFn: () =>
+      apiFetch<any>(`/api/gallery?sort=${sort}${category ? `&category=${category}` : ''}`),
   })
 
   return (
@@ -50,7 +51,9 @@ export default function GalleryPage() {
             key={s.value}
             onClick={() => setSort(s.value)}
             className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
-              sort === s.value ? 'bg-ink-900 text-cream-50' : 'bg-white border border-slate-200 text-slate-600'
+              sort === s.value
+                ? 'bg-ink-900 text-cream-50'
+                : 'bg-white border border-slate-200 text-slate-600'
             }`}
           >
             {s.label}
@@ -60,19 +63,23 @@ export default function GalleryPage() {
 
       <div className="flex flex-wrap gap-1.5 mb-6">
         {CATEGORIES.map((c) => {
-          const count = c.value ? data?.categories?.[c.value] ?? 0 : null
+          const count = c.value ? (data?.categories?.[c.value] ?? 0) : null
           return (
             <button
               key={c.value ?? 'all'}
               onClick={() => setCategory(c.value)}
               className={`px-2.5 py-1 rounded-full text-[11px] font-semibold flex items-center gap-1 ${
-                category === c.value ? 'bg-amber-500 text-ink-900' : 'bg-white border border-slate-200 text-slate-600'
+                category === c.value
+                  ? 'bg-amber-500 text-ink-900'
+                  : 'bg-white border border-slate-200 text-slate-600'
               }`}
             >
               <span>{c.emoji}</span>
               <span>{c.label}</span>
               {count !== null && count > 0 && (
-                <span className={`text-[9px] font-mono ${category === c.value ? 'text-ink-900/60' : 'text-slate-400'}`}>
+                <span
+                  className={`text-[9px] font-mono ${category === c.value ? 'text-ink-900/60' : 'text-slate-400'}`}
+                >
                   {count}
                 </span>
               )}
@@ -84,7 +91,10 @@ export default function GalleryPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-3xl p-5 border border-slate-100 animate-pulse h-32" />
+            <div
+              key={i}
+              className="bg-white rounded-3xl p-5 border border-slate-100 animate-pulse h-32"
+            />
           ))}
         </div>
       ) : (

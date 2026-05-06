@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '../lib/supabase'
-import { apiFetch } from '../lib/api'
 import * as FileSystem from 'expo-file-system'
+import { apiFetch } from '../lib/api'
+import { supabase } from '../lib/supabase'
 
 export interface Document {
   id: string
@@ -35,8 +35,7 @@ export interface GeneratedFlashcard {
   created_at: string
 }
 
-const PDF_BASE_URL =
-  process.env.EXPO_PUBLIC_PDF_BASE_URL ?? 'http://localhost:4003'
+const PDF_BASE_URL = process.env.EXPO_PUBLIC_PDF_BASE_URL ?? 'http://localhost:4003'
 
 export function useDocuments() {
   return useQuery({
@@ -57,11 +56,7 @@ export function useDocument(id: string | null) {
     queryKey: ['document', id],
     enabled: !!id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('documents')
-        .select('*')
-        .eq('id', id!)
-        .single()
+      const { data, error } = await supabase.from('documents').select('*').eq('id', id!).single()
       if (error) throw error
       return data as Document
     },

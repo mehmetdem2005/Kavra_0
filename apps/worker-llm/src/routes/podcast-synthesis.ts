@@ -1,8 +1,8 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { supabase, verifyUserToken } from '../supabase.js'
 import { edgeTTS } from '../edge-tts.js'
-import { elevenlabsSingle, ELEVENLABS_VOICES } from '../lib/elevenlabs.js'
+import { ELEVENLABS_VOICES, elevenlabsSingle } from '../lib/elevenlabs.js'
+import { supabase, verifyUserToken } from '../supabase.js'
 
 /**
  * Podcast Synthesis Routes
@@ -27,8 +27,8 @@ const SynthesizePodcastSchema = z.object({
 
 const VOICE_MAP: Record<string, Record<string, string>> = {
   tr: {
-    A: 'tr-TR-EmelNeural',     // Kadın
-    B: 'tr-TR-AhmetNeural',    // Erkek
+    A: 'tr-TR-EmelNeural', // Kadın
+    B: 'tr-TR-AhmetNeural', // Erkek
   },
   en: {
     A: 'en-US-AriaNeural',
@@ -53,7 +53,6 @@ const VOICE_MAP: Record<string, Record<string, string>> = {
 }
 
 export async function podcastSynthesisRoutes(fastify: FastifyInstance) {
-
   /** POST /api/podcast/synthesize */
   fastify.post('/api/podcast/synthesize', async (req, reply) => {
     const userId = await verifyUserToken(req.headers.authorization)
@@ -89,8 +88,8 @@ export async function podcastSynthesisRoutes(fastify: FastifyInstance) {
     if (!script) return reply.code(400).send({ error: 'no_script' })
 
     const turns = script.turns as Array<{ speaker: 'A' | 'B'; text: string }>
-    const language = script.language ?? 'tr'
-    const voices = VOICE_MAP[language] ?? VOICE_MAP.tr
+    const language = (script.language ?? 'tr') as keyof typeof VOICE_MAP
+    const voices = VOICE_MAP[language] ?? VOICE_MAP.tr!
 
     // Voice provider seçimi: Pro+ (lifetime) ElevenLabs alır, normal Pro Edge TTS
     const { data: ent } = await supabase
@@ -102,8 +101,8 @@ export async function podcastSynthesisRoutes(fastify: FastifyInstance) {
     const isPro = ent?.is_pro ?? false
     const isLifetime = ent?.metadata?.product_id?.includes('lifetime') ?? false
     const useElevenLabs = isLifetime || (parsed.data as any).voiceProvider === 'elevenlabs'
-    const voiceProvider: 'edge' | 'elevenlabs' = useElevenLabs && process.env.ELEVENLABS_API_KEY
-      ? 'elevenlabs' : 'edge'
+    const voiceProvider: 'edge' | 'elevenlabs' =
+      useElevenLabs && process.env.ELEVENLABS_API_KEY ? 'elevenlabs' : 'edge'
 
     fastify.log.info({ userId, voiceProvider, isLifetime, turns: turns.length }, 'Podcast synth')
 
@@ -111,16 +110,19 @@ export async function podcastSynthesisRoutes(fastify: FastifyInstance) {
     setImmediate(async () => {
       try {
         // Mark synthesizing
-        await supabase
-          .from('generated_content')
-          .update({ status: 'processing' })
-          .eq('id', gen.id)
+        await supabase.from('generated_content').update({ status: 'processing' }).eq('id', gen.id)
 
-        const segments: { offset: number; durationMs: number; speaker: 'A' | 'B'; text: string; storagePath: string }[] = []
+        const segments: {
+          offset: number
+          durationMs: number
+          speaker: 'A' | 'B'
+          text: string
+          storagePath: string
+        }[] = []
         let totalOffset = 0
 
         for (let i = 0; i < turns.length; i++) {
-          const turn = turns[i]
+          const turn = turns[i]!
           const voice = voices[turn.speaker]
 
           // Voice synthesis (provider switch)
@@ -128,12 +130,12 @@ export async function podcastSynthesisRoutes(fastify: FastifyInstance) {
           let durationMs: number
 
           if (voiceProvider === 'elevenlabs') {
-            const elVoice = (ELEVENLABS_VOICES[language] ?? ELEVENLABS_VOICES.en)[turn.speaker]
+            const elVoice = (ELEVENLABS_VOICES[language] ?? ELEVENLABS_VOICES.en!)[turn.speaker]
             audio = await elevenlabsSingle(turn.text, elVoice)
-            durationMs = Math.round((audio.length / 16000) * 1000)        // 128kbps mp3
+            durationMs = Math.round((audio.length / 16000) * 1000) // 128kbps mp3
           } else {
             audio = await edgeTTS({ text: turn.text, voice })
-            durationMs = Math.round((audio.length / 6000) * 1000)         // 48kbps mp3
+            durationMs = Math.round((audio.length / 6000) * 1000) // 48kbps mp3
           }
 
           // Upload segment
@@ -151,7 +153,7 @@ export async function podcastSynthesisRoutes(fastify: FastifyInstance) {
             storagePath: segPath,
           })
 
-          totalOffset += durationMs + 200    // 200ms inter-turn pause
+          totalOffset += durationMs + 200 // 200ms inter-turn pause
         }
 
         // Manifest dosyası — frontend sırayla oynatır
@@ -171,11 +173,12 @@ export async function podcastSynthesisRoutes(fastify: FastifyInstance) {
           })),
         }
 
-        await supabase.storage.from('notebook-outputs').upload(
-          manifestPath,
-          Buffer.from(JSON.stringify(manifest)),
-          { contentType: 'application/json', upsert: true },
-        )
+        await supabase.storage
+          .from('notebook-outputs')
+          .upload(manifestPath, Buffer.from(JSON.stringify(manifest)), {
+            contentType: 'application/json',
+            upsert: true,
+          })
 
         // Generated content'i güncelle
         await supabase
@@ -187,7 +190,6 @@ export async function podcastSynthesisRoutes(fastify: FastifyInstance) {
             ready_at: new Date().toISOString(),
           })
           .eq('id', gen.id)
-
       } catch (err: any) {
         await supabase
           .from('generated_content')
@@ -221,7 +223,9 @@ export async function podcastSynthesisRoutes(fastify: FastifyInstance) {
     }
 
     // Manifest indir
-    const { data: blob } = await supabase.storage.from('notebook-outputs').download(gen.storage_path)
+    const { data: blob } = await supabase.storage
+      .from('notebook-outputs')
+      .download(gen.storage_path)
     if (!blob) return reply.code(404).send({ error: 'manifest_not_found' })
 
     const manifest = JSON.parse(await blob.text())

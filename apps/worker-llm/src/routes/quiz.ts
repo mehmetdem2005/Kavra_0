@@ -1,14 +1,16 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { groqChatJSON } from '../groq.js'
-import { supabase, verifyUserToken, getActiveGroqKey } from '../supabase.js'
+import { getActiveGroqKey, supabase, verifyUserToken } from '../supabase.js'
 
 const GenerateSchema = z.object({
   source: z.enum(['concept', 'document', 'subject']),
   sourceId: z.string().uuid(),
   questionCount: z.number().int().min(3).max(20).default(8),
   difficulty: z.enum(['easy', 'medium', 'hard', 'mixed']).default('mixed'),
-  types: z.array(z.enum(['multiple_choice', 'true_false', 'open_ended', 'fill_blank'])).default(['multiple_choice', 'true_false']),
+  types: z
+    .array(z.enum(['multiple_choice', 'true_false', 'open_ended', 'fill_blank']))
+    .default(['multiple_choice', 'true_false']),
 })
 
 const SubmitSchema = z.object({
@@ -112,10 +114,13 @@ export async function quizRoutes(fastify: FastifyInstance) {
     }
 
     const difficultyDesc =
-      difficulty === 'easy' ? 'Kolay seviye, temel hatırlama'
-      : difficulty === 'hard' ? 'Zorlu, uygulama ve analiz seviyesi'
-      : difficulty === 'mixed' ? 'Karışık zorluk: bazı kolay, bazı orta, bazı zor'
-      : 'Orta seviye, anlama'
+      difficulty === 'easy'
+        ? 'Kolay seviye, temel hatırlama'
+        : difficulty === 'hard'
+          ? 'Zorlu, uygulama ve analiz seviyesi'
+          : difficulty === 'mixed'
+            ? 'Karışık zorluk: bazı kolay, bazı orta, bazı zor'
+            : 'Orta seviye, anlama'
 
     const typesDesc = types.join(', ')
 
@@ -315,5 +320,8 @@ Kurallar:
 }
 
 function normalizeAnswer(s: string): string {
-  return s.toLowerCase().trim().replace(/[.,!?]/g, '')
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[.,!?]/g, '')
 }

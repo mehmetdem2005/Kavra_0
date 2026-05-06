@@ -13,7 +13,10 @@ const CreateNotebookSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(1000).optional(),
   emoji: z.string().max(8).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
   language: z.string().length(2).default('tr'),
 })
 
@@ -21,13 +24,15 @@ const UpdateNotebookSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   description: z.string().max(1000).optional(),
   emoji: z.string().max(8).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
   is_archived: z.boolean().optional(),
   is_pinned: z.boolean().optional(),
 })
 
 export async function notebooksRoutes(fastify: FastifyInstance) {
-
   /** GET /api/notebooks */
   fastify.get<{ Querystring: { archived?: string } }>('/api/notebooks', async (req, reply) => {
     const userId = await verifyUserToken(req.headers.authorization)
@@ -69,7 +74,9 @@ export async function notebooksRoutes(fastify: FastifyInstance) {
 
     const { data: sources } = await supabase
       .from('notebook_sources')
-      .select('id, source_type, title, status, chunk_count, language, word_count, created_at, metadata, external_url')
+      .select(
+        'id, source_type, title, status, chunk_count, language, word_count, created_at, metadata, external_url',
+      )
       .eq('notebook_id', req.params.id)
       .order('created_at', { ascending: false })
 
@@ -97,7 +104,10 @@ export async function notebooksRoutes(fastify: FastifyInstance) {
 
     // Free tier limit: 3 notebook
     const { data: ent } = await supabase
-      .from('user_entitlements').select('is_pro').eq('user_id', userId).single()
+      .from('user_entitlements')
+      .select('is_pro')
+      .eq('user_id', userId)
+      .single()
 
     if (!ent?.is_pro) {
       const { count } = await supabase
@@ -109,7 +119,7 @@ export async function notebooksRoutes(fastify: FastifyInstance) {
       if ((count ?? 0) >= 3) {
         return reply.code(403).send({
           error: 'free_limit',
-          message: 'Free üyeler 3 aktif defter tutabilir. Pro\'ya geç sınırsız aç.',
+          message: "Free üyeler 3 aktif defter tutabilir. Pro'ya geç sınırsız aç.",
         })
       }
     }
@@ -176,11 +186,7 @@ export async function notebooksRoutes(fastify: FastifyInstance) {
       await supabase.storage.from('notebook-outputs').remove(outPaths)
     }
 
-    await supabase
-      .from('notebooks')
-      .delete()
-      .eq('id', req.params.id)
-      .eq('user_id', userId)
+    await supabase.from('notebooks').delete().eq('id', req.params.id).eq('user_id', userId)
 
     return { ok: true }
   })

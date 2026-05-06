@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { View, TextInput, Pressable, Text, ActivityIndicator } from 'react-native'
-import { MicButton } from '../voice/MicButton'
+import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native'
 import { useVoiceInput } from '../../hooks/useVoiceInput'
+import { MicButton } from '../voice/MicButton'
 
 interface Props {
   onSend: (text: string) => void
@@ -14,7 +14,13 @@ interface Props {
 }
 
 export function ChatInput({
-  onSend, onCancel, isStreaming, placeholder, disabled, lessonId, voiceLanguage,
+  onSend,
+  onCancel,
+  isStreaming,
+  placeholder,
+  disabled,
+  lessonId,
+  voiceLanguage,
 }: Props) {
   const [text, setText] = useState('')
 
@@ -54,7 +60,11 @@ export function ChatInput({
           <TextInput
             value={text}
             onChangeText={setText}
-            placeholder={isRecording ? '🎤 Dinliyorum...' : placeholder ?? 'Mesajını yaz veya mikrofona bas...'}
+            placeholder={
+              isRecording
+                ? '🎤 Dinliyorum...'
+                : (placeholder ?? 'Mesajını yaz veya mikrofona bas...')
+            }
             placeholderTextColor={isRecording ? '#EF4444' : '#94A3B8'}
             multiline
             className="text-base text-brand-950 max-h-32"

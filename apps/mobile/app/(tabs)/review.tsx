@@ -1,6 +1,6 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDueFlashcards, useReviewStats } from '../../src/hooks/useReview'
 
 export default function ReviewTab() {
@@ -12,9 +12,7 @@ export default function ReviewTab() {
     <SafeAreaView className="flex-1 bg-ink-50">
       <ScrollView className="flex-1 px-5 pt-4">
         <Text className="text-3xl font-serif text-brand-950">Tekrar</Text>
-        <Text className="text-slate-500 mt-1 mb-6">
-          Aralıklı tekrar ile bilgini kalıcı yap.
-        </Text>
+        <Text className="text-slate-500 mt-1 mb-6">Aralıklı tekrar ile bilgini kalıcı yap.</Text>
 
         {/* Stats */}
         {sLoading ? (
@@ -73,9 +71,7 @@ export default function ReviewTab() {
           <Text style={{ fontSize: 28 }}>📝</Text>
           <View className="flex-1">
             <Text className="font-semibold text-brand-950">Quiz Üret</Text>
-            <Text className="text-slate-500 text-xs">
-              Bir konuya gir, "Quiz" butonuna bas
-            </Text>
+            <Text className="text-slate-500 text-xs">Bir konuya gir, "Quiz" butonuna bas</Text>
           </View>
           <Text className="text-slate-400 text-xl">›</Text>
         </Pressable>

@@ -1,11 +1,25 @@
 'use client'
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { getSupabaseBrowserClient } from '../../lib/supabase/client'
+import { useRouter, useSearchParams } from 'next/navigation'
+import * as React from 'react'
+import { Suspense as SuspenseRaw, useState } from 'react'
 import { toast } from 'sonner'
+import { getSupabaseBrowserClient } from '../../lib/supabase/client'
+
+const Suspense = SuspenseRaw as unknown as React.ComponentType<{
+  fallback?: React.ReactNode
+  children?: React.ReactNode
+}>
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginInner />
+    </Suspense>
+  )
+}
+
+function LoginInner() {
   const router = useRouter()
   const params = useSearchParams()
   const next = params.get('next') ?? '/library'
@@ -67,10 +81,22 @@ export default function LoginPage() {
             className="w-full bg-white border border-slate-200 rounded-full py-2.5 flex items-center justify-center gap-2 hover:border-slate-300 mb-3"
           >
             <svg width="16" height="16" viewBox="0 0 16 16">
-              <path d="M15.68 8.18c0-.6-.05-1.18-.15-1.73H8v3.27h4.31c-.19.99-.74 1.83-1.58 2.4v2H13.4c1.6-1.48 2.28-3.65 2.28-5.94z" fill="#4285F4"/>
-              <path d="M8 16c2.16 0 3.97-.71 5.3-1.93l-2.67-2c-.74.5-1.69.79-2.63.79-2.02 0-3.74-1.36-4.35-3.2H1.06v2.06A8 8 0 0 0 8 16z" fill="#34A853"/>
-              <path d="M3.65 9.66A4.8 4.8 0 0 1 3.4 8c0-.58.1-1.13.25-1.66V4.28H1.06A8 8 0 0 0 0 8c0 1.29.31 2.51.86 3.6l2.79-1.94z" fill="#FBBC05"/>
-              <path d="M8 3.16c1.18 0 2.23.4 3.06 1.2l2.3-2.3C11.97.79 10.16 0 8 0a8 8 0 0 0-7.14 4.4l2.79 2.16C4.26 4.52 5.98 3.16 8 3.16z" fill="#EA4335"/>
+              <path
+                d="M15.68 8.18c0-.6-.05-1.18-.15-1.73H8v3.27h4.31c-.19.99-.74 1.83-1.58 2.4v2H13.4c1.6-1.48 2.28-3.65 2.28-5.94z"
+                fill="#4285F4"
+              />
+              <path
+                d="M8 16c2.16 0 3.97-.71 5.3-1.93l-2.67-2c-.74.5-1.69.79-2.63.79-2.02 0-3.74-1.36-4.35-3.2H1.06v2.06A8 8 0 0 0 8 16z"
+                fill="#34A853"
+              />
+              <path
+                d="M3.65 9.66A4.8 4.8 0 0 1 3.4 8c0-.58.1-1.13.25-1.66V4.28H1.06A8 8 0 0 0 0 8c0 1.29.31 2.51.86 3.6l2.79-1.94z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M8 3.16c1.18 0 2.23.4 3.06 1.2l2.3-2.3C11.97.79 10.16 0 8 0a8 8 0 0 0-7.14 4.4l2.79 2.16C4.26 4.52 5.98 3.16 8 3.16z"
+                fill="#EA4335"
+              />
             </svg>
             <span className="text-sm font-semibold text-ink-900">Google ile devam et</span>
           </button>

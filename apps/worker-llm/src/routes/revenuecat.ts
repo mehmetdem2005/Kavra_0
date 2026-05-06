@@ -1,5 +1,5 @@
-import type { FastifyInstance } from 'fastify'
 import crypto from 'crypto'
+import type { FastifyInstance } from 'fastify'
 import { supabase } from '../supabase.js'
 
 /**
@@ -38,11 +38,11 @@ interface RevenueCatEvent {
     type: string
     id: string
     event_timestamp_ms: number
-    app_user_id: string                         // Kavra user_id
+    app_user_id: string // Kavra user_id
     aliases?: string[]
     original_app_user_id?: string
 
-    product_id: string                           // 'kavra_pro_monthly'
+    product_id: string // 'kavra_pro_monthly'
     period_type?: 'NORMAL' | 'TRIAL' | 'INTRO'
     purchased_at_ms?: number
     expiration_at_ms?: number | null
@@ -59,7 +59,7 @@ interface RevenueCatEvent {
     transaction_id?: string
     original_transaction_id?: string
 
-    cancel_reason?: string                       // CUSTOMER_SUPPORT, BILLING_ERROR, etc.
+    cancel_reason?: string // CUSTOMER_SUPPORT, BILLING_ERROR, etc.
     expiration_reason?: string
 
     entitlement_id?: string
@@ -68,9 +68,9 @@ interface RevenueCatEvent {
 }
 
 const PRODUCT_TO_TIER: Record<string, { tier: string; durationDays: number }> = {
-  'kavra_pro_monthly': { tier: 'pro', durationDays: 31 },
-  'kavra_pro_yearly': { tier: 'pro', durationDays: 366 },
-  'kavra_pro_lifetime': { tier: 'pro', durationDays: 36500 },
+  kavra_pro_monthly: { tier: 'pro', durationDays: 31 },
+  kavra_pro_yearly: { tier: 'pro', durationDays: 366 },
+  kavra_pro_lifetime: { tier: 'pro', durationDays: 36500 },
   // App Store ve Play Store farklı id kullanırsa
   'app.kavra.pro.monthly': { tier: 'pro', durationDays: 31 },
   'app.kavra.pro.yearly': { tier: 'pro', durationDays: 366 },
@@ -82,7 +82,6 @@ function verifyAuthHeader(header: string | undefined): boolean {
 }
 
 export async function revenueCatRoutes(fastify: FastifyInstance) {
-
   /** POST /api/revenuecat/webhook */
   fastify.post<{ Body: RevenueCatEvent }>('/api/revenuecat/webhook', async (req, reply) => {
     // Auth
@@ -114,15 +113,17 @@ export async function revenueCatRoutes(fastify: FastifyInstance) {
             ? new Date(evt.expiration_at_ms).toISOString()
             : new Date(Date.now() + productInfo.durationDays * 24 * 60 * 60 * 1000).toISOString()
 
-          await supabase
-            .from('user_entitlements')
-            .upsert({
+          await supabase.from('user_entitlements').upsert(
+            {
               user_id: userId,
               tier: productInfo.tier,
               is_pro: true,
               valid_until: validUntil,
-              source: evt.store === 'APP_STORE' ? 'app_store'
-                    : evt.store === 'PLAY_STORE' ? 'play_store'
+              source:
+                evt.store === 'APP_STORE'
+                  ? 'app_store'
+                  : evt.store === 'PLAY_STORE'
+                    ? 'play_store'
                     : 'revenuecat',
               external_subscription_id: evt.original_transaction_id ?? evt.transaction_id,
               metadata: {
@@ -133,7 +134,9 @@ export async function revenueCatRoutes(fastify: FastifyInstance) {
                 price: evt.price,
               },
               updated_at: new Date().toISOString(),
-            }, { onConflict: 'user_id' })
+            },
+            { onConflict: 'user_id' },
+          )
 
           break
         }
@@ -202,18 +205,21 @@ export async function revenueCatRoutes(fastify: FastifyInstance) {
       }
 
       // Log to audit table
-      await supabase.from('subscription_events').insert({
-        user_id: userId,
-        event_type: evt.type,
-        provider: 'revenuecat',
-        external_id: evt.id,
-        product_id: evt.product_id,
-        store: evt.store,
-        metadata: evt,
-      }).then(() => {}).catch(() => {})         // best-effort
+      await Promise.resolve(
+        supabase.from('subscription_events').insert({
+          user_id: userId,
+          event_type: evt.type,
+          provider: 'revenuecat',
+          external_id: evt.id,
+          product_id: evt.product_id,
+          store: evt.store,
+          metadata: evt,
+        }),
+      )
+        .then(() => {})
+        .catch(() => {}) // best-effort
 
       return { ok: true }
-
     } catch (err: any) {
       fastify.log.error(err, 'RevenueCat webhook hata')
       return reply.code(500).send({ error: err.message })

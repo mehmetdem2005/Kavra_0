@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
 import * as Linking from 'expo-linking'
 import { useRouter } from 'expo-router'
+import { useEffect } from 'react'
 import { Alert } from 'react-native'
 import { supabase } from './supabase'
 

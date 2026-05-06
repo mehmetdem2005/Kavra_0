@@ -29,7 +29,7 @@ const UploadLibrarySchema = z.object({
   language: z.string().default('tr'),
   subjectTags: z.array(z.string()).default([]),
   isProOnly: z.boolean().default(false),
-  storagePath: z.string(),                    // pre-uploaded
+  storagePath: z.string(), // pre-uploaded
   fileSize: z.number().int().positive(),
   pageCount: z.number().int().positive().optional(),
   coverImageUrl: z.string().url().optional(),
@@ -78,7 +78,6 @@ async function logAudit(
 }
 
 export async function adminRoutes(fastify: FastifyInstance) {
-
   // ============ DASHBOARD ============
 
   /** GET /api/admin/dashboard — özet istatistikler */
@@ -101,8 +100,9 @@ export async function adminRoutes(fastify: FastifyInstance) {
       .select('*', { count: 'exact', head: true })
       .gte('created_at', weekAgo)
 
-    const proCount = (subscriptions.data ?? []).filter((s: any) =>
-      ['pro_monthly', 'pro_yearly', 'pro_lifetime'].includes(s.tier) && s.status === 'active'
+    const proCount = (subscriptions.data ?? []).filter(
+      (s: any) =>
+        ['pro_monthly', 'pro_yearly', 'pro_lifetime'].includes(s.tier) && s.status === 'active',
     ).length
 
     return {
@@ -128,16 +128,19 @@ export async function adminRoutes(fastify: FastifyInstance) {
       const auth = await requireAdmin(req.headers.authorization)
       if (!auth.ok) return reply.code(403).send({ error: auth.error })
 
-      const limit = Math.min(parseInt(req.query.limit ?? '50'), 100)
-      const offset = parseInt(req.query.offset ?? '0')
+      const limit = Math.min(Number.parseInt(req.query.limit ?? '50'), 100)
+      const offset = Number.parseInt(req.query.offset ?? '0')
 
       let query = supabase
         .from('profiles')
-        .select(`
+        .select(
+          `
           id, email, full_name, role, banned_at, created_at,
           phone_number, phone_verified_at, auth_providers,
           subscriptions(tier, status, current_period_end)
-        `, { count: 'exact' })
+        `,
+          { count: 'exact' },
+        )
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1)
 
@@ -169,10 +172,23 @@ export async function adminRoutes(fastify: FastifyInstance) {
     if (!profile) return reply.code(404).send({ error: 'not_found' })
 
     const [lessons, subjects, documents, streaks] = await Promise.all([
-      supabase.from('lessons').select('*', { count: 'exact', head: true }).eq('user_id', req.params.id),
-      supabase.from('subjects').select('*', { count: 'exact', head: true }).eq('user_id', req.params.id),
-      supabase.from('documents').select('*', { count: 'exact', head: true }).eq('user_id', req.params.id),
-      supabase.from('streaks').select('current_streak, longest_streak').eq('user_id', req.params.id).maybeSingle(),
+      supabase
+        .from('lessons')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', req.params.id),
+      supabase
+        .from('subjects')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', req.params.id),
+      supabase
+        .from('documents')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', req.params.id),
+      supabase
+        .from('streaks')
+        .select('current_streak, longest_streak')
+        .eq('user_id', req.params.id)
+        .maybeSingle(),
     ])
 
     return {
@@ -205,9 +221,16 @@ export async function adminRoutes(fastify: FastifyInstance) {
 
     if (error) return reply.code(500).send({ error: error.message })
 
-    await logAudit(auth.userId!, 'user_role_changed', 'user', parsed.data.userId, {
-      newRole: parsed.data.newRole,
-    }, req.ip)
+    await logAudit(
+      auth.userId!,
+      'user_role_changed',
+      'user',
+      parsed.data.userId,
+      {
+        newRole: parsed.data.newRole,
+      },
+      req.ip,
+    )
 
     return { ok: true }
   })
@@ -231,9 +254,16 @@ export async function adminRoutes(fastify: FastifyInstance) {
       })
       .eq('id', parsed.data.userId)
 
-    await logAudit(auth.userId!, 'user_banned', 'user', parsed.data.userId, {
-      reason: parsed.data.reason,
-    }, req.ip)
+    await logAudit(
+      auth.userId!,
+      'user_banned',
+      'user',
+      parsed.data.userId,
+      {
+        reason: parsed.data.reason,
+      },
+      req.ip,
+    )
 
     return { ok: true }
   })
@@ -263,9 +293,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
     if (!auth.ok) return reply.code(403).send({ error: auth.error })
 
     const fileName = `${Date.now()}-${crypto.randomUUID()}.pdf`
-    const { data, error } = await supabase.storage
-      .from('library')
-      .createSignedUploadUrl(fileName)
+    const { data, error } = await supabase.storage.from('library').createSignedUploadUrl(fileName)
 
     if (error) return reply.code(500).send({ error: error.message })
 
@@ -305,10 +333,17 @@ export async function adminRoutes(fastify: FastifyInstance) {
 
     if (error) return reply.code(500).send({ error: error.message })
 
-    await logAudit(auth.userId!, 'library_uploaded', 'document', data.id, {
-      title: data.title,
-      isProOnly: data.is_pro_only,
-    }, req.ip)
+    await logAudit(
+      auth.userId!,
+      'library_uploaded',
+      'document',
+      data.id,
+      {
+        title: data.title,
+        isProOnly: data.is_pro_only,
+      },
+      req.ip,
+    )
 
     return { document: data }
   })
@@ -340,9 +375,16 @@ export async function adminRoutes(fastify: FastifyInstance) {
     if (doc) {
       await supabase.storage.from('library').remove([doc.file_path])
       await supabase.from('library_documents').delete().eq('id', req.params.id)
-      await logAudit(auth.userId!, 'library_deleted', 'document', req.params.id, {
-        title: doc.title,
-      }, req.ip)
+      await logAudit(
+        auth.userId!,
+        'library_deleted',
+        'document',
+        req.params.id,
+        {
+          title: doc.title,
+        },
+        req.ip,
+      )
     }
 
     return { ok: true }
@@ -396,7 +438,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
     const auth = await requireAdmin(req.headers.authorization)
     if (!auth.ok) return reply.code(403).send({ error: auth.error })
 
-    const limit = Math.min(parseInt(req.query.limit ?? '100'), 500)
+    const limit = Math.min(Number.parseInt(req.query.limit ?? '100'), 500)
 
     const { data } = await supabase
       .from('admin_audit_logs')

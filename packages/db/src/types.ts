@@ -4,11 +4,37 @@
 
 export type Json = string | number | boolean | null | { [k: string]: Json | undefined } | Json[]
 
+// Placeholder rows kullanır, geleneksel `unknown` yerine `any`:
+// gerçek tip üretilene kadar çağrı tarafında sürekli cast yapmaya gerek kalmaz.
+type GenericRow = Record<string, any>
+type GenericRelationship = {
+  foreignKeyName: string
+  columns: string[]
+  isOneToOne?: boolean
+  referencedRelation: string
+  referencedColumns: string[]
+}
+type GenericTable = {
+  Row: GenericRow
+  Insert: GenericRow
+  Update: GenericRow
+  Relationships: GenericRelationship[]
+}
+type GenericView = {
+  Row: GenericRow
+  Relationships: GenericRelationship[]
+}
+type GenericFunction = {
+  Args: GenericRow
+  Returns: any
+}
+
 export interface Database {
   public: {
-    Tables: Record<string, { Row: Record<string, unknown>; Insert: Record<string, unknown>; Update: Record<string, unknown> }>
-    Views: Record<string, { Row: Record<string, unknown> }>
-    Functions: Record<string, { Args: Record<string, unknown>; Returns: unknown }>
-    Enums: Record<string, string>
+    Tables: { [key: string]: GenericTable }
+    Views: { [key: string]: GenericView }
+    Functions: { [key: string]: GenericFunction }
+    Enums: { [key: string]: string }
+    CompositeTypes: { [key: string]: GenericRow }
   }
 }

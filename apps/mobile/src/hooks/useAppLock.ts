@@ -1,14 +1,14 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
-import { AppState, type AppStateStatus } from 'react-native'
-import * as LocalAuthentication from 'expo-local-authentication'
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as LocalAuthentication from 'expo-local-authentication'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { AppState, type AppStateStatus } from 'react-native'
+import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 interface AppLockSettings {
   enabled: boolean
   method: 'biometric' | 'pin'
-  timeoutSeconds: number  // 0 = anında, >0 = N saniye background sonrası
+  timeoutSeconds: number // 0 = anında, >0 = N saniye background sonrası
 }
 
 interface AppLockStore {
@@ -40,8 +40,7 @@ export const useAppLockStore = create<AppLockStore>()(
       },
       isLocked: false,
       lastBackgroundedAt: null,
-      setSettings: (s) =>
-        set((state) => ({ settings: { ...state.settings, ...s } })),
+      setSettings: (s) => set((state) => ({ settings: { ...state.settings, ...s } })),
       lock: () => {
         if (get().settings.enabled) set({ isLocked: true })
       },
@@ -86,7 +85,7 @@ export function useAppLock() {
         // Geri geliyor
         const elapsed = lastBackgroundedAt
           ? (Date.now() - lastBackgroundedAt) / 1000
-          : Infinity
+          : Number.POSITIVE_INFINITY
 
         if (elapsed >= settings.timeoutSeconds) {
           lock()
@@ -119,7 +118,7 @@ export async function tryBiometricUnlock(): Promise<{ success: boolean; error?: 
     }
 
     const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: 'Kavra\'yı aç',
+      promptMessage: "Kavra'yı aç",
       cancelLabel: 'İptal',
       fallbackLabel: 'Şifre kullan',
       disableDeviceFallback: false,

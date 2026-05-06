@@ -19,10 +19,7 @@ export function useVoiceClones() {
   return useQuery({
     queryKey: ['voice-clones'],
     queryFn: async () => {
-      const { clones } = await apiFetch<{ clones: VoiceClone[] }>(
-        '/api/voice-clones',
-        {},
-      )
+      const { clones } = await apiFetch<{ clones: VoiceClone[] }>('/api/voice-clones', {})
       return clones
     },
   })
@@ -39,8 +36,8 @@ export function useCreateVoiceClone() {
 
   return useMutation({
     mutationFn: async (input: {
-      audioUri: string             // local file uri
-      audioBlob?: Blob             // web için
+      audioUri: string // local file uri
+      audioBlob?: Blob // web için
       name: string
       description?: string
       referenceText: string
@@ -71,20 +68,17 @@ export function useCreateVoiceClone() {
       if (!uploadRes.ok) throw new Error(`Upload başarısız: ${uploadRes.status}`)
 
       // 3. Klonu oluştur
-      const result = await apiFetch<{ clone: VoiceClone }>(
-        `${VOICE_BASE}/api/voice-clones`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            name: input.name,
-            description: input.description,
-            storagePath: uploadInfo.storagePath,
-            durationSeconds: 30, // estimate; gerçek validation server'da
-            referenceText: input.referenceText,
-            language: input.language ?? 'tr',
-          }),
-        },
-      )
+      const result = await apiFetch<{ clone: VoiceClone }>(`${VOICE_BASE}/api/voice-clones`, {
+        method: 'POST',
+        body: JSON.stringify({
+          name: input.name,
+          description: input.description,
+          storagePath: uploadInfo.storagePath,
+          durationSeconds: 30, // estimate; gerçek validation server'da
+          referenceText: input.referenceText,
+          language: input.language ?? 'tr',
+        }),
+      })
 
       return result.clone
     },

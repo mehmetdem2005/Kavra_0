@@ -1,7 +1,7 @@
 'use client'
+import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { apiFetch } from '../../../lib/api'
 
 export default function LeaderboardPage() {
@@ -27,7 +27,9 @@ export default function LeaderboardPage() {
             key={p}
             onClick={() => setPeriod(p)}
             className={`px-4 py-2 rounded-full text-xs font-bold ${
-              period === p ? 'bg-ink-900 text-cream-50' : 'bg-white border border-slate-200 text-slate-600'
+              period === p
+                ? 'bg-ink-900 text-cream-50'
+                : 'bg-white border border-slate-200 text-slate-600'
             }`}
           >
             {p === 'weekly' ? 'Bu Hafta' : 'Bu Ay'}
@@ -56,12 +58,17 @@ export default function LeaderboardPage() {
             href={`/u/${e.username}`}
             className="bg-white border border-slate-100 rounded-2xl p-3 flex items-center gap-3 hover:border-amber-300 transition-colors"
           >
-            <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm ${
-              e.rank === 1 ? 'bg-amber-500 text-ink-900'
-                : e.rank === 2 ? 'bg-slate-300 text-ink-900'
-                : e.rank === 3 ? 'bg-orange-300 text-ink-900'
-                : 'bg-cream-50 text-slate-600 border border-slate-100'
-            }`}>
+            <div
+              className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm ${
+                e.rank === 1
+                  ? 'bg-amber-500 text-ink-900'
+                  : e.rank === 2
+                    ? 'bg-slate-300 text-ink-900'
+                    : e.rank === 3
+                      ? 'bg-orange-300 text-ink-900'
+                      : 'bg-cream-50 text-slate-600 border border-slate-100'
+              }`}
+            >
               {e.rank}
             </div>
 
@@ -90,7 +97,9 @@ export default function LeaderboardPage() {
         <div className="text-center py-16">
           <p className="text-3xl mb-3">📊</p>
           <h2 className="font-serif text-lg text-slate-700">Liderlik henüz boş</h2>
-          <p className="text-sm text-slate-500 mt-1">İlk listeye girmek için profilini public yap.</p>
+          <p className="text-sm text-slate-500 mt-1">
+            İlk listeye girmek için profilini public yap.
+          </p>
         </div>
       )}
     </div>

@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator, TextInput } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import { useAdminUsers, type AdminUser } from '../../src/hooks/useAdmin'
+import { useState } from 'react'
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Icon } from '../../src/components/ui/Icon'
+import { type AdminUser, useAdminUsers } from '../../src/hooks/useAdmin'
 
 export default function AdminUsers() {
   const router = useRouter()
@@ -40,7 +40,9 @@ export default function AdminUsers() {
                 onPress={() => setRoleFilter(f.v)}
                 className={`px-3 py-1.5 rounded-full ${roleFilter === f.v ? 'bg-ink-900' : 'bg-slate-100'}`}
               >
-                <Text className={`text-xs font-semibold ${roleFilter === f.v ? 'text-cream-50' : 'text-slate-600'}`}>
+                <Text
+                  className={`text-xs font-semibold ${roleFilter === f.v ? 'text-cream-50' : 'text-slate-600'}`}
+                >
                   {f.l}
                 </Text>
               </Pressable>
@@ -66,7 +68,7 @@ export default function AdminUsers() {
             <UserRow key={u.id} user={u} onPress={() => router.push(`/(admin)/users/${u.id}`)} />
           ))}
 
-          {data && data.total > (data.users.length) && (
+          {data && data.total > data.users.length && (
             <Text className="text-center text-xs text-slate-500 mt-4">
               {data.users.length} / {data.total}
             </Text>
@@ -80,7 +82,10 @@ export default function AdminUsers() {
 function UserRow({ user, onPress }: { user: AdminUser; onPress: () => void }) {
   const initial = (user.full_name ?? user.email).charAt(0).toUpperCase()
   const sub = user.subscriptions?.[0]
-  const isPro = sub && ['pro_monthly', 'pro_yearly', 'pro_lifetime'].includes(sub.tier) && sub.status === 'active'
+  const isPro =
+    sub &&
+    ['pro_monthly', 'pro_yearly', 'pro_lifetime'].includes(sub.tier) &&
+    sub.status === 'active'
 
   return (
     <Pressable
@@ -90,13 +95,19 @@ function UserRow({ user, onPress }: { user: AdminUser; onPress: () => void }) {
       <View
         className="w-11 h-11 rounded-full items-center justify-center"
         style={{
-          backgroundColor: user.role === 'super_admin' ? '#F59E0B' : user.role === 'admin' ? '#1E1B4B' : '#E2E8F0',
+          backgroundColor:
+            user.role === 'super_admin' ? '#F59E0B' : user.role === 'admin' ? '#1E1B4B' : '#E2E8F0',
         }}
       >
         <Text
           className="font-serif text-lg"
           style={{
-            color: user.role === 'super_admin' ? '#1E1B4B' : user.role === 'admin' ? '#FBF8F0' : '#475569',
+            color:
+              user.role === 'super_admin'
+                ? '#1E1B4B'
+                : user.role === 'admin'
+                  ? '#FBF8F0'
+                  : '#475569',
             fontStyle: 'italic',
           }}
         >
@@ -119,20 +130,22 @@ function UserRow({ user, onPress }: { user: AdminUser; onPress: () => void }) {
               <Text className="text-[8px] text-cream-50 font-bold">ADMIN</Text>
             </View>
           )}
-          {isPro && (
-            <Icon name="crown" size={12} color="#F59E0B" fill="#F59E0B" />
-          )}
+          {isPro && <Icon name="crown" size={12} color="#F59E0B" fill="#F59E0B" />}
           {user.banned_at && (
             <View className="bg-red-500 px-1.5 py-0.5 rounded">
               <Text className="text-[8px] text-white font-bold">YASAKLI</Text>
             </View>
           )}
         </View>
-        <Text className="text-xs text-slate-500" numberOfLines={1}>{user.email}</Text>
+        <Text className="text-xs text-slate-500" numberOfLines={1}>
+          {user.email}
+        </Text>
         <View className="flex-row gap-2 mt-0.5">
           {user.phone_verified_at && <Icon name="phone" size={10} color="#10B981" />}
           {(user.auth_providers ?? []).slice(0, 3).map((p, i) => (
-            <Text key={i} className="text-[9px] text-slate-400">{p}</Text>
+            <Text key={i} className="text-[9px] text-slate-400">
+              {p}
+            </Text>
           ))}
         </View>
       </View>

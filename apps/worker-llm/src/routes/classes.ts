@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
+import { AUDIT_EVENTS, audit } from '../lib/audit.js'
 import { supabase, verifyUserToken } from '../supabase.js'
-import { audit, AUDIT_EVENTS } from '../lib/audit.js'
 
 const CreateClassSchema = z.object({
   orgId: z.string().uuid(),
@@ -39,7 +39,6 @@ async function isOrgTeacher(userId: string, orgId: string): Promise<boolean> {
 }
 
 export async function classesRoutes(fastify: FastifyInstance) {
-
   /** POST /api/classes */
   fastify.post('/api/classes', async (req, reply) => {
     const userId = await verifyUserToken(req.headers.authorization)
@@ -48,7 +47,7 @@ export async function classesRoutes(fastify: FastifyInstance) {
     const parsed = CreateClassSchema.safeParse(req.body)
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.format() })
 
-    if (!await isOrgTeacher(userId, parsed.data.orgId)) {
+    if (!(await isOrgTeacher(userId, parsed.data.orgId))) {
       return reply.code(403).send({ error: 'must_be_teacher' })
     }
 
@@ -92,83 +91,79 @@ export async function classesRoutes(fastify: FastifyInstance) {
   })
 
   /** GET /api/classes?orgId=... */
-  fastify.get<{ Querystring: { orgId?: string } }>(
-    '/api/classes',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.get<{ Querystring: { orgId?: string } }>('/api/classes', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      // Hem öğretmenliği hem de öğrenciliği görür
-      const { data: teaching } = await supabase
-        .from('classes')
-        .select('id, name, slug, emoji, grade_level, subject, member_count, teacher_id')
-        .eq('teacher_id', userId)
-        .eq('is_archived', false)
+    // Hem öğretmenliği hem de öğrenciliği görür
+    const { data: teaching } = await supabase
+      .from('classes')
+      .select('id, name, slug, emoji, grade_level, subject, member_count, teacher_id')
+      .eq('teacher_id', userId)
+      .eq('is_archived', false)
 
-      const { data: enrolled } = await supabase
-        .from('class_members')
-        .select(`
+    const { data: enrolled } = await supabase
+      .from('class_members')
+      .select(`
           class_id,
           classes(id, name, slug, emoji, grade_level, subject, member_count, teacher_id,
             profiles!classes_teacher_id_fkey(full_name, username))
         `)
-        .eq('user_id', userId)
+      .eq('user_id', userId)
 
-      return {
-        teaching: teaching ?? [],
-        enrolled: enrolled ?? [],
-      }
-    },
-  )
+    return {
+      teaching: teaching ?? [],
+      enrolled: enrolled ?? [],
+    }
+  })
 
   /** GET /api/classes/:id */
-  fastify.get<{ Params: { id: string } }>(
-    '/api/classes/:id',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.get<{ Params: { id: string } }>('/api/classes/:id', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      const { data: cls } = await supabase
-        .from('classes')
-        .select(`*, profiles!classes_teacher_id_fkey(id, username, full_name, avatar_url)`)
-        .eq('id', req.params.id)
-        .single()
+    const { data: cls } = await supabase
+      .from('classes')
+      .select(`*, profiles!classes_teacher_id_fkey(id, username, full_name, avatar_url)`)
+      .eq('id', req.params.id)
+      .single()
 
-      if (!cls) return reply.code(404).send({ error: 'not_found' })
+    if (!cls) return reply.code(404).send({ error: 'not_found' })
 
-      const isTeacher = cls.teacher_id === userId
-      const { data: membership } = await supabase
+    const isTeacher = cls.teacher_id === userId
+    const { data: membership } = await supabase
+      .from('class_members')
+      .select('role')
+      .eq('class_id', cls.id)
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (!isTeacher && !membership) return reply.code(403).send({ error: 'not_member' })
+
+    // Members + assignments
+    const [membersRes, assignmentsRes] = await Promise.all([
+      supabase
         .from('class_members')
-        .select('role')
-        .eq('class_id', cls.id)
-        .eq('user_id', userId)
-        .maybeSingle()
-
-      if (!isTeacher && !membership) return reply.code(403).send({ error: 'not_member' })
-
-      // Members + assignments
-      const [membersRes, assignmentsRes] = await Promise.all([
-        supabase.from('class_members')
-          .select(`
+        .select(`
             role, joined_at, total_reviews, current_streak, last_active_at,
             profiles(id, username, full_name, avatar_url)
           `)
-          .eq('class_id', cls.id)
-          .order('total_reviews', { ascending: false }),
-        supabase.from('assignments')
-          .select('*')
-          .eq('class_id', cls.id)
-          .order('assigned_at', { ascending: false }),
-      ])
+        .eq('class_id', cls.id)
+        .order('total_reviews', { ascending: false }),
+      supabase
+        .from('assignments')
+        .select('*')
+        .eq('class_id', cls.id)
+        .order('assigned_at', { ascending: false }),
+    ])
 
-      return {
-        class: cls,
-        members: membersRes.data ?? [],
-        assignments: assignmentsRes.data ?? [],
-        myRole: isTeacher ? 'teacher' : (membership?.role ?? 'observer'),
-      }
-    },
-  )
+    return {
+      class: cls,
+      members: membersRes.data ?? [],
+      assignments: assignmentsRes.data ?? [],
+      myRole: isTeacher ? 'teacher' : (membership?.role ?? 'observer'),
+    }
+  })
 
   /** POST /api/assignments */
   fastify.post('/api/assignments', async (req, reply) => {

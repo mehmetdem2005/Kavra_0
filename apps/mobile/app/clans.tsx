@@ -1,12 +1,37 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Stack, useRouter } from 'expo-router'
 import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator, TextInput, Modal, Alert } from 'react-native'
+import {
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiFetch } from '../src/lib/api'
 import { Icon } from '../src/components/ui/Icon'
+import { apiFetch } from '../src/lib/api'
 
-const EMOJIS = ['🦁', '🐺', '🦅', '🐉', '🦊', '🐻', '🦋', '⚔️', '🛡️', '🎯', '🔥', '⚡', '🌙', '☀️', '🌊']
+const EMOJIS = [
+  '🦁',
+  '🐺',
+  '🦅',
+  '🐉',
+  '🦊',
+  '🐻',
+  '🦋',
+  '⚔️',
+  '🛡️',
+  '🎯',
+  '🔥',
+  '⚡',
+  '🌙',
+  '☀️',
+  '🌊',
+]
 
 export default function ClansScreen() {
   const router = useRouter()
@@ -32,13 +57,16 @@ export default function ClansScreen() {
   const [emoji, setEmoji] = useState('🦁')
 
   const createMut = useMutation({
-    mutationFn: () => apiFetch<{ clan: any }>('/api/clans', {
-      method: 'POST',
-      body: JSON.stringify({ name, slug, description, emoji, isPublic: true }),
-    }),
+    mutationFn: () =>
+      apiFetch<{ clan: any }>('/api/clans', {
+        method: 'POST',
+        body: JSON.stringify({ name, slug, description, emoji, isPublic: true }),
+      }),
     onSuccess: (res) => {
       setCreateOpen(false)
-      setName(''); setSlug(''); setDescription('')
+      setName('')
+      setSlug('')
+      setDescription('')
       qc.invalidateQueries({ queryKey: ['my-clans'] })
       router.push(`/clan/${res.clan.slug}`)
     },
@@ -83,7 +111,9 @@ export default function ClansScreen() {
           onPress={() => setTab('mine')}
           className={`flex-1 py-2.5 rounded-full ${tab === 'mine' ? 'bg-ink-900' : 'bg-white border border-slate-200'}`}
         >
-          <Text className={`text-center text-xs font-bold ${tab === 'mine' ? 'text-cream-50' : 'text-slate-600'}`}>
+          <Text
+            className={`text-center text-xs font-bold ${tab === 'mine' ? 'text-cream-50' : 'text-slate-600'}`}
+          >
             Klanlarım ({mine?.memberships?.length ?? 0})
           </Text>
         </Pressable>
@@ -91,7 +121,9 @@ export default function ClansScreen() {
           onPress={() => setTab('discover')}
           className={`flex-1 py-2.5 rounded-full ${tab === 'discover' ? 'bg-ink-900' : 'bg-white border border-slate-200'}`}
         >
-          <Text className={`text-center text-xs font-bold ${tab === 'discover' ? 'text-cream-50' : 'text-slate-600'}`}>
+          <Text
+            className={`text-center text-xs font-bold ${tab === 'discover' ? 'text-cream-50' : 'text-slate-600'}`}
+          >
             Keşfet
           </Text>
         </Pressable>
@@ -168,15 +200,27 @@ export default function ClansScreen() {
       </ScrollView>
 
       {/* Create modal */}
-      <Modal animationType="slide" transparent visible={createOpen} onRequestClose={() => setCreateOpen(false)}>
+      <Modal
+        animationType="slide"
+        transparent
+        visible={createOpen}
+        onRequestClose={() => setCreateOpen(false)}
+      >
         <Pressable onPress={() => setCreateOpen(false)} className="flex-1 bg-black/40 justify-end">
           <Pressable className="bg-cream-50 rounded-t-3xl pt-3 pb-8 max-h-[85%]">
             <View className="w-12 h-1 bg-slate-200 rounded-full self-center mb-4" />
             <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}>
               <Text className="font-serif text-2xl text-ink-900 mb-4">Yeni Klan</Text>
 
-              <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">Emoji</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4" contentContainerStyle={{ gap: 6 }}>
+              <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">
+                Emoji
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="mb-4"
+                contentContainerStyle={{ gap: 6 }}
+              >
                 {EMOJIS.map((e) => (
                   <Pressable
                     key={e}
@@ -190,7 +234,9 @@ export default function ClansScreen() {
                 ))}
               </ScrollView>
 
-              <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">İsim</Text>
+              <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">
+                İsim
+              </Text>
               <TextInput
                 placeholder="Yeditepe Çalışkanları"
                 value={name}
@@ -199,7 +245,9 @@ export default function ClansScreen() {
                 className="bg-white border border-slate-200 rounded-xl px-3 py-3 text-base mb-3"
               />
 
-              <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">URL (slug)</Text>
+              <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">
+                URL (slug)
+              </Text>
               <TextInput
                 placeholder="yeditepe-calisanlari"
                 value={slug}
@@ -208,9 +256,13 @@ export default function ClansScreen() {
                 maxLength={30}
                 className="bg-white border border-slate-200 rounded-xl px-3 py-3 text-base mb-1"
               />
-              <Text className="text-[10px] text-slate-400 mb-3">kavra.app/clan/{slug || 'slug'}</Text>
+              <Text className="text-[10px] text-slate-400 mb-3">
+                kavra.app/clan/{slug || 'slug'}
+              </Text>
 
-              <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">Açıklama</Text>
+              <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">
+                Açıklama
+              </Text>
               <TextInput
                 placeholder="Kısaca klanınız ne hakkında?"
                 value={description}
@@ -231,7 +283,9 @@ export default function ClansScreen() {
                 {createMut.isPending ? (
                   <ActivityIndicator color="#F59E0B" />
                 ) : (
-                  <Text className={`font-semibold ${name && slug ? 'text-cream-50' : 'text-slate-500'}`}>
+                  <Text
+                    className={`font-semibold ${name && slug ? 'text-cream-50' : 'text-slate-500'}`}
+                  >
                     Klanı Kur
                   </Text>
                 )}

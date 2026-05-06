@@ -29,5 +29,16 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "pnpm": {
+    "overrides": {
+      "@kavra/web>@types/react": "^19.0.0",
+      "@kavra/web>@types/react-dom": "^19.0.0"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "@types/react": "^19.0.0"
+      }
+    }
   }
 }

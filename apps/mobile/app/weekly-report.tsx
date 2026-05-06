@@ -1,13 +1,9 @@
-import { useEffect } from 'react'
-import {
-  View, Text, ScrollView, ActivityIndicator, Alert,
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack } from 'expo-router'
+import { useEffect } from 'react'
+import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../src/components/ui/Button'
-import {
-  useWeeklyReports, useGenerateWeeklyReport,
-} from '../src/hooks/useReflections'
+import { useGenerateWeeklyReport, useWeeklyReports } from '../src/hooks/useReflections'
 
 export default function WeeklyReport() {
   const { data: reports, isLoading } = useWeeklyReports()
@@ -47,9 +43,15 @@ export default function WeeklyReport() {
             {/* Hafta başlığı */}
             <View className="bg-brand-950 rounded-2xl p-5 mb-4">
               <Text className="text-white/70 text-sm">
-                {new Date(latest.week_start).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })}
+                {new Date(latest.week_start).toLocaleDateString('tr-TR', {
+                  day: 'numeric',
+                  month: 'long',
+                })}
                 {' — '}
-                {new Date(latest.week_end).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })}
+                {new Date(latest.week_end).toLocaleDateString('tr-TR', {
+                  day: 'numeric',
+                  month: 'long',
+                })}
               </Text>
 
               <View className="flex-row gap-4 mt-4">
@@ -77,13 +79,17 @@ export default function WeeklyReport() {
                 </Text>
                 {latest.highlights.most_active_subject && (
                   <Text className="text-brand-950 text-sm mb-1">
-                    🎯 En aktif konu: <Text className="font-semibold">{latest.highlights.most_active_subject}</Text>
+                    🎯 En aktif konu:{' '}
+                    <Text className="font-semibold">{latest.highlights.most_active_subject}</Text>
                   </Text>
                 )}
                 {latest.highlights.best_day && (
                   <Text className="text-brand-950 text-sm">
-                    📅 En verimli gün: <Text className="font-semibold">
-                      {new Date(latest.highlights.best_day).toLocaleDateString('tr-TR', { weekday: 'long' })}
+                    📅 En verimli gün:{' '}
+                    <Text className="font-semibold">
+                      {new Date(latest.highlights.best_day).toLocaleDateString('tr-TR', {
+                        weekday: 'long',
+                      })}
                     </Text>
                   </Text>
                 )}
@@ -142,7 +148,10 @@ export default function WeeklyReport() {
                 {reports.slice(1).map((r) => (
                   <View key={r.id} className="bg-white border border-slate-100 rounded-xl p-3 mb-2">
                     <Text className="text-brand-950 font-medium">
-                      {new Date(r.week_start).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                      {new Date(r.week_start).toLocaleDateString('tr-TR', {
+                        day: 'numeric',
+                        month: 'short',
+                      })}
                     </Text>
                     <Text className="text-slate-500 text-xs">
                       {r.total_lessons} ders · {r.total_reviews} tekrar

@@ -1,10 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { Check, Copy } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { apiFetch } from '../../../../../lib/api'
+import { useState } from 'react'
 import { toast } from 'sonner'
-import { Copy, Check } from 'lucide-react'
+import { apiFetch } from '../../../../../lib/api'
 
 export default function SsoPage() {
   const params = useParams()
@@ -74,9 +74,13 @@ export default function SsoPage() {
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 mt-4">
           <p className="text-[11px] text-amber-900">
             <strong>Kurulum:</strong> Plan'ın Enterprise olması gerekir.{' '}
-            <a href={`/orgs/${slug}/billing`} className="underline font-bold">Plana Yükselt</a>{' '}
+            <a href={`/orgs/${slug}/billing`} className="underline font-bold">
+              Plana Yükselt
+            </a>{' '}
             veya{' '}
-            <a href="mailto:sales@kavra.app" className="underline font-bold">satış ekibiyle</a>{' '}
+            <a href="mailto:sales@kavra.app" className="underline font-bold">
+              satış ekibiyle
+            </a>{' '}
             görüş.
           </p>
         </div>
@@ -86,7 +90,8 @@ export default function SsoPage() {
       <section className="bg-white rounded-3xl p-6 border border-slate-100">
         <h2 className="font-serif text-xl text-ink-900 mb-2">SCIM 2.0 Otomatik Sağlama</h2>
         <p className="text-xs text-slate-500 mb-4">
-          IdP'ten Kavra'ya otomatik kullanıcı sync — yeni çalışan eklendiğinde, ayrılan deactive olduğunda otomatik.
+          IdP'ten Kavra'ya otomatik kullanıcı sync — yeni çalışan eklendiğinde, ayrılan deactive
+          olduğunda otomatik.
         </p>
 
         {!scimToken ? (
@@ -100,14 +105,20 @@ export default function SsoPage() {
         ) : (
           <div className="space-y-3">
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
-              <p className="text-xs text-amber-900 font-bold mb-2">⚠️ Token sadece bir kez gösterilir</p>
+              <p className="text-xs text-amber-900 font-bold mb-2">
+                ⚠️ Token sadece bir kez gösterilir
+              </p>
               <div className="bg-white border border-amber-300 rounded-xl p-3 flex items-center gap-2">
                 <code className="text-xs font-mono text-ink-900 flex-1 break-all">{scimToken}</code>
                 <button
                   onClick={copyToken}
                   className="bg-amber-500 rounded-lg p-2 hover:bg-amber-600"
                 >
-                  {copied ? <Check size={14} className="text-ink-900" /> : <Copy size={14} className="text-ink-900" />}
+                  {copied ? (
+                    <Check size={14} className="text-ink-900" />
+                  ) : (
+                    <Copy size={14} className="text-ink-900" />
+                  )}
                 </button>
               </div>
             </div>
@@ -140,16 +151,24 @@ export default function SsoPage() {
   )
 }
 
-function ProviderCard({ name, icon, status }: { name: string; icon: string; status: 'active' | 'available' }) {
+function ProviderCard({
+  name,
+  icon,
+  status,
+}: { name: string; icon: string; status: 'active' | 'available' }) {
   return (
-    <div className={`rounded-2xl p-4 border-2 ${
-      status === 'active' ? 'bg-emerald-50 border-emerald-300' : 'bg-cream-50 border-slate-200'
-    }`}>
+    <div
+      className={`rounded-2xl p-4 border-2 ${
+        status === 'active' ? 'bg-emerald-50 border-emerald-300' : 'bg-cream-50 border-slate-200'
+      }`}
+    >
       <div className="text-2xl mb-2">{icon}</div>
       <p className="text-sm font-bold text-ink-900">{name}</p>
-      <p className={`text-[10px] font-mono uppercase mt-1 ${
-        status === 'active' ? 'text-emerald-600' : 'text-slate-500'
-      }`}>
+      <p
+        className={`text-[10px] font-mono uppercase mt-1 ${
+          status === 'active' ? 'text-emerald-600' : 'text-slate-500'
+        }`}
+      >
         {status === 'active' ? '✓ AKTIF' : 'KURMAK İÇIN TIKLA'}
       </p>
     </div>

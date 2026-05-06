@@ -1,8 +1,8 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import { useAdminDashboard, useMyRole } from '../../src/hooks/useAdmin'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Icon } from '../../src/components/ui/Icon'
+import { useAdminDashboard, useMyRole } from '../../src/hooks/useAdmin'
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -14,11 +14,19 @@ export default function AdminDashboard() {
       <SafeAreaView edges={['bottom']}>
         <View className="px-6 py-6">
           {/* Hero */}
-          <View className="bg-ink-950 rounded-3xl p-6 mb-4 overflow-hidden" style={{ position: 'relative' }}>
+          <View
+            className="bg-ink-950 rounded-3xl p-6 mb-4 overflow-hidden"
+            style={{ position: 'relative' }}
+          >
             <View
               style={{
-                position: 'absolute', top: -40, right: -40, width: 140, height: 140,
-                backgroundColor: '#F59E0B33', borderRadius: 70,
+                position: 'absolute',
+                top: -40,
+                right: -40,
+                width: 140,
+                height: 140,
+                backgroundColor: '#F59E0B33',
+                borderRadius: 70,
               }}
             />
             <View className="flex-row items-center gap-2 mb-2">
@@ -94,7 +102,11 @@ export default function AdminDashboard() {
   )
 }
 
-function StatCard({ label, value, accent = '#1E1B4B' }: { label: string; value: number; accent?: string }) {
+function StatCard({
+  label,
+  value,
+  accent = '#1E1B4B',
+}: { label: string; value: number; accent?: string }) {
   return (
     <View className="flex-1 bg-white border border-slate-100 rounded-2xl p-3">
       <Text className="text-[10px] text-slate-500 uppercase tracking-wider">{label}</Text>
@@ -105,7 +117,12 @@ function StatCard({ label, value, accent = '#1E1B4B' }: { label: string; value: 
   )
 }
 
-function ActionRow({ icon, title, desc, onPress }: { icon: string; title: string; desc: string; onPress: () => void }) {
+function ActionRow({
+  icon,
+  title,
+  desc,
+  onPress,
+}: { icon: string; title: string; desc: string; onPress: () => void }) {
   return (
     <Pressable
       onPress={onPress}

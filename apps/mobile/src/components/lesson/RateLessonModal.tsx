@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, Text, Modal, Pressable, TextInput } from 'react-native'
+import { Modal, Pressable, Text, TextInput, View } from 'react-native'
 import { Button } from '../ui/Button'
 
 interface Props {
@@ -10,9 +10,7 @@ interface Props {
   submitting?: boolean
 }
 
-export function RateLessonModal({
-  visible, techniqueName, onClose, onSubmit, submitting,
-}: Props) {
+export function RateLessonModal({ visible, techniqueName, onClose, onSubmit, submitting }: Props) {
   const [rating, setRating] = useState<number>(0)
   const [note, setNote] = useState('')
 
@@ -45,28 +43,24 @@ export function RateLessonModal({
           {/* Yıldızlar */}
           <View className="flex-row justify-center gap-2 my-4">
             {[1, 2, 3, 4, 5].map((n) => (
-              <Pressable
-                key={n}
-                onPress={() => setRating(n)}
-                className="p-2"
-              >
-                <Text style={{ fontSize: 40 }}>
-                  {n <= rating ? '⭐' : '☆'}
-                </Text>
+              <Pressable key={n} onPress={() => setRating(n)} className="p-2">
+                <Text style={{ fontSize: 40 }}>{n <= rating ? '⭐' : '☆'}</Text>
               </Pressable>
             ))}
           </View>
 
           {rating > 0 && (
             <Text className="text-center text-slate-600 mb-4 text-sm">
-              {[
-                '',
-                'Hiç anlamadım 😕',
-                'Biraz zor geldi 😐',
-                'Fena değildi 🙂',
-                'İyi anladım 😊',
-                'Mükemmeldi! 🤩',
-              ][rating]}
+              {
+                [
+                  '',
+                  'Hiç anlamadım 😕',
+                  'Biraz zor geldi 😐',
+                  'Fena değildi 🙂',
+                  'İyi anladım 😊',
+                  'Mükemmeldi! 🤩',
+                ][rating]
+              }
             </Text>
           )}
 

@@ -1,8 +1,8 @@
+import crypto from 'crypto'
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import crypto from 'crypto'
+import { AUDIT_EVENTS, audit } from '../lib/audit.js'
 import { supabase, verifyUserToken } from '../supabase.js'
-import { audit, AUDIT_EVENTS } from '../lib/audit.js'
 
 /**
  * Bulk Import + SCIM 2.0
@@ -19,12 +19,17 @@ import { audit, AUDIT_EVENTS } from '../lib/audit.js'
 
 const BulkImportSchema = z.object({
   orgId: z.string().uuid(),
-  rows: z.array(z.object({
-    email: z.string().email(),
-    fullName: z.string().min(1).max(100).optional(),
-    role: z.enum(['admin', 'teacher', 'member', 'student']).default('student'),
-    classSlug: z.string().optional(),                 // varsa otomatik atama
-  })).min(1).max(500),
+  rows: z
+    .array(
+      z.object({
+        email: z.string().email(),
+        fullName: z.string().min(1).max(100).optional(),
+        role: z.enum(['admin', 'teacher', 'member', 'student']).default('student'),
+        classSlug: z.string().optional(), // varsa otomatik atama
+      }),
+    )
+    .min(1)
+    .max(500),
 })
 
 async function checkOrgAdmin(userId: string, orgId: string): Promise<boolean> {
@@ -52,124 +57,130 @@ async function verifyScimToken(token: string, orgId: string): Promise<boolean> {
 }
 
 export async function provisioningRoutes(fastify: FastifyInstance) {
-
   // ============== BULK CSV IMPORT ==============
 
   /** POST /api/orgs/:id/bulk-import */
-  fastify.post<{ Params: { id: string } }>(
-    '/api/orgs/:id/bulk-import',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.post<{ Params: { id: string } }>('/api/orgs/:id/bulk-import', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      if (!await checkOrgAdmin(userId, req.params.id)) {
-        return reply.code(403).send({ error: 'forbidden' })
-      }
+    if (!(await checkOrgAdmin(userId, req.params.id))) {
+      return reply.code(403).send({ error: 'forbidden' })
+    }
 
-      const parsed = BulkImportSchema.safeParse(req.body)
-      if (!parsed.success) return reply.code(400).send({ error: parsed.error.format() })
+    const parsed = BulkImportSchema.safeParse(req.body)
+    if (!parsed.success) return reply.code(400).send({ error: parsed.error.format() })
 
-      // Seat check
-      const { data: org } = await supabase
-        .from('organizations')
-        .select('seats_used, max_seats')
-        .eq('id', req.params.id)
-        .single()
+    // Seat check
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('seats_used, max_seats')
+      .eq('id', req.params.id)
+      .single()
 
-      if (!org) return reply.code(404).send({ error: 'org_not_found' })
-      const requiredSeats = parsed.data.rows.length
-      if (org.seats_used + requiredSeats > org.max_seats) {
-        return reply.code(400).send({
-          error: 'insufficient_seats',
-          message: `${requiredSeats} import için yer yok. Şu an ${org.max_seats - org.seats_used} boş.`,
-        })
-      }
+    if (!org) return reply.code(404).send({ error: 'org_not_found' })
+    const requiredSeats = parsed.data.rows.length
+    if (org.seats_used + requiredSeats > org.max_seats) {
+      return reply.code(400).send({
+        error: 'insufficient_seats',
+        message: `${requiredSeats} import için yer yok. Şu an ${org.max_seats - org.seats_used} boş.`,
+      })
+    }
 
-      // Class slug → id map
-      const classSlugs = [...new Set(parsed.data.rows.map((r) => r.classSlug).filter(Boolean) as string[])]
-      const { data: classes } = await supabase
-        .from('classes')
-        .select('id, slug')
-        .eq('org_id', req.params.id)
-        .in('slug', classSlugs)
-      const slugToId: Record<string, string> = {}
-      ;(classes ?? []).forEach((c: any) => { slugToId[c.slug] = c.id })
+    // Class slug → id map
+    const classSlugs = [
+      ...new Set(parsed.data.rows.map((r) => r.classSlug).filter(Boolean) as string[]),
+    ]
+    const { data: classes } = await supabase
+      .from('classes')
+      .select('id, slug')
+      .eq('org_id', req.params.id)
+      .in('slug', classSlugs)
+    const slugToId: Record<string, string> = {}
+    ;(classes ?? []).forEach((c: any) => {
+      slugToId[c.slug] = c.id
+    })
 
-      // Import işle
-      const results = {
-        added: 0,
-        invited: 0,
-        skipped: 0,
-        errors: [] as Array<{ email: string; reason: string }>,
-      }
+    // Import işle
+    const results = {
+      added: 0,
+      invited: 0,
+      skipped: 0,
+      errors: [] as Array<{ email: string; reason: string }>,
+    }
 
-      for (const row of parsed.data.rows) {
-        try {
-          // Profile var mı?
-          const { data: existing } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('email', row.email)
-            .maybeSingle()
+    for (const row of parsed.data.rows) {
+      try {
+        // Profile var mı?
+        const { data: existing } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', row.email)
+          .maybeSingle()
 
-          if (existing) {
-            await supabase.from('organization_members').upsert({
+        if (existing) {
+          await supabase.from('organization_members').upsert(
+            {
               org_id: req.params.id,
               user_id: existing.id,
               role: row.role,
               invited_by: userId,
               invitation_email: row.email,
               invitation_status: 'accepted',
-            }, { onConflict: 'org_id,user_id' })
+            },
+            { onConflict: 'org_id,user_id' },
+          )
 
-            // Class atama
-            if (row.classSlug && slugToId[row.classSlug]) {
-              await supabase.from('class_members').upsert({
+          // Class atama
+          if (row.classSlug && slugToId[row.classSlug]) {
+            await supabase.from('class_members').upsert(
+              {
                 class_id: slugToId[row.classSlug],
                 user_id: existing.id,
                 role: row.role === 'teacher' ? 'co_teacher' : 'student',
-              }, { onConflict: 'class_id,user_id' })
-            }
-
-            results.added++
-          } else {
-            const token = crypto.randomBytes(24).toString('hex')
-            await supabase.from('organization_members').insert({
-              org_id: req.params.id,
-              user_id: null as any,
-              role: row.role,
-              invitation_token: token,
-              invitation_email: row.email,
-              invitation_status: 'pending',
-              invited_by: userId,
-            } as any)
-
-            results.invited++
+              },
+              { onConflict: 'class_id,user_id' },
+            )
           }
-        } catch (e: any) {
-          results.errors.push({ email: row.email, reason: e.message })
-          results.skipped++
+
+          results.added++
+        } else {
+          const token = crypto.randomBytes(24).toString('hex')
+          await supabase.from('organization_members').insert({
+            org_id: req.params.id,
+            user_id: null as any,
+            role: row.role,
+            invitation_token: token,
+            invitation_email: row.email,
+            invitation_status: 'pending',
+            invited_by: userId,
+          } as any)
+
+          results.invited++
         }
+      } catch (e: any) {
+        results.errors.push({ email: row.email, reason: e.message })
+        results.skipped++
       }
+    }
 
-      await supabase.rpc('recompute_org_seats', { p_org_id: req.params.id })
+    await supabase.rpc('recompute_org_seats', { p_org_id: req.params.id })
 
-      await audit({
-        orgId: req.params.id,
-        userId,
-        eventType: 'org.bulk_import',
-        eventCategory: 'org',
-        metadata: {
-          totalRows: parsed.data.rows.length,
-          added: results.added,
-          invited: results.invited,
-          skipped: results.skipped,
-        },
-      })
+    await audit({
+      orgId: req.params.id,
+      userId,
+      eventType: 'org.bulk_import',
+      eventCategory: 'org',
+      metadata: {
+        totalRows: parsed.data.rows.length,
+        added: results.added,
+        invited: results.invited,
+        skipped: results.skipped,
+      },
+    })
 
-      return results
-    },
-  )
+    return results
+  })
 
   // ============== SCIM 2.0 ==============
   // Endpoint: /api/scim/v2/orgs/:orgId/Users
@@ -182,7 +193,7 @@ export async function provisioningRoutes(fastify: FastifyInstance) {
       const userId = await verifyUserToken(req.headers.authorization)
       if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      if (!await checkOrgAdmin(userId, req.params.id)) {
+      if (!(await checkOrgAdmin(userId, req.params.id))) {
         return reply.code(403).send({ error: 'forbidden' })
       }
 
@@ -207,7 +218,7 @@ export async function provisioningRoutes(fastify: FastifyInstance) {
 
       return {
         token,
-        message: 'Bu token sadece bir kez gösterilir. IdP\'ye kaydet.',
+        message: "Bu token sadece bir kez gösterilir. IdP'ye kaydet.",
         endpoint: `https://api.kavra.app/api/scim/v2/orgs/${req.params.id}/Users`,
       }
     },
@@ -218,11 +229,23 @@ export async function provisioningRoutes(fastify: FastifyInstance) {
     '/api/scim/v2/orgs/:orgId/Users',
     async (req, reply) => {
       const auth = req.headers.authorization?.replace('Bearer ', '')
-      if (!auth || !await verifyScimToken(auth, req.params.orgId)) {
-        return reply.code(401).send({ schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'], detail: 'unauthorized', status: '401' })
+      if (!auth || !(await verifyScimToken(auth, req.params.orgId))) {
+        return reply
+          .code(401)
+          .send({
+            schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'],
+            detail: 'unauthorized',
+            status: '401',
+          })
       }
 
-      const { userName, externalId, name, emails, active } = req.body
+      const { userName, externalId, name, emails, active } = req.body as {
+        userName?: string
+        externalId?: string
+        name?: { givenName?: string; familyName?: string; formatted?: string }
+        emails?: Array<{ value: string; primary?: boolean }>
+        active?: boolean
+      }
 
       // Email primary
       const email = emails?.find((e: any) => e.primary)?.value ?? userName
@@ -240,7 +263,8 @@ export async function provisioningRoutes(fastify: FastifyInstance) {
           email,
           email_confirm: true,
           user_metadata: {
-            full_name: name?.formatted ?? `${name?.givenName ?? ''} ${name?.familyName ?? ''}`.trim(),
+            full_name:
+              name?.formatted ?? `${name?.givenName ?? ''} ${name?.familyName ?? ''}`.trim(),
             scim_provisioned: true,
           },
         })
@@ -250,18 +274,27 @@ export async function provisioningRoutes(fastify: FastifyInstance) {
       }
 
       if (!profile) {
-        return reply.code(500).send({ schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'], detail: 'profile_create_failed', status: '500' })
+        return reply
+          .code(500)
+          .send({
+            schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'],
+            detail: 'profile_create_failed',
+            status: '500',
+          })
       }
 
       // Org member upsert
-      await supabase.from('organization_members').upsert({
-        org_id: req.params.orgId,
-        user_id: profile.id,
-        role: 'member',
-        scim_external_id: externalId,
-        scim_active: active ?? true,
-        invitation_status: 'accepted',
-      }, { onConflict: 'org_id,user_id' })
+      await supabase.from('organization_members').upsert(
+        {
+          org_id: req.params.orgId,
+          user_id: profile.id,
+          role: 'member',
+          scim_external_id: externalId,
+          scim_active: active ?? true,
+          invitation_status: 'accepted',
+        },
+        { onConflict: 'org_id,user_id' },
+      )
 
       await supabase.rpc('recompute_org_seats', { p_org_id: req.params.orgId })
 
@@ -296,8 +329,14 @@ export async function provisioningRoutes(fastify: FastifyInstance) {
     '/api/scim/v2/orgs/:orgId/Users/:userId',
     async (req, reply) => {
       const auth = req.headers.authorization?.replace('Bearer ', '')
-      if (!auth || !await verifyScimToken(auth, req.params.orgId)) {
-        return reply.code(401).send({ schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'], detail: 'unauthorized', status: '401' })
+      if (!auth || !(await verifyScimToken(auth, req.params.orgId))) {
+        return reply
+          .code(401)
+          .send({
+            schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'],
+            detail: 'unauthorized',
+            status: '401',
+          })
       }
 
       // Soft deactivate (data corruption riskli — silmek yerine deactive)
@@ -331,8 +370,14 @@ export async function provisioningRoutes(fastify: FastifyInstance) {
     '/api/scim/v2/orgs/:orgId/Users',
     async (req, reply) => {
       const auth = req.headers.authorization?.replace('Bearer ', '')
-      if (!auth || !await verifyScimToken(auth, req.params.orgId)) {
-        return reply.code(401).send({ schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'], detail: 'unauthorized', status: '401' })
+      if (!auth || !(await verifyScimToken(auth, req.params.orgId))) {
+        return reply
+          .code(401)
+          .send({
+            schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'],
+            detail: 'unauthorized',
+            status: '401',
+          })
       }
 
       const { data: members } = await supabase

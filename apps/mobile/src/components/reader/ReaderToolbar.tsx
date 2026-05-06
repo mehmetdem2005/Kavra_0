@@ -1,7 +1,7 @@
-import { View, Text, Pressable, Modal } from 'react-native'
-import { Icon } from '../ui/Icon'
-import { useCreateBookmark } from '../../hooks/useBooks'
+import { Modal, Pressable, Text, View } from 'react-native'
 import { Alert } from 'react-native'
+import { useCreateBookmark } from '../../hooks/useBooks'
+import { Icon } from '../ui/Icon'
 
 interface Props {
   theme: 'light' | 'dark' | 'sepia'
@@ -14,7 +14,13 @@ interface Props {
 }
 
 export function ReaderToolbar({
-  theme, fontSize, onThemeChange, onFontSizeChange, onClose, bookId, currentCfi,
+  theme,
+  fontSize,
+  onThemeChange,
+  onFontSizeChange,
+  onClose,
+  bookId,
+  currentCfi,
 }: Props) {
   const createBookmark = useCreateBookmark()
 
@@ -56,8 +62,19 @@ export function ReaderToolbar({
                   }`}
                   style={{ backgroundColor: t.bg }}
                 >
-                  <Text style={{ color: t.fg, fontFamily: 'InstrumentSerif', fontSize: 24, fontStyle: 'italic' }}>Aa</Text>
-                  <Text className="text-[10px] mt-1 font-semibold" style={{ color: t.fg }}>{t.l}</Text>
+                  <Text
+                    style={{
+                      color: t.fg,
+                      fontFamily: 'InstrumentSerif',
+                      fontSize: 24,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    Aa
+                  </Text>
+                  <Text className="text-[10px] mt-1 font-semibold" style={{ color: t.fg }}>
+                    {t.l}
+                  </Text>
                 </Pressable>
               ))}
             </View>

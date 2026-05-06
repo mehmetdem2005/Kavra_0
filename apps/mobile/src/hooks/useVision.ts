@@ -1,10 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
+import * as FileSystem from 'expo-file-system'
 import { apiFetch } from '../lib/api'
 import { supabase } from '../lib/supabase'
-import * as FileSystem from 'expo-file-system'
 
-const PDF_BASE_URL =
-  process.env.EXPO_PUBLIC_PDF_BASE_URL ?? 'http://localhost:4003'
+const PDF_BASE_URL = process.env.EXPO_PUBLIC_PDF_BASE_URL ?? 'http://localhost:4003'
 
 export type VisionTask =
   | 'solve_math'
@@ -45,17 +44,14 @@ export function useAnalyzeImage() {
       if (upErr) throw upErr
 
       // 3. Worker-pdf'e analiz isteği
-      const { result } = await apiFetch<{ result: string }>(
-        `${PDF_BASE_URL}/api/vision/analyze`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            storagePath,
-            task: input.task,
-            lessonId: input.lessonId,
-          }),
-        },
-      )
+      const { result } = await apiFetch<{ result: string }>(`${PDF_BASE_URL}/api/vision/analyze`, {
+        method: 'POST',
+        body: JSON.stringify({
+          storagePath,
+          task: input.task,
+          lessonId: input.lessonId,
+        }),
+      })
 
       // Yerel dosyayı sil
       FileSystem.deleteAsync(input.uri, { idempotent: true }).catch(() => {})

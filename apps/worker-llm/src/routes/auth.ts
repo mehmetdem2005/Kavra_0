@@ -1,7 +1,7 @@
+import crypto from 'node:crypto'
+import bcrypt from 'bcryptjs'
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import bcrypt from 'bcryptjs'
-import crypto from 'node:crypto'
 import { supabase, verifyUserToken } from '../supabase.js'
 
 /**
@@ -24,7 +24,7 @@ import { supabase, verifyUserToken } from '../supabase.js'
 // ===== Schemas =====
 
 const SendOTPSchema = z.object({
-  identifier: z.string().min(3),              // email veya telefon
+  identifier: z.string().min(3), // email veya telefon
   identifierType: z.enum(['phone', 'email']),
   purpose: z.enum(['signup', 'login', 'password_reset', 'phone_verify', 'email_verify']),
 })
@@ -54,11 +54,11 @@ async function sendEmailOTP(email: string, code: string, purpose: string): Promi
   const RESEND_KEY = process.env.RESEND_API_KEY
   if (!RESEND_KEY) {
     console.log(`[OTP] ${email} için kod: ${code} (${purpose})`)
-    return  // dev mode — console'a yaz
+    return // dev mode — console'a yaz
   }
 
   const subjects: Record<string, string> = {
-    signup: '✨ Kavra\'ya hoş geldin — Doğrulama kodun',
+    signup: "✨ Kavra'ya hoş geldin — Doğrulama kodun",
     login: '🔑 Kavra giriş kodun',
     password_reset: '🔒 Şifre sıfırlama kodun',
     email_verify: '📧 E-posta doğrulama kodun',
@@ -95,7 +95,7 @@ async function sendSMSOTP(phone: string, code: string): Promise<void> {
 
   if (!TWILIO_SID || !TWILIO_TOKEN || !TWILIO_FROM) {
     console.log(`[OTP-SMS] ${phone} için kod: ${code}`)
-    return  // dev mode
+    return // dev mode
   }
 
   const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64')
@@ -116,7 +116,6 @@ async function sendSMSOTP(phone: string, code: string): Promise<void> {
 // ===== Routes =====
 
 export async function authRoutes(fastify: FastifyInstance) {
-
   /**
    * POST /api/auth/otp/send
    * 6 haneli kod oluşturur, hash'leyip DB'ye kaydeder, email/SMS gönderir.
@@ -174,9 +173,10 @@ export async function authRoutes(fastify: FastifyInstance) {
 
     return {
       ok: true,
-      message: identifierType === 'email'
-        ? 'E-postana 6 haneli kod gönderdik'
-        : 'Telefonuna SMS ile 6 haneli kod gönderdik',
+      message:
+        identifierType === 'email'
+          ? 'E-postana 6 haneli kod gönderdik'
+          : 'Telefonuna SMS ile 6 haneli kod gönderdik',
       expiresAt: expiresAt.toISOString(),
     }
   })
@@ -204,16 +204,23 @@ export async function authRoutes(fastify: FastifyInstance) {
       .maybeSingle()
 
     if (!otp) {
-      return reply.code(400).send({ error: 'invalid_or_expired', message: 'Kod geçersiz veya süresi doldu' })
+      return reply
+        .code(400)
+        .send({ error: 'invalid_or_expired', message: 'Kod geçersiz veya süresi doldu' })
     }
 
     if (otp.attempts >= otp.max_attempts) {
-      return reply.code(429).send({ error: 'too_many_attempts', message: 'Çok fazla yanlış deneme' })
+      return reply
+        .code(429)
+        .send({ error: 'too_many_attempts', message: 'Çok fazla yanlış deneme' })
     }
 
     const valid = await bcrypt.compare(code, otp.code_hash)
     if (!valid) {
-      await supabase.from('otp_codes').update({ attempts: otp.attempts + 1 }).eq('id', otp.id)
+      await supabase
+        .from('otp_codes')
+        .update({ attempts: otp.attempts + 1 })
+        .eq('id', otp.id)
       return reply.code(400).send({
         error: 'invalid_code',
         attemptsRemaining: otp.max_attempts - otp.attempts - 1,
@@ -221,7 +228,10 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
 
     // Doğru — consumed işaretle
-    await supabase.from('otp_codes').update({ consumed_at: new Date().toISOString() }).eq('id', otp.id)
+    await supabase
+      .from('otp_codes')
+      .update({ consumed_at: new Date().toISOString() })
+      .eq('id', otp.id)
 
     // Purpose'a göre devam et
     switch (purpose) {
@@ -229,10 +239,13 @@ export async function authRoutes(fastify: FastifyInstance) {
         const userId = await verifyUserToken(req.headers.authorization)
         if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-        await supabase.from('profiles').update({
-          phone_number: identifier,
-          phone_verified_at: new Date().toISOString(),
-        }).eq('id', userId)
+        await supabase
+          .from('profiles')
+          .update({
+            phone_number: identifier,
+            phone_verified_at: new Date().toISOString(),
+          })
+          .eq('id', userId)
 
         return { ok: true, verified: true }
       }
@@ -310,10 +323,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
     // Push token deactivate
-    await supabase
-      .from('push_tokens')
-      .update({ is_active: false })
-      .eq('user_id', userId)
+    await supabase.from('push_tokens').update({ is_active: false }).eq('user_id', userId)
 
     return { ok: true, message: 'Çıkış yapıldı' }
   })

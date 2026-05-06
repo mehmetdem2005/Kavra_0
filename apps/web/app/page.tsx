@@ -11,8 +11,12 @@ export default function Landing() {
             <span className="font-serif text-2xl text-brand-950">Kavra</span>
           </div>
           <div className="flex items-center gap-6 text-sm">
-            <a href="#ozellikler" className="text-slate-600 hover:text-brand-950">Özellikler</a>
-            <a href="#fiyat" className="text-slate-600 hover:text-brand-950">Fiyat</a>
+            <a href="#ozellikler" className="text-slate-600 hover:text-brand-950">
+              Özellikler
+            </a>
+            <a href="#fiyat" className="text-slate-600 hover:text-brand-950">
+              Fiyat
+            </a>
             <a href="#indir" className="bg-brand-950 text-white px-4 py-2 rounded-lg font-semibold">
               İndir
             </a>
@@ -27,13 +31,14 @@ export default function Landing() {
         </div>
 
         <h1 className="text-6xl md:text-7xl font-serif text-brand-950 leading-tight">
-          Kavra.<br />
+          Kavra.
+          <br />
           <span className="text-accent-500">Her şeyi.</span>
         </h1>
 
         <p className="text-xl text-slate-600 mt-6 max-w-2xl mx-auto leading-relaxed">
-          Kendi Groq anahtarınla sınırsız sohbet. PDF yükle, fotoğraf çek, konuşarak ders dinle.
-          Her dilde. Tamamen senin kontrolünde.
+          Kendi Groq anahtarınla sınırsız sohbet. PDF yükle, fotoğraf çek, konuşarak ders dinle. Her
+          dilde. Tamamen senin kontrolünde.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
@@ -62,26 +67,46 @@ export default function Landing() {
       <section id="ozellikler" className="bg-white border-y border-slate-100 py-24">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-serif text-brand-950 text-center mb-4">
-            Nasıl öğrendiğin kadar,<br />nasıl öğretildiğin de önemli.
+            Nasıl öğrendiğin kadar,
+            <br />
+            nasıl öğretildiğin de önemli.
           </h2>
           <p className="text-center text-slate-600 max-w-2xl mx-auto mb-16">
-            Feynman, Zihin Sarayı, Sokratik yöntem — her teknik bir uzman
-            tarafından seçilmiş, AI tarafından sana özel uygulanmış.
+            Feynman, Zihin Sarayı, Sokratik yöntem — her teknik bir uzman tarafından seçilmiş, AI
+            tarafından sana özel uygulanmış.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <Feature emoji="🧠" title="150 Teknik"
-              desc="Hafızadan üstbilişe, odaklanmadan yaratıcılığa 7 ana modül + 10 AI kategorisi." />
-            <Feature emoji="🎙️" title="Sesli Ders"
-              desc="Konuşarak sor, AI'dan sesli cevap al. Whisper STT + 30+ dilde TTS." />
-            <Feature emoji="📄" title="PDF + Fotoğraf"
-              desc="Materyalini yükle, el yazısını tanısın, otomatik flashcard üretsin." />
-            <Feature emoji="🎭" title="7 AI Kişilik"
-              desc="Profesör, abla/abi, Sokratik, komedyen — ruh haline göre seç." />
-            <Feature emoji="🔁" title="Aralıklı Tekrar"
-              desc="SM-2 + Leitner. Unutma eğrine karşı tam zamanında tekrar." />
-            <Feature emoji="🌍" title="Her Dil"
-              desc="Arayüz Türkçe, içerik istediğin dilde. 16+ dil desteği." />
+            <Feature
+              emoji="🧠"
+              title="150 Teknik"
+              desc="Hafızadan üstbilişe, odaklanmadan yaratıcılığa 7 ana modül + 10 AI kategorisi."
+            />
+            <Feature
+              emoji="🎙️"
+              title="Sesli Ders"
+              desc="Konuşarak sor, AI'dan sesli cevap al. Whisper STT + 30+ dilde TTS."
+            />
+            <Feature
+              emoji="📄"
+              title="PDF + Fotoğraf"
+              desc="Materyalini yükle, el yazısını tanısın, otomatik flashcard üretsin."
+            />
+            <Feature
+              emoji="🎭"
+              title="7 AI Kişilik"
+              desc="Profesör, abla/abi, Sokratik, komedyen — ruh haline göre seç."
+            />
+            <Feature
+              emoji="🔁"
+              title="Aralıklı Tekrar"
+              desc="SM-2 + Leitner. Unutma eğrine karşı tam zamanında tekrar."
+            />
+            <Feature
+              emoji="🌍"
+              title="Her Dil"
+              desc="Arayüz Türkçe, içerik istediğin dilde. 16+ dil desteği."
+            />
           </div>
         </div>
       </section>
@@ -92,8 +117,8 @@ export default function Landing() {
           Ücretsiz başla. İstersen Pro'ya geç.
         </h2>
         <p className="text-center text-slate-600 mb-16 max-w-2xl mx-auto">
-          Groq anahtarın sende olduğu için LLM maliyeti bizde değil.
-          Senden sadece ekstra özellikler için ücret alıyoruz.
+          Groq anahtarın sende olduğu için LLM maliyeti bizde değil. Senden sadece ekstra özellikler
+          için ücret alıyoruz.
         </p>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -133,12 +158,10 @@ export default function Landing() {
       {/* CTA */}
       <section id="indir" className="bg-brand-950 text-white py-24">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-serif mb-6">
-            Bugün kavramaya başla.
-          </h2>
+          <h2 className="text-4xl md:text-5xl font-serif mb-6">Bugün kavramaya başla.</h2>
           <p className="text-white/70 text-lg mb-10 max-w-xl mx-auto">
-            Ücretsiz Android uygulamasını indir, Groq anahtarını ekle,
-            istediğin dilde kavramaya başla.
+            Ücretsiz Android uygulamasını indir, Groq anahtarını ekle, istediğin dilde kavramaya
+            başla.
           </p>
           <a
             href="#"
@@ -155,9 +178,15 @@ export default function Landing() {
       <footer className="py-12 text-center text-sm text-slate-500 border-t border-slate-100">
         <p>© 2026 Kavra · Frankfurt, KVKK uyumlu</p>
         <div className="flex items-center justify-center gap-4 mt-2">
-          <a href="/privacy" className="hover:text-brand-950">Gizlilik</a>
-          <a href="/terms" className="hover:text-brand-950">Şartlar</a>
-          <a href="/contact" className="hover:text-brand-950">İletişim</a>
+          <a href="/privacy" className="hover:text-brand-950">
+            Gizlilik
+          </a>
+          <a href="/terms" className="hover:text-brand-950">
+            Şartlar
+          </a>
+          <a href="/contact" className="hover:text-brand-950">
+            İletişim
+          </a>
         </div>
       </footer>
     </main>
@@ -175,7 +204,13 @@ function Feature({ emoji, title, desc }: { emoji: string; title: string; desc: s
 }
 
 function PriceCard({
-  name, price, period, features, cta, highlight, extra,
+  name,
+  price,
+  period,
+  features,
+  cta,
+  highlight,
+  extra,
 }: {
   name: string
   price: string
@@ -199,9 +234,7 @@ function PriceCard({
           {name}
         </h3>
         {highlight && (
-          <span className="text-xs bg-accent-500 text-white px-2 py-0.5 rounded-full">
-            Popüler
-          </span>
+          <span className="text-xs bg-accent-500 text-white px-2 py-0.5 rounded-full">Popüler</span>
         )}
       </div>
       <div className="mt-4 flex items-baseline gap-1">
@@ -219,9 +252,7 @@ function PriceCard({
         ))}
       </ul>
       {extra && (
-        <p className={`text-xs mt-4 ${highlight ? 'text-white/60' : 'text-slate-500'}`}>
-          {extra}
-        </p>
+        <p className={`text-xs mt-4 ${highlight ? 'text-white/60' : 'text-slate-500'}`}>{extra}</p>
       )}
       <button
         className={[

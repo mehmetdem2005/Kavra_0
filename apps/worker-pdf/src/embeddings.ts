@@ -1,7 +1,10 @@
 const OPENAI_BASE = 'https://api.openai.com/v1'
 
 export class EmbeddingError extends Error {
-  constructor(message: string, public status: number) {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
     super(message)
     this.name = 'EmbeddingError'
   }

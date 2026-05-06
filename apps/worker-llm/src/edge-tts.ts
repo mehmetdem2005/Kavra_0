@@ -22,7 +22,9 @@ import crypto from 'node:crypto'
 import { WebSocket } from 'ws'
 
 const EDGE_TTS_TRUSTED_TOKEN = '6A5AA1D4EAFF4E9FB37E23D68491D6F4'
-const EDGE_TTS_WSS_URL = 'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=' + EDGE_TTS_TRUSTED_TOKEN
+const EDGE_TTS_WSS_URL =
+  'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=' +
+  EDGE_TTS_TRUSTED_TOKEN
 
 export interface EdgeTTSVoice {
   shortName: string
@@ -38,18 +40,28 @@ export const TURKISH_VOICES: EdgeTTSVoice[] = [
 ]
 
 export const ENGLISH_VOICES: EdgeTTSVoice[] = [
-  { shortName: 'en-US-AvaMultilingualNeural', displayName: 'Ava (Multilingual)', gender: 'Female', locale: 'en-US' },
-  { shortName: 'en-US-AndrewMultilingualNeural', displayName: 'Andrew (Multilingual)', gender: 'Male', locale: 'en-US' },
+  {
+    shortName: 'en-US-AvaMultilingualNeural',
+    displayName: 'Ava (Multilingual)',
+    gender: 'Female',
+    locale: 'en-US',
+  },
+  {
+    shortName: 'en-US-AndrewMultilingualNeural',
+    displayName: 'Andrew (Multilingual)',
+    gender: 'Male',
+    locale: 'en-US',
+  },
   { shortName: 'en-US-AriaNeural', displayName: 'Aria', gender: 'Female', locale: 'en-US' },
   { shortName: 'en-US-GuyNeural', displayName: 'Guy', gender: 'Male', locale: 'en-US' },
 ]
 
 export interface EdgeTTSParams {
   text: string
-  voice?: string                              // varsayılan: tr-TR-EmelNeural
-  rate?: number                               // -100 .. +100 (% hız değişimi)
-  pitch?: number                              // -100 .. +100 (Hz pitch değişimi)
-  volume?: number                             // -100 .. +100 (% ses değişimi)
+  voice?: string // varsayılan: tr-TR-EmelNeural
+  rate?: number // -100 .. +100 (% hız değişimi)
+  pitch?: number // -100 .. +100 (Hz pitch değişimi)
+  volume?: number // -100 .. +100 (% ses değişimi)
 }
 
 /**
@@ -71,8 +83,9 @@ export async function edgeTTS(params: EdgeTTSParams): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
     const ws = new WebSocket(EDGE_TTS_WSS_URL, {
       headers: {
-        'Origin': 'chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0',
+        Origin: 'chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold',
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0',
       },
     })
 
@@ -183,7 +196,7 @@ function escapeXml(text: string): string {
  * Edge TTS voice seçimi - dile göre otomatik
  */
 export function defaultVoiceForLanguage(lang: string, gender?: 'Male' | 'Female'): string {
-  const langPrefix = lang.toLowerCase().split('-')[0]
+  const langPrefix = lang.toLowerCase().split('-')[0] ?? 'tr'
 
   const voices: Record<string, [string, string]> = {
     tr: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural'],
@@ -196,6 +209,6 @@ export function defaultVoiceForLanguage(lang: string, gender?: 'Male' | 'Female'
     ar: ['ar-SA-ZariyahNeural', 'ar-SA-HamedNeural'],
   }
 
-  const pair = voices[langPrefix] ?? voices.tr
+  const pair = voices[langPrefix] ?? voices.tr!
   return gender === 'Male' ? pair[1] : pair[0]
 }

@@ -22,7 +22,10 @@ const GoalSchema = z.object({
   outcome: z.string().min(3).max(300),
   obstacle: z.string().max(300).optional(),
   plan: z.string().max(500).optional(),
-  targetDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  targetDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 })
 
 const PushTokenSchema = z.object({
@@ -72,10 +75,7 @@ export async function motivationRoutes(fastify: FastifyInstance) {
     const newIds = (data ?? []).map((r: any) => r.achievement_id)
     if (newIds.length === 0) return { newAchievements: [] }
 
-    const { data: details } = await supabase
-      .from('achievements')
-      .select('*')
-      .in('id', newIds)
+    const { data: details } = await supabase.from('achievements').select('*').in('id', newIds)
 
     return { newAchievements: details ?? [] }
   })
@@ -87,11 +87,7 @@ export async function motivationRoutes(fastify: FastifyInstance) {
     const userId = await verifyUserToken(req.headers.authorization)
     if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-    const { data } = await supabase
-      .from('streaks')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle()
+    const { data } = await supabase.from('streaks').select('*').eq('user_id', userId).maybeSingle()
 
     return {
       currentStreak: data?.current_streak ?? 0,

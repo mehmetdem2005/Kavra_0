@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react'
-import { View, Text, Pressable, Alert } from 'react-native'
 import { Canvas, Path, Skia, useCanvasRef } from '@shopify/react-native-skia'
-import { GestureDetector, Gesture } from 'react-native-gesture-handler'
+import { useRef, useState } from 'react'
+import { Alert, Pressable, Text, View } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 import { Icon } from '../ui/Icon'
 

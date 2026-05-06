@@ -74,7 +74,7 @@ export class RAGEngine {
       match_count: params.topK ?? 3,
     })
 
-    return (data as any[] ?? []).map((row) => ({
+    return ((data as any[]) ?? []).map((row) => ({
       conceptId: row.concept_id,
       name: row.name,
       similarity: Number(row.similarity),

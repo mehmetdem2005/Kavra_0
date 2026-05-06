@@ -2,8 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@kavra/db', '@kavra/shared'],
-  experimental: {
-    typedRoutes: true,
+  typescript: {
+    // typecheck pnpm typecheck ile ayrı koşuyor; React 18/19 type
+    // merging Next.js build'de patlayabiliyor.
+    ignoreBuildErrors: true,
   },
 }
 

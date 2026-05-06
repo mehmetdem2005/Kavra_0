@@ -1,5 +1,5 @@
 // Node.js'te pdfjs-dist için legacy build kullanıyoruz
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs'
+import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
 
 // Worker'ı disable et (Node.js'te gerekmiyor)
 GlobalWorkerOptions.workerSrc = ''
@@ -69,7 +69,10 @@ export interface Chunk {
   index: number
 }
 
-export function chunkText(parsed: ParsedPDF, opts: { maxChars?: number; overlap?: number } = {}): Chunk[] {
+export function chunkText(
+  parsed: ParsedPDF,
+  opts: { maxChars?: number; overlap?: number } = {},
+): Chunk[] {
   const maxChars = opts.maxChars ?? 2000
   const overlap = opts.overlap ?? 200
   const chunks: Chunk[] = []

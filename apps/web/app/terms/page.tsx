@@ -10,8 +10,8 @@ export default function TermsPage() {
       <p className="text-sm text-slate-500">Son güncelleme: 1 Mayıs 2026</p>
 
       <p>
-        Kavra'yı kullanmaya başladığında bu şartları kabul etmiş sayılırsın. Kısa, sade ve
-        avukatça olmayan bir Türkçe ile yazıldı.
+        Kavra'yı kullanmaya başladığında bu şartları kabul etmiş sayılırsın. Kısa, sade ve avukatça
+        olmayan bir Türkçe ile yazıldı.
       </p>
 
       <h2>Hesap & Erişim</h2>
@@ -25,8 +25,8 @@ export default function TermsPage() {
       <h2>Pro Abonelik</h2>
       <ul>
         <li>
-          <strong>iOS / Android:</strong> Abonelik App Store / Play Store üzerinden otomatik yenilenir.
-          Yenilemenin durması için süresinin bitmesinden 24 saat önce iptal etmelisin.
+          <strong>iOS / Android:</strong> Abonelik App Store / Play Store üzerinden otomatik
+          yenilenir. Yenilemenin durması için süresinin bitmesinden 24 saat önce iptal etmelisin.
         </li>
         <li>
           <strong>Web:</strong> Aylık veya yıllık abonelik Stripe üzerinden yönetilir.
@@ -43,8 +43,8 @@ export default function TermsPage() {
       <h2>İade Politikası</h2>
       <p>
         Aboneliğin iadesini App Store / Play Store üzerinden talep et. Web Stripe abonelikleri için
-        7 gün içinde {' '}<a href="mailto:billing@kavra.app">billing@kavra.app</a>'a yaz. Lifetime ödemeler
-        iade edilmez (ancak hesap silinirse abonelik aktif kalır — devredilemez).
+        7 gün içinde <a href="mailto:billing@kavra.app">billing@kavra.app</a>'a yaz. Lifetime
+        ödemeler iade edilmez (ancak hesap silinirse abonelik aktif kalır — devredilemez).
       </p>
 
       <h2>Yasak Kullanımlar</h2>
@@ -58,39 +58,38 @@ export default function TermsPage() {
         <li>Spam veya rahatsız edici otomatik istek</li>
       </ul>
       <p>
-        Bu kuralları ihlal eden hesaplar uyarı olmadan kapatılabilir; lifetime ödemeler dahil
-        iade yapılmaz.
+        Bu kuralları ihlal eden hesaplar uyarı olmadan kapatılabilir; lifetime ödemeler dahil iade
+        yapılmaz.
       </p>
 
       <h2>Senin İçeriğin</h2>
       <p>
-        Yüklediğin PDF, video, metin senin. Kavra'nın bunları sadece <strong>sana hizmet vermek için</strong>
-        kullanma hakkı vardır (AI işlemek, çevirmek, özetlemek). Asla başka kullanıcılara göstermeyiz,
-        eğitim verisi olarak kullanmayız, satmayız.
+        Yüklediğin PDF, video, metin senin. Kavra'nın bunları sadece{' '}
+        <strong>sana hizmet vermek için</strong>
+        kullanma hakkı vardır (AI işlemek, çevirmek, özetlemek). Asla başka kullanıcılara
+        göstermeyiz, eğitim verisi olarak kullanmayız, satmayız.
       </p>
-      <p>
-        Yüklediğin içeriklerin telif veya gizlilik haklarını ihlal etmediğinden sen sorumlusun.
-      </p>
+      <p>Yüklediğin içeriklerin telif veya gizlilik haklarını ihlal etmediğinden sen sorumlusun.</p>
 
       <h2>AI Çıktılarının Garantisi</h2>
       <p>
         AI cevapları doğru olmayabilir. Sınava girerken, tıbbi karar verirken, hukuki belge yazarken
-        Kavra'nın çıktısını <strong>tek başına referans alma</strong>. AI yardımcıdır, kanıt değildir.
+        Kavra'nın çıktısını <strong>tek başına referans alma</strong>. AI yardımcıdır, kanıt
+        değildir.
       </p>
 
       <h2>Sorumluluk Sınırı</h2>
       <p>
         Kavra "olduğu gibi" sunulur. Herhangi bir kayıp (sınavı kaçırma, iş kaybı, zaman, hayal
-        kırıklığı dahil) için Kavra'nın yıllık ödediğin abonelik tutarından fazla sorumluluğu yoktur.
+        kırıklığı dahil) için Kavra'nın yıllık ödediğin abonelik tutarından fazla sorumluluğu
+        yoktur.
       </p>
 
       <h2>Hizmet Değişikliği & Sonlandırma</h2>
       <ul>
         <li>Pro fiyatlarını ve özelliklerini değiştirebiliriz (önceden bildirim ile).</li>
         <li>Free özellikleri kısıtlayabiliriz.</li>
-        <li>
-          Kavra kapanırsa (umarız hiç) tüm verilerini indirmen için en az 90 gün veririz.
-        </li>
+        <li>Kavra kapanırsa (umarız hiç) tüm verilerini indirmen için en az 90 gün veririz.</li>
       </ul>
 
       <h2>Yasal Uyuşmazlıklar</h2>
@@ -101,8 +100,10 @@ export default function TermsPage() {
 
       <h2>İletişim</h2>
       <p>
-        <a href="mailto:legal@kavra.app">legal@kavra.app</a> — sözleşme ve hukuki konular<br/>
-        <a href="mailto:support@kavra.app">support@kavra.app</a> — kullanım ile ilgili her şey<br/>
+        <a href="mailto:legal@kavra.app">legal@kavra.app</a> — sözleşme ve hukuki konular
+        <br />
+        <a href="mailto:support@kavra.app">support@kavra.app</a> — kullanım ile ilgili her şey
+        <br />
         <a href="mailto:billing@kavra.app">billing@kavra.app</a> — ödeme & iade
       </p>
     </main>

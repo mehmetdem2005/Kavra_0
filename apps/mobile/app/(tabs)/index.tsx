@@ -1,14 +1,14 @@
-import { View, Text, ScrollView, Pressable, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import { useTranslation } from 'react-i18next'
-import { useAuth } from '../../src/stores/auth'
-import { useCreateLesson, useRecentLessons } from '../../src/hooks/useLessons'
-import { useApiKeys } from '../../src/hooks/useApiKeys'
-import { useStreak, useAchievements, useCheckAchievements } from '../../src/hooks/useMotivation'
-import { useTodayReflection } from '../../src/hooks/useReflections'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native'
 import { Alert as RNAlert } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useApiKeys } from '../../src/hooks/useApiKeys'
+import { useCreateLesson, useRecentLessons } from '../../src/hooks/useLessons'
+import { useAchievements, useCheckAchievements, useStreak } from '../../src/hooks/useMotivation'
+import { useTodayReflection } from '../../src/hooks/useReflections'
+import { useAuth } from '../../src/stores/auth'
 
 function greeting(t: (k: string) => string) {
   const hour = new Date().getHours()
@@ -40,7 +40,10 @@ export default function Dashboard() {
             `${first.name} — ${first.description}`,
             r.newAchievements.length > 1
               ? [
-                  { text: `+${r.newAchievements.length - 1} daha var`, onPress: () => router.push('/achievements') },
+                  {
+                    text: `+${r.newAchievements.length - 1} daha var`,
+                    onPress: () => router.push('/achievements'),
+                  },
                   { text: 'Süper', style: 'cancel' },
                 ]
               : [{ text: 'Süper', style: 'cancel' }],
@@ -69,18 +72,24 @@ export default function Dashboard() {
 
   const handleNewChat = () => {
     if (!requireKey()) return
-    createLesson.mutate({}, {
-      onSuccess: (lesson) => router.push(`/lesson/${lesson.id}`),
-      onError: (e: any) => Alert.alert('Hata', e.message),
-    })
+    createLesson.mutate(
+      {},
+      {
+        onSuccess: (lesson) => router.push(`/lesson/${lesson.id}`),
+        onError: (e: any) => Alert.alert('Hata', e.message),
+      },
+    )
   }
 
   const handleVoiceLesson = () => {
     if (!requireKey()) return
-    createLesson.mutate({}, {
-      onSuccess: (lesson) => router.push(`/voice-lesson/${lesson.id}`),
-      onError: (e: any) => Alert.alert('Hata', e.message),
-    })
+    createLesson.mutate(
+      {},
+      {
+        onSuccess: (lesson) => router.push(`/voice-lesson/${lesson.id}`),
+        onError: (e: any) => Alert.alert('Hata', e.message),
+      },
+    )
   }
 
   return (
@@ -131,9 +140,7 @@ export default function Dashboard() {
               <Text className="text-brand-950 text-3xl font-bold">
                 {achievements?.earnedCount ?? 0}
               </Text>
-              <Text className="text-slate-400 mb-1 text-xs">
-                / {achievements?.totalCount ?? 0}
-              </Text>
+              <Text className="text-slate-400 mb-1 text-xs">/ {achievements?.totalCount ?? 0}</Text>
             </View>
             <Text className="text-brand-600 text-xs mt-1">⭐ Göster</Text>
           </Pressable>
@@ -187,18 +194,44 @@ export default function Dashboard() {
         </Text>
 
         <View className="gap-3 pb-8">
-          <QuickAction emoji="💬" title="Yeni sohbet" subtitle="AI ile yazışarak öğren"
-            onPress={handleNewChat} loading={createLesson.isPending} />
-          <QuickAction emoji="🎤" title="Sesli ders" subtitle="Konuşarak öğren"
-            onPress={handleVoiceLesson} loading={createLesson.isPending} />
-          <QuickAction emoji="🍅" title="Pomodoro" subtitle="25 dakika odak modu"
-            onPress={() => router.push('/pomodoro')} />
-          <QuickAction emoji="🎯" title="Hedeflerim" subtitle="WOOP yöntemiyle hedef belirle"
-            onPress={() => router.push('/goals')} />
-          <QuickAction emoji="📄" title="PDF yükle" subtitle="Materyalini ekle, AI flashcard üretsin"
-            onPress={() => router.push('/documents')} />
-          <QuickAction emoji="📸" title="Fotoğrafla" subtitle="Soru çek, el yazısı tanı, diyagram analizi"
-            onPress={() => router.push('/scan')} />
+          <QuickAction
+            emoji="💬"
+            title="Yeni sohbet"
+            subtitle="AI ile yazışarak öğren"
+            onPress={handleNewChat}
+            loading={createLesson.isPending}
+          />
+          <QuickAction
+            emoji="🎤"
+            title="Sesli ders"
+            subtitle="Konuşarak öğren"
+            onPress={handleVoiceLesson}
+            loading={createLesson.isPending}
+          />
+          <QuickAction
+            emoji="🍅"
+            title="Pomodoro"
+            subtitle="25 dakika odak modu"
+            onPress={() => router.push('/pomodoro')}
+          />
+          <QuickAction
+            emoji="🎯"
+            title="Hedeflerim"
+            subtitle="WOOP yöntemiyle hedef belirle"
+            onPress={() => router.push('/goals')}
+          />
+          <QuickAction
+            emoji="📄"
+            title="PDF yükle"
+            subtitle="Materyalini ekle, AI flashcard üretsin"
+            onPress={() => router.push('/documents')}
+          />
+          <QuickAction
+            emoji="📸"
+            title="Fotoğrafla"
+            subtitle="Soru çek, el yazısı tanı, diyagram analizi"
+            onPress={() => router.push('/scan')}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -206,7 +239,12 @@ export default function Dashboard() {
 }
 
 function QuickAction({
-  emoji, title, subtitle, onPress, loading, disabled,
+  emoji,
+  title,
+  subtitle,
+  onPress,
+  loading,
+  disabled,
 }: {
   emoji: string
   title: string

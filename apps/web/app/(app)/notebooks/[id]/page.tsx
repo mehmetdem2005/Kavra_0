@@ -1,12 +1,12 @@
 'use client'
-import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from '../../../../lib/api'
+import { useParams } from 'next/navigation'
 import { useState } from 'react'
-import { SourcesPanel } from '../../../../components/notebook/SourcesPanel'
 import { ChatPanel } from '../../../../components/notebook/ChatPanel'
+import { SourcesPanel } from '../../../../components/notebook/SourcesPanel'
 import { StudioPanel } from '../../../../components/notebook/StudioPanel'
 import { useNotebookRealtime } from '../../../../hooks/useNotebookRealtime'
+import { apiFetch } from '../../../../lib/api'
 
 export default function NotebookDetailPage() {
   const params = useParams()
@@ -40,7 +40,9 @@ export default function NotebookDetailPage() {
         <div className="flex-1 min-w-0">
           <h1 className="font-serif text-xl text-ink-900 truncate">{notebook.notebook?.title}</h1>
           {notebook.notebook?.description && (
-            <p className="text-xs text-slate-500 mt-0.5 truncate">{notebook.notebook.description}</p>
+            <p className="text-xs text-slate-500 mt-0.5 truncate">
+              {notebook.notebook.description}
+            </p>
           )}
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">

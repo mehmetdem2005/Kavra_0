@@ -1,15 +1,23 @@
-import { useEffect, useRef, useState } from 'react'
-import { View, Text, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, Pressable } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useLocalSearchParams } from 'expo-router'
-import { MessageBubble } from '../../src/components/chat/MessageBubble'
+import { useEffect, useRef, useState } from 'react'
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { ChatInput } from '../../src/components/chat/ChatInput'
+import { MessageBubble } from '../../src/components/chat/MessageBubble'
 import { ModelPickerModal } from '../../src/components/chat/ModelPickerModal'
 import { PersonalityPickerModal } from '../../src/components/chat/PersonalityPickerModal'
 import { useLesson, useMessages, useSendMessage } from '../../src/hooks/useLessons'
-import { supabase } from '../../src/lib/supabase'
 import type { LLMModel } from '../../src/hooks/useModels'
 import type { Personality } from '../../src/hooks/useSubjects'
+import { supabase } from '../../src/lib/supabase'
 
 export default function LessonChat() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -149,9 +157,7 @@ function EmptyState() {
   return (
     <View className="flex-1 items-center justify-center py-20 px-6">
       <Text style={{ fontSize: 48 }}>💬</Text>
-      <Text className="text-lg font-serif text-brand-950 mt-4">
-        Neyi kavramak istersin?
-      </Text>
+      <Text className="text-lg font-serif text-brand-950 mt-4">Neyi kavramak istersin?</Text>
       <Text className="text-slate-500 text-center mt-2 leading-6">
         Aşağıdan sorunu yaz, Kavra senin için 150 tekniğin en uygun olanıyla anlatsın.
       </Text>

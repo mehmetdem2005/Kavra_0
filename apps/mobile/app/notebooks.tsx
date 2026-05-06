@@ -1,8 +1,8 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native'
+import { Stack, useRouter } from 'expo-router'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
-import { useNotebooks } from '../../src/hooks/useNotebooks'
-import { Icon } from '../../src/components/ui/Icon'
+import { Icon } from '../src/components/ui/Icon'
+import { useNotebooks } from '../src/hooks/useNotebooks'
 
 export default function NotebooksScreen() {
   const router = useRouter()
@@ -24,9 +24,7 @@ export default function NotebooksScreen() {
           <Text className="font-serif text-3xl text-ink-900 leading-tight">
             <Text className="italic">Notlar</Text>, kaynaklar,
           </Text>
-          <Text className="font-serif text-3xl text-ink-900 leading-tight">
-            tek bir yerde.
-          </Text>
+          <Text className="font-serif text-3xl text-ink-900 leading-tight">tek bir yerde.</Text>
           <Text className="text-sm text-slate-600 mt-2 max-w-[300px]">
             PDF, URL, ses, YouTube. Hepsini at, AI sana özetlesin, podcast yapsın, sınav hazırlasın.
           </Text>
@@ -97,7 +95,12 @@ export default function NotebooksScreen() {
         <Pressable
           onPress={() => router.push('/notebook/new')}
           className="absolute bottom-8 right-5 w-14 h-14 bg-ink-900 rounded-full items-center justify-center"
-          style={{ shadowColor: '#1E1B4B', shadowOpacity: 0.3, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } }}
+          style={{
+            shadowColor: '#1E1B4B',
+            shadowOpacity: 0.3,
+            shadowRadius: 16,
+            shadowOffset: { width: 0, height: 8 },
+          }}
         >
           <Icon name="plus" size={24} color="#F59E0B" />
         </Pressable>
@@ -116,7 +119,10 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
       <Text className="text-sm text-slate-500 text-center mt-2 max-w-[280px]">
         Bir defter oluştur, kaynaklarını ekle, AI ile öğrenmeye başla.
       </Text>
-      <Pressable onPress={onCreate} className="mt-5 bg-ink-900 rounded-full px-6 py-3 flex-row items-center gap-2">
+      <Pressable
+        onPress={onCreate}
+        className="mt-5 bg-ink-900 rounded-full px-6 py-3 flex-row items-center gap-2"
+      >
         <Icon name="plus" size={16} color="#F59E0B" />
         <Text className="text-cream-50 font-semibold text-sm">İlk Defter</Text>
       </Pressable>

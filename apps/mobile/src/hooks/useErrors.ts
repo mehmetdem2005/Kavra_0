@@ -40,9 +40,7 @@ export function useErrors(opts: { subjectId?: string; conceptId?: string } = {})
       if (opts.subjectId) params.set('subjectId', opts.subjectId)
       if (opts.conceptId) params.set('conceptId', opts.conceptId)
       const qs = params.toString()
-      const { errors } = await apiFetch<{ errors: ErrorRow[] }>(
-        `/api/errors${qs ? `?${qs}` : ''}`,
-      )
+      const { errors } = await apiFetch<{ errors: ErrorRow[] }>(`/api/errors${qs ? `?${qs}` : ''}`)
       return errors
     },
   })
@@ -83,9 +81,7 @@ export function useSubjectStats(subjectId: string | null) {
     queryKey: ['subject-stats', subjectId],
     enabled: !!subjectId,
     queryFn: async () => {
-      const { stats } = await apiFetch<{ stats: SubjectStats }>(
-        `/api/subjects/${subjectId}/stats`,
-      )
+      const { stats } = await apiFetch<{ stats: SubjectStats }>(`/api/subjects/${subjectId}/stats`)
       return stats
     },
   })

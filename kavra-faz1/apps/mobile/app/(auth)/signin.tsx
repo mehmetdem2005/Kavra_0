@@ -1,12 +1,20 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, KeyboardAvoidingView, Platform } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Link } from 'expo-router'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
 import { Input } from '../../src/components/ui/Input'
-import { useAuth } from '../../src/stores/auth'
 import { signInWithGoogle } from '../../src/lib/google-auth'
+import { useAuth } from '../../src/stores/auth'
 
 export default function SignIn() {
   const { t } = useTranslation()
@@ -31,7 +39,10 @@ export default function SignIn() {
   }
 
   const handleMagicLink = async () => {
-    if (!email) { Alert.alert('', t('auth.signin.email')); return }
+    if (!email) {
+      Alert.alert('', t('auth.signin.email'))
+      return
+    }
     setMagicLoading(true)
     const res = await magicLink(email)
     setMagicLoading(false)
@@ -66,12 +77,8 @@ export default function SignIn() {
             <View className="w-16 h-0.5 bg-accent-500 mt-1" />
           </View>
 
-          <Text className="text-2xl font-serif text-brand-950 mb-1">
-            {t('auth.signin.title')}
-          </Text>
-          <Text className="text-base text-slate-600 mb-8">
-            {t('auth.signin.subtitle')}
-          </Text>
+          <Text className="text-2xl font-serif text-brand-950 mb-1">{t('auth.signin.title')}</Text>
+          <Text className="text-base text-slate-600 mb-8">{t('auth.signin.subtitle')}</Text>
 
           <Input
             label={t('auth.signin.email')}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, TextInput, Pressable, Text, ActivityIndicator } from 'react-native'
+import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native'
 
 interface Props {
   onSend: (text: string) => void

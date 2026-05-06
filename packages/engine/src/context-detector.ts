@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
-import type { LearningContext, UserIntent, UserSnapshot, ConceptSnapshot } from './types.js'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { ConceptSnapshot, LearningContext, UserIntent, UserSnapshot } from './types.js'
 
 /**
  * Kullanıcı ve konu verisinden "context" çıkaran detektör.
@@ -18,7 +18,7 @@ export class ContextDetector {
     concept?: ConceptSnapshot
     subjectId?: string
     messageContent: string
-    groqApiKey?: string  // Intent classification için
+    groqApiKey?: string // Intent classification için
   }): Promise<{
     context: LearningContext
     intent: UserIntent
@@ -160,8 +160,13 @@ Cevap: sadece bir kelime, başka hiçbir şey.`,
       const raw = (json.choices[0]?.message?.content ?? '').trim().toLowerCase()
 
       const valid: UserIntent[] = [
-        'learn_new', 'deepen', 'test_me', 'solve_problem',
-        'review_mistake', 'explore', 'chat',
+        'learn_new',
+        'deepen',
+        'test_me',
+        'solve_problem',
+        'review_mistake',
+        'explore',
+        'chat',
       ]
       const intent = valid.find((v) => raw.includes(v)) ?? 'learn_new'
 

@@ -1,8 +1,21 @@
-import { useEffect, useRef, useState } from 'react'
-import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native'
 import { useRouter } from 'expo-router'
+import { useEffect, useRef, useState } from 'react'
 import {
-  useNotebookMessages, useNotebookChat, type Notebook, type NotebookSource, type NotebookMessage,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
+import {
+  type Notebook,
+  type NotebookMessage,
+  type NotebookSource,
+  useNotebookChat,
+  useNotebookMessages,
 } from '../../hooks/useNotebooks'
 import { Icon } from '../ui/Icon'
 
@@ -64,7 +77,9 @@ export function NotebookChatTab({ notebook, sources }: Props) {
             onSuggestion={(s) => setInput(s)}
           />
         ) : (
-          {messages.map((m) => <MessageBubble key={m.id} message={m} sources={sources} notebookId={notebook.id} />)}
+          messages.map((m) => (
+            <MessageBubble key={m.id} message={m} sources={sources} notebookId={notebook.id} />
+          ))
         )}
 
         {chat.isPending && (
@@ -101,7 +116,11 @@ export function NotebookChatTab({ notebook, sources }: Props) {
               input.trim() && !chat.isPending ? 'bg-ink-900' : 'bg-slate-200'
             }`}
           >
-            <Icon name="send" size={14} color={input.trim() && !chat.isPending ? '#F59E0B' : '#94A3B8'} />
+            <Icon
+              name="send"
+              size={14}
+              color={input.trim() && !chat.isPending ? '#F59E0B' : '#94A3B8'}
+            />
           </Pressable>
         </View>
       </View>
@@ -110,7 +129,9 @@ export function NotebookChatTab({ notebook, sources }: Props) {
 }
 
 function EmptyState({
-  sourcesCount, hasNoReady, onSuggestion,
+  sourcesCount,
+  hasNoReady,
+  onSuggestion,
 }: { sourcesCount: number; hasNoReady: boolean; onSuggestion: (s: string) => void }) {
   if (sourcesCount === 0) {
     return (
@@ -118,11 +139,10 @@ function EmptyState({
         <View className="w-16 h-16 bg-amber-50 rounded-full items-center justify-center mb-4">
           <Icon name="file" size={28} color="#F59E0B" />
         </View>
-        <Text className="font-serif text-xl text-ink-900 text-center">
-          Önce kaynak ekle
-        </Text>
+        <Text className="font-serif text-xl text-ink-900 text-center">Önce kaynak ekle</Text>
         <Text className="text-sm text-slate-500 text-center mt-2 max-w-[260px]">
-          Kaynaklar sekmesinden bir PDF, URL, ses kaydı ya da metin ekle. Sonra ben hepsini öğrenip sorularını yanıtlarım :)
+          Kaynaklar sekmesinden bir PDF, URL, ses kaydı ya da metin ekle. Sonra ben hepsini öğrenip
+          sorularını yanıtlarım :)
         </Text>
       </View>
     )
@@ -149,7 +169,10 @@ function EmptyState({
   return (
     <View className="py-6">
       <View className="items-center mb-5">
-        <View className="w-16 h-16 bg-cream-100 rounded-full items-center justify-center mb-3" style={{ borderWidth: 1, borderColor: '#FBBF24' }}>
+        <View
+          className="w-16 h-16 bg-cream-100 rounded-full items-center justify-center mb-3"
+          style={{ borderWidth: 1, borderColor: '#FBBF24' }}
+        >
           <Icon name="message-square" size={28} color="#F59E0B" />
         </View>
         <Text className="font-serif text-xl text-ink-900">Kaynaklara sor!</Text>
@@ -176,7 +199,11 @@ function EmptyState({
   )
 }
 
-function MessageBubble({ message, sources, notebookId }: { message: NotebookMessage; sources: NotebookSource[]; notebookId: string }) {
+function MessageBubble({
+  message,
+  sources,
+  notebookId,
+}: { message: NotebookMessage; sources: NotebookSource[]; notebookId: string }) {
   const router = useRouter()
   if (message.role === 'user') {
     return (
@@ -195,7 +222,9 @@ function MessageBubble({ message, sources, notebookId }: { message: NotebookMess
         <View className="w-6 h-6 bg-ink-900 rounded-full items-center justify-center">
           <Icon name="sparkles" size={10} color="#F59E0B" />
         </View>
-        <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase">Kavra</Text>
+        <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase">
+          Kavra
+        </Text>
       </View>
       <View className="bg-white border border-slate-100 rounded-3xl rounded-tl-md px-4 py-3 max-w-[88%]">
         <CitedText content={message.content} citations={message.citations} />
@@ -247,7 +276,10 @@ function MessageBubble({ message, sources, notebookId }: { message: NotebookMess
 /**
  * Render text with [[n]] citation markers as superscript pills.
  */
-function CitedText({ content, citations }: { content: string; citations: NotebookMessage['citations'] }) {
+function CitedText({
+  content,
+  citations,
+}: { content: string; citations: NotebookMessage['citations'] }) {
   const parts: Array<{ type: 'text' | 'cite'; value: string; n?: number }> = []
   const regex = /\[\[(\d+)\]\]/g
   let lastIdx = 0
@@ -257,7 +289,7 @@ function CitedText({ content, citations }: { content: string; citations: Noteboo
     if (m.index > lastIdx) {
       parts.push({ type: 'text', value: content.slice(lastIdx, m.index) })
     }
-    parts.push({ type: 'cite', value: m[0], n: parseInt(m[1]) })
+    parts.push({ type: 'cite', value: m[0], n: Number.parseInt(m[1]) })
     lastIdx = m.index + m[0].length
   }
   if (lastIdx < content.length) {

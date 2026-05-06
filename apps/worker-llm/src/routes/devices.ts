@@ -31,7 +31,7 @@ const SendPushSchema = z.object({
   title: z.string().max(100),
   body: z.string().max(500),
   data: z.record(z.string(), z.any()).optional(),
-  channelId: z.string().optional(),             // Android channel
+  channelId: z.string().optional(), // Android channel
   sound: z.enum(['default', 'none']).optional().default('default'),
   badge: z.number().int().optional(),
   priority: z.enum(['default', 'normal', 'high']).optional().default('default'),
@@ -70,7 +70,6 @@ async function sendExpoPush(messages: ExpoPushMessage[]): Promise<any> {
 }
 
 export async function devicesRoutes(fastify: FastifyInstance) {
-
   /** POST /api/devices/register */
   fastify.post('/api/devices/register', async (req, reply) => {
     const userId = await verifyUserToken(req.headers.authorization)
@@ -82,17 +81,20 @@ export async function devicesRoutes(fastify: FastifyInstance) {
     // Upsert (deviceId unique per user)
     const { data, error } = await supabase
       .from('user_devices')
-      .upsert({
-        user_id: userId,
-        device_id: parsed.data.deviceId,
-        device_name: parsed.data.deviceName,
-        platform: parsed.data.platform,
-        app_version: parsed.data.appVersion,
-        os_version: parsed.data.osVersion,
-        push_token: parsed.data.pushToken,
-        push_enabled: parsed.data.pushEnabled,
-        last_active_at: new Date().toISOString(),
-      }, { onConflict: 'user_id,device_id' })
+      .upsert(
+        {
+          user_id: userId,
+          device_id: parsed.data.deviceId,
+          device_name: parsed.data.deviceName,
+          platform: parsed.data.platform,
+          app_version: parsed.data.appVersion,
+          os_version: parsed.data.osVersion,
+          push_token: parsed.data.pushToken,
+          push_enabled: parsed.data.pushEnabled,
+          last_active_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,device_id' },
+      )
       .select()
       .single()
 
@@ -107,7 +109,9 @@ export async function devicesRoutes(fastify: FastifyInstance) {
 
     const { data } = await supabase
       .from('user_devices')
-      .select('id, device_name, platform, app_version, os_version, push_enabled, last_active_at, created_at')
+      .select(
+        'id, device_name, platform, app_version, os_version, push_enabled, last_active_at, created_at',
+      )
       .eq('user_id', userId)
       .order('last_active_at', { ascending: false })
 
@@ -137,11 +141,7 @@ export async function devicesRoutes(fastify: FastifyInstance) {
     const userId = await verifyUserToken(req.headers.authorization)
     if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-    await supabase
-      .from('user_devices')
-      .delete()
-      .eq('id', req.params.id)
-      .eq('user_id', userId)
+    await supabase.from('user_devices').delete().eq('id', req.params.id).eq('user_id', userId)
 
     return { ok: true }
   })
@@ -173,9 +173,7 @@ export async function devicesRoutes(fastify: FastifyInstance) {
       .eq('push_enabled', true)
       .not('push_token', 'is', null)
 
-    const tokens = (devices ?? [])
-      .map((d) => d.push_token)
-      .filter(Boolean) as string[]
+    const tokens = (devices ?? []).map((d) => d.push_token).filter(Boolean) as string[]
 
     if (tokens.length === 0) {
       return { sent: 0, errors: ['no_push_tokens'] }

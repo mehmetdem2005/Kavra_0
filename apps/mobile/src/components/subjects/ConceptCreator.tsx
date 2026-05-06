@@ -1,10 +1,19 @@
-import { useState } from 'react'
-import { View, Text, Modal, Pressable, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native'
 import { supabase } from '../../lib/supabase'
-import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
 import { Icon } from '../ui/Icon'
+import { Input } from '../ui/Input'
 
 interface Props {
   visible: boolean
@@ -24,7 +33,9 @@ export function ConceptCreator({ visible, onClose, subjectId, subjectName, subje
   const [loading, setLoading] = useState(false)
 
   const reset = () => {
-    setName(''); setDescription(''); setDifficulty(2)
+    setName('')
+    setDescription('')
+    setDifficulty(2)
   }
 
   const handleCreate = async () => {
@@ -70,7 +81,10 @@ export function ConceptCreator({ visible, onClose, subjectId, subjectName, subje
                   {subjectName} altında
                 </Text>
                 <Text className="font-serif text-2xl text-ink-900">
-                  Yeni <Text className="italic" style={{ color: subjectColor }}>kavram</Text>
+                  Yeni{' '}
+                  <Text className="italic" style={{ color: subjectColor }}>
+                    kavram
+                  </Text>
                 </Text>
               </View>
               <Pressable onPress={onClose} hitSlop={12}>
@@ -106,11 +120,18 @@ export function ConceptCreator({ visible, onClose, subjectId, subjectName, subje
                       key={n}
                       onPress={() => setDifficulty(n)}
                       className={`flex-1 py-3 rounded-xl border ${
-                        difficulty >= n ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-white'
+                        difficulty >= n
+                          ? 'border-amber-500 bg-amber-50'
+                          : 'border-slate-200 bg-white'
                       }`}
                     >
                       <View className="items-center">
-                        <Icon name="star" size={16} color={difficulty >= n ? '#F59E0B' : '#CBD5E1'} fill={difficulty >= n ? '#F59E0B' : 'none'} />
+                        <Icon
+                          name="star"
+                          size={16}
+                          color={difficulty >= n ? '#F59E0B' : '#CBD5E1'}
+                          fill={difficulty >= n ? '#F59E0B' : 'none'}
+                        />
                       </View>
                     </Pressable>
                   ))}
@@ -121,7 +142,13 @@ export function ConceptCreator({ visible, onClose, subjectId, subjectName, subje
               </View>
 
               <View className="mt-6">
-                <Button title="Kavramı Oluştur" onPress={handleCreate} loading={loading} disabled={!name.trim()} fullWidth />
+                <Button
+                  title="Kavramı Oluştur"
+                  onPress={handleCreate}
+                  loading={loading}
+                  disabled={!name.trim()}
+                  fullWidth
+                />
               </View>
 
               <Text className="text-[10px] text-slate-500 text-center mt-3 leading-4">

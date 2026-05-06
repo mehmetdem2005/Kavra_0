@@ -62,7 +62,10 @@ export const CreateSubjectSchema = z.object({
   description: z.string().max(500).optional(),
   targetLevel: z.string().optional(),
   targetDate: z.string().optional(), // ISO date
-  color: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-F]{6}$/i)
+    .optional(),
   icon: z.string().optional(),
 })
 

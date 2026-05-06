@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { getSupabaseBrowserClient } from '../../lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { toast } from 'sonner'
+import { getSupabaseBrowserClient } from '../../lib/supabase/client'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -92,8 +92,14 @@ export default function SignupPage() {
 
           <p className="text-[9px] text-slate-400 text-center mt-4">
             Kayıt olarak{' '}
-            <Link href="/terms" className="underline">Kullanım Şartları</Link>'nı ve{' '}
-            <Link href="/privacy" className="underline">Gizlilik Politikası</Link>'nı kabul ediyorsun.
+            <Link href="/terms" className="underline">
+              Kullanım Şartları
+            </Link>
+            'nı ve{' '}
+            <Link href="/privacy" className="underline">
+              Gizlilik Politikası
+            </Link>
+            'nı kabul ediyorsun.
           </p>
         </div>
       </div>

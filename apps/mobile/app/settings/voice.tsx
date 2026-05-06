@@ -1,17 +1,22 @@
-import { useEffect, useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Stack } from 'expo-router'
 import Slider from '@react-native-community/slider'
+import { Stack } from 'expo-router'
+import { useEffect, useState } from 'react'
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
+import { useProfile } from '../../src/hooks/useSubjects'
 import { useTTS } from '../../src/hooks/useTTS'
 import { supabase } from '../../src/lib/supabase'
-import { useProfile } from '../../src/hooks/useSubjects'
 
 type TTSMode = 'device' | 'server' | 'auto' | 'off'
 
 const TTS_MODES: Array<{ value: TTSMode; label: string; desc: string; emoji: string }> = [
-  { value: 'auto', label: 'Otomatik', desc: 'Kısa metin cihaz, uzun metin sunucu (önerilen)', emoji: '✨' },
+  {
+    value: 'auto',
+    label: 'Otomatik',
+    desc: 'Kısa metin cihaz, uzun metin sunucu (önerilen)',
+    emoji: '✨',
+  },
   { value: 'device', label: 'Cihaz', desc: 'Hızlı, çevrimdışı, ücretsiz', emoji: '📱' },
   { value: 'server', label: 'Sunucu (Piper)', desc: 'En kaliteli, internet gerekli', emoji: '🎙️' },
   { value: 'off', label: 'Kapalı', desc: 'Sesli yanıt yok', emoji: '🔇' },
@@ -45,7 +50,9 @@ export default function VoiceSettings() {
     if (isSpeaking) {
       stop()
     } else {
-      speak('Merhaba, ben Kavra. Sesli ders için hazırım. Bu sesin hızını ve tonunu ayarlardan değiştirebilirsin.')
+      speak(
+        'Merhaba, ben Kavra. Sesli ders için hazırım. Bu sesin hızını ve tonunu ayarlardan değiştirebilirsin.',
+      )
     }
   }
 

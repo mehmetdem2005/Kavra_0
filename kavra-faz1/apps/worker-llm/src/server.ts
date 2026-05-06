@@ -1,8 +1,8 @@
 import 'dotenv/config'
-import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import helmet from '@fastify/helmet'
 import rateLimit from '@fastify/rate-limit'
+import Fastify from 'fastify'
 import { apiKeysRoutes } from './routes/api-keys.js'
 import { chatRoutes } from './routes/chat.js'
 import { modelsRoutes } from './routes/models.js'
@@ -12,9 +12,7 @@ const isDev = process.env.NODE_ENV !== 'production'
 const app = Fastify({
   logger: {
     level: process.env.LOG_LEVEL ?? 'info',
-    transport: isDev
-      ? { target: 'pino-pretty', options: { colorize: true } }
-      : undefined,
+    transport: isDev ? { target: 'pino-pretty', options: { colorize: true } } : undefined,
   },
   bodyLimit: 10 * 1024 * 1024, // 10MB (PDF/ses için ileride)
 })
@@ -29,11 +27,7 @@ await app.register(cors, {
     // Dev modda tüm origin'lere izin (Expo Go IP'si değişken)
     if (isDev) return cb(null, true)
 
-    const allowed = [
-      'https://kavra.app',
-      'https://admin.kavra.app',
-      'https://www.kavra.app',
-    ]
+    const allowed = ['https://kavra.app', 'https://admin.kavra.app', 'https://www.kavra.app']
     if (!origin) return cb(null, true) // mobil app (origin header'ı yok)
     if (allowed.includes(origin)) return cb(null, true)
     if (origin.startsWith('exp://') || origin.startsWith('exps://')) return cb(null, true)

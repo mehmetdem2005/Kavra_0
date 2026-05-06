@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { tts, type TTSMode } from '../lib/voice/tts'
+import { type TTSMode, tts } from '../lib/voice/tts'
 
 interface UseTTSOptions {
   language?: string
@@ -18,26 +18,31 @@ export function useTTS(opts: UseTTSOptions = {}) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    return () => { tts.stop() }
+    return () => {
+      tts.stop()
+    }
   }, [])
 
-  const speak = useCallback((text: string) => {
-    if (!text.trim()) return
-    setError(null)
-    tts.speak({
-      text,
-      language: opts.language ?? 'tr',
-      voice: opts.voice,
-      speed: opts.speed ?? 1.0,
-      mode: opts.mode ?? 'auto',
-      onStart: () => setIsSpeaking(true),
-      onDone: () => setIsSpeaking(false),
-      onError: (err) => {
-        setError(err.message)
-        setIsSpeaking(false)
-      },
-    })
-  }, [opts.language, opts.voice, opts.speed, opts.mode])
+  const speak = useCallback(
+    (text: string) => {
+      if (!text.trim()) return
+      setError(null)
+      tts.speak({
+        text,
+        language: opts.language ?? 'tr',
+        voice: opts.voice,
+        speed: opts.speed ?? 1.0,
+        mode: opts.mode ?? 'auto',
+        onStart: () => setIsSpeaking(true),
+        onDone: () => setIsSpeaking(false),
+        onError: (err) => {
+          setError(err.message)
+          setIsSpeaking(false)
+        },
+      })
+    },
+    [opts.language, opts.voice, opts.speed, opts.mode],
+  )
 
   const stop = useCallback(async () => {
     await tts.stop()

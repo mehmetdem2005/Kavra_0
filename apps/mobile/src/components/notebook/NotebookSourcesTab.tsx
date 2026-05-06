@@ -1,8 +1,23 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, TextInput, Modal, ActivityIndicator } from 'react-native'
-import { useRouter } from 'expo-router'
 import * as DocumentPicker from 'expo-document-picker'
-import { useUploadSource, useCreateSource, useDeleteSource, type Notebook, type NotebookSource } from '../../hooks/useNotebooks'
+import { useRouter } from 'expo-router'
+import { useState } from 'react'
+import {
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
+import {
+  type Notebook,
+  type NotebookSource,
+  useCreateSource,
+  useDeleteSource,
+  useUploadSource,
+} from '../../hooks/useNotebooks'
 import { Icon, type IconName } from '../ui/Icon'
 
 interface Props {
@@ -30,9 +45,12 @@ export function NotebookSourcesTab({ notebook, sources }: Props) {
   const handlePickFile = async (type: 'pdf' | 'audio' | 'epub') => {
     setAddModalOpen(false)
     try {
-      const types = type === 'pdf' ? ['application/pdf']
-                  : type === 'audio' ? ['audio/*']
-                  : ['application/epub+zip']
+      const types =
+        type === 'pdf'
+          ? ['application/pdf']
+          : type === 'audio'
+            ? ['audio/*']
+            : ['application/epub+zip']
 
       const res = await DocumentPicker.getDocumentAsync({ type: types, copyToCacheDirectory: true })
       if (res.canceled || !res.assets[0]) return
@@ -141,13 +159,24 @@ export function NotebookSourcesTab({ notebook, sources }: Props) {
                 }}
                 className="bg-white border border-slate-100 rounded-2xl p-3 flex-row items-center gap-3"
               >
-                <View className="w-10 h-10 rounded-xl items-center justify-center" style={{ backgroundColor: sourceTypeBg(s.source_type) }}>
-                  <Icon name={sourceTypeIcon(s.source_type)} size={18} color={sourceTypeColor(s.source_type)} />
+                <View
+                  className="w-10 h-10 rounded-xl items-center justify-center"
+                  style={{ backgroundColor: sourceTypeBg(s.source_type) }}
+                >
+                  <Icon
+                    name={sourceTypeIcon(s.source_type)}
+                    size={18}
+                    color={sourceTypeColor(s.source_type)}
+                  />
                 </View>
                 <View className="flex-1">
-                  <Text className="font-semibold text-ink-900 text-sm" numberOfLines={1}>{s.title}</Text>
+                  <Text className="font-semibold text-ink-900 text-sm" numberOfLines={1}>
+                    {s.title}
+                  </Text>
                   <View className="flex-row items-center gap-2 mt-0.5">
-                    <Text className="text-[10px] text-slate-500 uppercase font-mono">{s.source_type}</Text>
+                    <Text className="text-[10px] text-slate-500 uppercase font-mono">
+                      {s.source_type}
+                    </Text>
                     {s.status === 'ready' ? (
                       <View className="flex-row items-center gap-1">
                         <Icon name="check-circle" size={10} color="#10B981" />
@@ -163,14 +192,20 @@ export function NotebookSourcesTab({ notebook, sources }: Props) {
                     )}
                   </View>
                   {s.error_message && (
-                    <Text className="text-[10px] text-red-500 mt-0.5" numberOfLines={2}>{s.error_message}</Text>
+                    <Text className="text-[10px] text-red-500 mt-0.5" numberOfLines={2}>
+                      {s.error_message}
+                    </Text>
                   )}
                 </View>
                 <Pressable
                   onPress={() => {
                     Alert.alert('Sil?', 'Bu kaynağı silmek istediğine emin misin?', [
                       { text: 'İptal', style: 'cancel' },
-                      { text: 'Sil', style: 'destructive', onPress: () => deleteSource.mutate({ id: s.id, notebookId: notebook.id }) },
+                      {
+                        text: 'Sil',
+                        style: 'destructive',
+                        onPress: () => deleteSource.mutate({ id: s.id, notebookId: notebook.id }),
+                      },
                     ])
                   }}
                   hitSlop={8}
@@ -193,26 +228,81 @@ export function NotebookSourcesTab({ notebook, sources }: Props) {
       </Pressable>
 
       {/* Add type picker */}
-      <Modal animationType="slide" transparent visible={addModalOpen} onRequestClose={() => setAddModalOpen(false)}>
-        <Pressable onPress={() => setAddModalOpen(false)} className="flex-1 bg-black/40 justify-end">
+      <Modal
+        animationType="slide"
+        transparent
+        visible={addModalOpen}
+        onRequestClose={() => setAddModalOpen(false)}
+      >
+        <Pressable
+          onPress={() => setAddModalOpen(false)}
+          className="flex-1 bg-black/40 justify-end"
+        >
           <Pressable className="bg-cream-50 rounded-t-3xl pt-3 pb-8">
             <View className="w-12 h-1 bg-slate-200 rounded-full self-center mb-4" />
             <View className="px-5">
               <Text className="font-serif text-2xl text-ink-900 mb-4">Kaynak ekle</Text>
-              <SourceTypeBtn icon="file" label="PDF" desc="Kitap, makale, ders notu" onPress={() => handlePickFile('pdf')} />
-              <SourceTypeBtn icon="globe" label="Web Sayfası" desc="URL'den içerik" onPress={() => { setAddModalOpen(false); setUrlModalOpen(true) }} />
-              <SourceTypeBtn icon="headphones" label="Ses Kaydı" desc="MP3/WAV — Whisper transkripti" onPress={() => handlePickFile('audio')} />
-              <SourceTypeBtn icon="book-open" label="EPUB" desc="E-kitap" onPress={() => handlePickFile('epub')} />
-              <SourceTypeBtn icon="edit" label="Düz Metin" desc="Kendi yazdığın notlar" onPress={() => { setAddModalOpen(false); setTextModalOpen(true) }} />
-              <SourceTypeBtn icon="play" label="YouTube" desc="Video transkripti + zaman damgalı" onPress={() => { setAddModalOpen(false); setYoutubeModalOpen(true) }} />
+              <SourceTypeBtn
+                icon="file"
+                label="PDF"
+                desc="Kitap, makale, ders notu"
+                onPress={() => handlePickFile('pdf')}
+              />
+              <SourceTypeBtn
+                icon="globe"
+                label="Web Sayfası"
+                desc="URL'den içerik"
+                onPress={() => {
+                  setAddModalOpen(false)
+                  setUrlModalOpen(true)
+                }}
+              />
+              <SourceTypeBtn
+                icon="headphones"
+                label="Ses Kaydı"
+                desc="MP3/WAV — Whisper transkripti"
+                onPress={() => handlePickFile('audio')}
+              />
+              <SourceTypeBtn
+                icon="book-open"
+                label="EPUB"
+                desc="E-kitap"
+                onPress={() => handlePickFile('epub')}
+              />
+              <SourceTypeBtn
+                icon="edit"
+                label="Düz Metin"
+                desc="Kendi yazdığın notlar"
+                onPress={() => {
+                  setAddModalOpen(false)
+                  setTextModalOpen(true)
+                }}
+              />
+              <SourceTypeBtn
+                icon="play"
+                label="YouTube"
+                desc="Video transkripti + zaman damgalı"
+                onPress={() => {
+                  setAddModalOpen(false)
+                  setYoutubeModalOpen(true)
+                }}
+              />
             </View>
           </Pressable>
         </Pressable>
       </Modal>
 
       {/* Text input modal */}
-      <Modal animationType="slide" transparent visible={textModalOpen} onRequestClose={() => setTextModalOpen(false)}>
-        <Pressable onPress={() => setTextModalOpen(false)} className="flex-1 bg-black/40 justify-end">
+      <Modal
+        animationType="slide"
+        transparent
+        visible={textModalOpen}
+        onRequestClose={() => setTextModalOpen(false)}
+      >
+        <Pressable
+          onPress={() => setTextModalOpen(false)}
+          className="flex-1 bg-black/40 justify-end"
+        >
           <Pressable className="bg-cream-50 rounded-t-3xl pt-3 pb-8" style={{ maxHeight: '85%' }}>
             <View className="w-12 h-1 bg-slate-200 rounded-full self-center mb-4" />
             <View className="px-5">
@@ -247,8 +337,16 @@ export function NotebookSourcesTab({ notebook, sources }: Props) {
       </Modal>
 
       {/* URL modal */}
-      <Modal animationType="slide" transparent visible={urlModalOpen} onRequestClose={() => setUrlModalOpen(false)}>
-        <Pressable onPress={() => setUrlModalOpen(false)} className="flex-1 bg-black/40 justify-end">
+      <Modal
+        animationType="slide"
+        transparent
+        visible={urlModalOpen}
+        onRequestClose={() => setUrlModalOpen(false)}
+      >
+        <Pressable
+          onPress={() => setUrlModalOpen(false)}
+          className="flex-1 bg-black/40 justify-end"
+        >
           <Pressable className="bg-cream-50 rounded-t-3xl pt-3 pb-8">
             <View className="w-12 h-1 bg-slate-200 rounded-full self-center mb-4" />
             <View className="px-5">
@@ -282,8 +380,16 @@ export function NotebookSourcesTab({ notebook, sources }: Props) {
       </Modal>
 
       {/* YouTube modal */}
-      <Modal animationType="slide" transparent visible={youtubeModalOpen} onRequestClose={() => setYoutubeModalOpen(false)}>
-        <Pressable onPress={() => setYoutubeModalOpen(false)} className="flex-1 bg-black/40 justify-end">
+      <Modal
+        animationType="slide"
+        transparent
+        visible={youtubeModalOpen}
+        onRequestClose={() => setYoutubeModalOpen(false)}
+      >
+        <Pressable
+          onPress={() => setYoutubeModalOpen(false)}
+          className="flex-1 bg-black/40 justify-end"
+        >
           <Pressable className="bg-cream-50 rounded-t-3xl pt-3 pb-8">
             <View className="w-12 h-1 bg-slate-200 rounded-full self-center mb-4" />
             <View className="px-5">
@@ -292,7 +398,8 @@ export function NotebookSourcesTab({ notebook, sources }: Props) {
                 <Text className="font-serif text-2xl text-ink-900">YouTube Ekle</Text>
               </View>
               <Text className="text-xs text-slate-500 mb-4">
-                Video transkriptini çıkarır, zaman damgalı pasajlara böler. Cevaplarda [3:24] gibi linkler olur.
+                Video transkriptini çıkarır, zaman damgalı pasajlara böler. Cevaplarda [3:24] gibi
+                linkler olur.
               </Text>
 
               <TextInput
@@ -313,7 +420,8 @@ export function NotebookSourcesTab({ notebook, sources }: Props) {
               <View className="bg-amber-50 border border-amber-200 rounded-2xl p-3 mt-4 flex-row gap-2">
                 <Icon name="info" size={14} color="#F59E0B" />
                 <Text className="flex-1 text-[11px] text-amber-900 leading-4">
-                  Resmi altyazısı olan videolar saniyeler içinde işlenir. Yoksa otomatik AI transkripti çıkartılır (1-2 dakika).
+                  Resmi altyazısı olan videolar saniyeler içinde işlenir. Yoksa otomatik AI
+                  transkripti çıkartılır (1-2 dakika).
                 </Text>
               </View>
 
@@ -334,8 +442,18 @@ export function NotebookSourcesTab({ notebook, sources }: Props) {
   )
 }
 
-function SourceTypeBtn({ icon, label, desc, disabled, onPress }: {
-  icon: IconName; label: string; desc: string; disabled?: boolean; onPress: () => void
+function SourceTypeBtn({
+  icon,
+  label,
+  desc,
+  disabled,
+  onPress,
+}: {
+  icon: IconName
+  label: string
+  desc: string
+  disabled?: boolean
+  onPress: () => void
 }) {
   return (
     <Pressable
@@ -355,22 +473,33 @@ function SourceTypeBtn({ icon, label, desc, disabled, onPress }: {
 }
 
 function sourceTypeIcon(t: string): IconName {
-  return t === 'pdf' ? 'file'
-       : t === 'url' ? 'globe'
-       : t === 'youtube' ? 'play'
-       : t === 'audio' ? 'headphones'
-       : t === 'text' ? 'edit'
-       : t === 'epub' ? 'book-open'
-       : 'file'
+  return t === 'pdf'
+    ? 'file'
+    : t === 'url'
+      ? 'globe'
+      : t === 'youtube'
+        ? 'play'
+        : t === 'audio'
+          ? 'headphones'
+          : t === 'text'
+            ? 'edit'
+            : t === 'epub'
+              ? 'book-open'
+              : 'file'
 }
 
 function sourceTypeColor(t: string): string {
-  return t === 'pdf' ? '#EF4444'
-       : t === 'url' ? '#0891B2'
-       : t === 'youtube' ? '#DB2777'
-       : t === 'audio' ? '#F59E0B'
-       : t === 'text' ? '#7C3AED'
-       : '#1E1B4B'
+  return t === 'pdf'
+    ? '#EF4444'
+    : t === 'url'
+      ? '#0891B2'
+      : t === 'youtube'
+        ? '#DB2777'
+        : t === 'audio'
+          ? '#F59E0B'
+          : t === 'text'
+            ? '#7C3AED'
+            : '#1E1B4B'
 }
 
 function sourceTypeBg(t: string): string {

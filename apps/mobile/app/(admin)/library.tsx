@@ -1,7 +1,7 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native'
 import { useRouter } from 'expo-router'
-import { useLibraryDocuments, useDeleteLibraryDocument } from '../../src/hooks/useAdmin'
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native'
 import { Icon } from '../../src/components/ui/Icon'
+import { useDeleteLibraryDocument, useLibraryDocuments } from '../../src/hooks/useAdmin'
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string; icon: string }> = {
   textbook: { label: 'Ders Kitabı', color: '#1E1B4B', icon: 'book-text' },
@@ -19,9 +19,7 @@ export default function AdminLibrary() {
   return (
     <View className="flex-1 bg-cream-50">
       <View className="px-5 py-3 bg-white border-b border-slate-100 flex-row items-center justify-between">
-        <Text className="text-sm text-slate-600">
-          {data?.length ?? 0} doküman
-        </Text>
+        <Text className="text-sm text-slate-600">{data?.length ?? 0} doküman</Text>
         <Pressable
           onPress={() => router.push('/(admin)/library/upload')}
           className="bg-ink-900 rounded-full px-4 py-2 flex-row items-center gap-1.5"
@@ -65,7 +63,9 @@ export default function AdminLibrary() {
                     <Text className="font-semibold text-ink-900 text-sm" numberOfLines={2}>
                       {d.title}
                     </Text>
-                    {d.author && <Text className="text-[11px] text-slate-500 mt-0.5">— {d.author}</Text>}
+                    {d.author && (
+                      <Text className="text-[11px] text-slate-500 mt-0.5">— {d.author}</Text>
+                    )}
 
                     <View className="flex-row items-center gap-2 mt-2 flex-wrap">
                       <View
@@ -77,7 +77,9 @@ export default function AdminLibrary() {
                         </Text>
                       </View>
                       <Text className="text-[10px] text-slate-500">{sizeMB} MB</Text>
-                      {d.page_count && <Text className="text-[10px] text-slate-500">· {d.page_count} sayfa</Text>}
+                      {d.page_count && (
+                        <Text className="text-[10px] text-slate-500">· {d.page_count} sayfa</Text>
+                      )}
                       {d.is_pro_only && (
                         <View className="bg-amber-500 px-1.5 py-0.5 rounded">
                           <Text className="text-[8px] text-ink-900 font-bold">PRO</Text>
@@ -88,7 +90,10 @@ export default function AdminLibrary() {
                     {d.subject_tags?.length > 0 && (
                       <View className="flex-row flex-wrap gap-1 mt-2">
                         {d.subject_tags.map((t, i) => (
-                          <Text key={i} className="text-[10px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+                          <Text
+                            key={i}
+                            className="text-[10px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full"
+                          >
                             #{t}
                           </Text>
                         ))}
@@ -101,14 +106,12 @@ export default function AdminLibrary() {
                   </View>
 
                   <Pressable
-                    onPress={() => Alert.alert(
-                      'Sil',
-                      `"${d.title}" silinecek. Emin misin?`,
-                      [
+                    onPress={() =>
+                      Alert.alert('Sil', `"${d.title}" silinecek. Emin misin?`, [
                         { text: 'İptal', style: 'cancel' },
                         { text: 'Sil', style: 'destructive', onPress: () => del.mutate(d.id) },
-                      ],
-                    )}
+                      ])
+                    }
                     hitSlop={10}
                   >
                     <Icon name="trash" size={16} color="#EF4444" />

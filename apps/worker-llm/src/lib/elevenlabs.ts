@@ -26,12 +26,12 @@ const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY
 // Pro v3 voice IDs (ElevenLabs Studio'da clone'lanmış)
 export const ELEVENLABS_VOICES: Record<string, { A: string; B: string }> = {
   tr: {
-    A: process.env.ELEVENLABS_VOICE_TR_A ?? 'pNInz6obpgDQGcFmaJgB',     // Ela
-    B: process.env.ELEVENLABS_VOICE_TR_B ?? 'TxGEqnHWrfWFTfGW9XjX',     // Mert
+    A: process.env.ELEVENLABS_VOICE_TR_A ?? 'pNInz6obpgDQGcFmaJgB', // Ela
+    B: process.env.ELEVENLABS_VOICE_TR_B ?? 'TxGEqnHWrfWFTfGW9XjX', // Mert
   },
   en: {
-    A: 'EXAVITQu4vr4xnSDxMaL',                                          // Sarah
-    B: 'ErXwobaYiN019PkySvjV',                                          // Antoni
+    A: 'EXAVITQu4vr4xnSDxMaL', // Sarah
+    B: 'ErXwobaYiN019PkySvjV', // Antoni
   },
 }
 
@@ -58,7 +58,7 @@ export async function elevenlabsDialogue(
 ): Promise<{ audio: Buffer; method: 'dialogue' | 'concat' }> {
   if (!ELEVENLABS_API_KEY) throw new Error('ELEVENLABS_API_KEY not configured')
 
-  const voices = ELEVENLABS_VOICES[language] ?? ELEVENLABS_VOICES.en
+  const voices = ELEVENLABS_VOICES[language] ?? ELEVENLABS_VOICES.en!
 
   // Önce dialogue API'yi dene (eğer beta'da hesabımıza açıldıysa)
   try {
@@ -137,9 +137,7 @@ async function synthesizeAndConcat(
 
   for (let i = 0; i < turns.length; i += PARALLEL) {
     const batch = turns.slice(i, i + PARALLEL)
-    const results = await Promise.all(
-      batch.map((t) => synthesizeOne(t.text, voices[t.speaker])),
-    )
+    const results = await Promise.all(batch.map((t) => synthesizeOne(t.text, voices[t.speaker])))
     results.forEach((buf, j) => {
       audioBuffers[i + j] = buf
     })

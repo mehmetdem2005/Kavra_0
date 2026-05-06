@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { View, Text, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
-import { Input } from '../../src/components/ui/Input'
+import { useState } from 'react'
+import { Alert, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
+import { Input } from '../../src/components/ui/Input'
 import { apiFetch } from '../../src/lib/api'
 
 export default function ResetPassword() {
@@ -41,7 +41,9 @@ export default function ResetPassword() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream-50">
-      <Stack.Screen options={{ title: 'Şifremi Unuttum', headerStyle: { backgroundColor: '#FBF8F0' } }} />
+      <Stack.Screen
+        options={{ title: 'Şifremi Unuttum', headerStyle: { backgroundColor: '#FBF8F0' } }}
+      />
       <View className="flex-1 px-6 pt-8">
         <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">
           Sıfırla
@@ -63,7 +65,12 @@ export default function ResetPassword() {
         />
 
         <View className="mt-4">
-          <Button title="Sıfırlama Kodu Gönder" onPress={handleSubmit} loading={loading} fullWidth />
+          <Button
+            title="Sıfırlama Kodu Gönder"
+            onPress={handleSubmit}
+            loading={loading}
+            fullWidth
+          />
         </View>
       </View>
     </SafeAreaView>

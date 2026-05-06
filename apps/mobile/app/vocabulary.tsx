@@ -1,9 +1,9 @@
+import { Stack, useRouter } from 'expo-router'
 import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
-import { useVocabulary, useUpdateVocabStatus } from '../../src/hooks/useDictionary'
-import { Icon } from '../../src/components/ui/Icon'
+import { Icon } from '../src/components/ui/Icon'
+import { useUpdateVocabStatus, useVocabulary } from '../src/hooks/useDictionary'
 
 export default function VocabularyScreen() {
   const router = useRouter()
@@ -59,7 +59,9 @@ export default function VocabularyScreen() {
               onPress={() => setFilter(f.v)}
               className={`px-3 py-1.5 rounded-full ${filter === f.v ? 'bg-ink-900' : 'bg-white border border-slate-200'}`}
             >
-              <Text className={`text-xs font-semibold ${filter === f.v ? 'text-cream-50' : 'text-slate-700'}`}>
+              <Text
+                className={`text-xs font-semibold ${filter === f.v ? 'text-cream-50' : 'text-slate-700'}`}
+              >
                 {f.l}
               </Text>
             </Pressable>
@@ -104,28 +106,45 @@ export default function VocabularyScreen() {
                       <View className="flex-row items-center gap-2 mt-2">
                         <View className="flex-row items-center gap-1">
                           <Icon name="repeat" size={10} color="#94A3B8" />
-                          <Text className="text-[10px] text-slate-500">{v.encounters}× karşılaşma</Text>
+                          <Text className="text-[10px] text-slate-500">
+                            {v.encounters}× karşılaşma
+                          </Text>
                         </View>
                       </View>
                     </View>
 
                     <Pressable
                       onPress={() => {
-                        const next = v.status === 'learning' ? 'reviewing'
-                                   : v.status === 'reviewing' ? 'mastered'
-                                   : 'learning'
+                        const next =
+                          v.status === 'learning'
+                            ? 'reviewing'
+                            : v.status === 'reviewing'
+                              ? 'mastered'
+                              : 'learning'
                         updateStatus.mutate({ id: v.id, status: next })
                       }}
                       className={`px-2.5 py-1 rounded-full ${
-                        v.status === 'mastered' ? 'bg-emerald-100' :
-                        v.status === 'reviewing' ? 'bg-purple-100' : 'bg-amber-100'
+                        v.status === 'mastered'
+                          ? 'bg-emerald-100'
+                          : v.status === 'reviewing'
+                            ? 'bg-purple-100'
+                            : 'bg-amber-100'
                       }`}
                     >
-                      <Text className={`text-[10px] font-bold ${
-                        v.status === 'mastered' ? 'text-emerald-700' :
-                        v.status === 'reviewing' ? 'text-purple-700' : 'text-amber-700'
-                      }`}>
-                        {v.status === 'mastered' ? '✓ USTA' : v.status === 'reviewing' ? 'TEKRAR' : 'YENİ'}
+                      <Text
+                        className={`text-[10px] font-bold ${
+                          v.status === 'mastered'
+                            ? 'text-emerald-700'
+                            : v.status === 'reviewing'
+                              ? 'text-purple-700'
+                              : 'text-amber-700'
+                        }`}
+                      >
+                        {v.status === 'mastered'
+                          ? '✓ USTA'
+                          : v.status === 'reviewing'
+                            ? 'TEKRAR'
+                            : 'YENİ'}
                       </Text>
                     </Pressable>
                   </View>
@@ -143,7 +162,9 @@ function StatCard({ label, value, color }: { label: string; value: number; color
   return (
     <View className="flex-1 bg-white border border-slate-100 rounded-2xl p-3">
       <Text className="text-[10px] text-slate-500 uppercase tracking-wider">{label}</Text>
-      <Text className="font-serif text-2xl mt-1" style={{ color, fontStyle: 'italic' }}>{value}</Text>
+      <Text className="font-serif text-2xl mt-1" style={{ color, fontStyle: 'italic' }}>
+        {value}
+      </Text>
     </View>
   )
 }

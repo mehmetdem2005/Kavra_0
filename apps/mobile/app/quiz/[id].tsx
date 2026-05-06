@@ -1,12 +1,21 @@
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import {
-  View, Text, ScrollView, Pressable, ActivityIndicator, TextInput, Alert,
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from '../../src/components/ui/Button'
 import {
-  useQuiz, useSubmitQuiz, type QuizQuestion, type SubmitResult,
+  type QuizQuestion,
+  type SubmitResult,
+  useQuiz,
+  useSubmitQuiz,
 } from '../../src/hooks/useQuiz'
 
 export default function QuizPlay() {
@@ -63,7 +72,14 @@ export default function QuizPlay() {
 
   // Sonuç ekranı
   if (results && score) {
-    return <ResultsView results={results} score={score} questions={data.questions} onClose={() => router.back()} />
+    return (
+      <ResultsView
+        results={results}
+        score={score}
+        questions={data.questions}
+        onClose={() => router.back()}
+      />
+    )
   }
 
   // Çözme ekranı
@@ -117,7 +133,10 @@ export default function QuizPlay() {
 }
 
 function QuestionCard({
-  question, index, value, onChange,
+  question,
+  index,
+  value,
+  onChange,
 }: {
   question: QuizQuestion
   index: number
@@ -152,7 +171,13 @@ function QuestionCard({
                   value === key ? 'bg-brand-950' : 'bg-slate-100',
                 ].join(' ')}
               >
-                <Text className={value === key ? 'text-white text-sm font-bold' : 'text-slate-600 text-sm font-bold'}>
+                <Text
+                  className={
+                    value === key
+                      ? 'text-white text-sm font-bold'
+                      : 'text-slate-600 text-sm font-bold'
+                  }
+                >
                   {key.toUpperCase()}
                 </Text>
               </View>
@@ -196,7 +221,10 @@ function QuestionCard({
 }
 
 function ResultsView({
-  results, score, questions, onClose,
+  results,
+  score,
+  questions,
+  onClose,
 }: {
   results: SubmitResult[]
   score: { correct: number; total: number }
@@ -226,9 +254,7 @@ function ResultsView({
           </Text>
         </View>
 
-        <Text className="text-xs font-semibold text-slate-400 uppercase mb-2 px-1">
-          Cevaplar
-        </Text>
+        <Text className="text-xs font-semibold text-slate-400 uppercase mb-2 px-1">Cevaplar</Text>
 
         <View className="gap-3">
           {results.map((r, i) => {
@@ -241,7 +267,14 @@ function ResultsView({
                   'bg-white rounded-2xl p-4 border-l-4',
                   r.isCorrect ? 'border-green-500' : 'border-red-500',
                 ].join(' ')}
-                style={{ borderTopWidth: 1, borderRightWidth: 1, borderBottomWidth: 1, borderTopColor: '#E2E8F0', borderRightColor: '#E2E8F0', borderBottomColor: '#E2E8F0' }}
+                style={{
+                  borderTopWidth: 1,
+                  borderRightWidth: 1,
+                  borderBottomWidth: 1,
+                  borderTopColor: '#E2E8F0',
+                  borderRightColor: '#E2E8F0',
+                  borderBottomColor: '#E2E8F0',
+                }}
               >
                 <View className="flex-row items-start gap-2 mb-2">
                   <Text style={{ fontSize: 18 }}>{r.isCorrect ? '✓' : '✗'}</Text>
@@ -252,7 +285,14 @@ function ResultsView({
 
                 <View className="ml-7 gap-1">
                   <Text className="text-xs text-slate-500">
-                    Senin cevabın: <Text className={r.isCorrect ? 'text-green-700 font-medium' : 'text-red-600 font-medium'}>{r.userAnswer}</Text>
+                    Senin cevabın:{' '}
+                    <Text
+                      className={
+                        r.isCorrect ? 'text-green-700 font-medium' : 'text-red-600 font-medium'
+                      }
+                    >
+                      {r.userAnswer}
+                    </Text>
                   </Text>
                   {!r.isCorrect && (
                     <Text className="text-xs text-slate-500">

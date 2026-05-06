@@ -1,11 +1,19 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, TextInput, Alert, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
 import Constants from 'expo-constants'
+import { Stack, useRouter } from 'expo-router'
+import { useState } from 'react'
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 import { Platform } from 'react-native'
-import { apiFetch } from '../../src/lib/api'
-import { Icon, type IconName } from '../../src/components/ui/Icon'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { Icon, type IconName } from '../src/components/ui/Icon'
+import { apiFetch } from '../src/lib/api'
 
 const TYPES: Array<{ value: any; label: string; icon: IconName; color: string }> = [
   { value: 'bug', label: 'Hata', icon: 'alert-triangle', color: '#DC2626' },
@@ -75,9 +83,11 @@ export default function FeedbackScreen() {
               }`}
             >
               <Icon name={t.icon} size={18} color={type === t.value ? t.color : '#94A3B8'} />
-              <Text className={`text-[10px] mt-1.5 font-bold ${
-                type === t.value ? 'text-ink-900' : 'text-slate-500'
-              }`}>
+              <Text
+                className={`text-[10px] mt-1.5 font-bold ${
+                  type === t.value ? 'text-ink-900' : 'text-slate-500'
+                }`}
+              >
                 {t.label}
               </Text>
             </Pressable>
@@ -108,9 +118,11 @@ export default function FeedbackScreen() {
         </Text>
         <TextInput
           placeholder={
-            type === 'bug' ? 'Ne oldu? Hangi ekran? Ne bekliyordun? Ne gerçekleşti?'
-              : type === 'feature_request' ? 'Hangi özelliği isterdin? Nasıl bir problemi çözer?'
-              : 'Aklındakini paylaş...'
+            type === 'bug'
+              ? 'Ne oldu? Hangi ekran? Ne bekliyordun? Ne gerçekleşti?'
+              : type === 'feature_request'
+                ? 'Hangi özelliği isterdin? Nasıl bir problemi çözer?'
+                : 'Aklındakini paylaş...'
           }
           value={message}
           onChangeText={setMessage}
@@ -131,7 +143,9 @@ export default function FeedbackScreen() {
           {submitting ? (
             <ActivityIndicator color="#F59E0B" />
           ) : (
-            <Text className={`font-semibold ${message.trim() ? 'text-cream-50' : 'text-slate-500'}`}>
+            <Text
+              className={`font-semibold ${message.trim() ? 'text-cream-50' : 'text-slate-500'}`}
+            >
               Gönder
             </Text>
           )}

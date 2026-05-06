@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { groqChatJSON } from '../groq.js'
-import { supabase, verifyUserToken, getActiveGroqKey } from '../supabase.js'
+import { getActiveGroqKey, supabase, verifyUserToken } from '../supabase.js'
 
 const FiveWhysSchema = z.object({
   errorId: z.string().uuid(),

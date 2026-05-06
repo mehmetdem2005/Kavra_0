@@ -1,13 +1,21 @@
 import { useState } from 'react'
 import {
-  View, Text, Modal, Pressable, Alert, KeyboardAvoidingView, Platform,
-  Image, ActivityIndicator, ScrollView,
+  ActivityIndicator,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
 } from 'react-native'
 import { useGenerateImage } from '../../hooks/useAIImages'
 import { useIsPro } from '../../hooks/useEntitlement'
+import { Button } from '../ui/Button'
 import { Icon } from '../ui/Icon'
 import { Input } from '../ui/Input'
-import { Button } from '../ui/Button'
 
 interface Props {
   visible: boolean
@@ -26,7 +34,7 @@ const ASPECT_RATIOS = [
 export function ImageGeneratorModal({ visible, onClose, conversationId, onGenerated }: Props) {
   const isPro = useIsPro()
   const [prompt, setPrompt] = useState('')
-  const [aspectRatio, setAspectRatio] = useState<typeof ASPECT_RATIOS[number]['v']>('1:1')
+  const [aspectRatio, setAspectRatio] = useState<(typeof ASPECT_RATIOS)[number]['v']>('1:1')
   const [model, setModel] = useState<'flux-schnell' | 'flux-dev'>('flux-schnell')
   const [resultUrl, setResultUrl] = useState<string | null>(null)
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null)
@@ -47,10 +55,7 @@ export function ImageGeneratorModal({ visible, onClose, conversationId, onGenera
       setUsage(result.usage)
     } catch (e: any) {
       if (e.message?.includes('pro_required')) {
-        Alert.alert(
-          '👑 Pro özelliği',
-          'AI görsel üretimi Pro üyeler için. Pro\'ya geçer misin?',
-        )
+        Alert.alert('👑 Pro özelliği', "AI görsel üretimi Pro üyeler için. Pro'ya geçer misin?")
       } else if (e.message?.includes('monthly_limit')) {
         Alert.alert('Aylık hak doldu', 'Bu ay görsel hakkın bitti. Sonraki ay yenilenir.')
       } else {
@@ -116,8 +121,18 @@ export function ImageGeneratorModal({ visible, onClose, conversationId, onGenera
               {/* Result preview */}
               {resultUrl && (
                 <View className="mb-4">
-                  <View className="rounded-3xl overflow-hidden bg-ink-950" style={{ aspectRatio: aspectRatio === '1:1' ? 1 : aspectRatio === '16:9' ? 16/9 : 9/16 }}>
-                    <Image source={{ uri: resultUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                  <View
+                    className="rounded-3xl overflow-hidden bg-ink-950"
+                    style={{
+                      aspectRatio:
+                        aspectRatio === '1:1' ? 1 : aspectRatio === '16:9' ? 16 / 9 : 9 / 16,
+                    }}
+                  >
+                    <Image
+                      source={{ uri: resultUrl }}
+                      style={{ width: '100%', height: '100%' }}
+                      resizeMode="cover"
+                    />
                   </View>
                   {usage && (
                     <Text className="text-[11px] text-slate-500 text-center mt-2">
@@ -126,7 +141,12 @@ export function ImageGeneratorModal({ visible, onClose, conversationId, onGenera
                   )}
                   <View className="flex-row gap-2 mt-3">
                     <View className="flex-1">
-                      <Button title="Tekrar Üret" variant="secondary" onPress={handleGenerate} loading={generate.isPending} />
+                      <Button
+                        title="Tekrar Üret"
+                        variant="secondary"
+                        onPress={handleGenerate}
+                        loading={generate.isPending}
+                      />
                     </View>
                     <View className="flex-1">
                       <Button title="Sohbete Ekle" onPress={handleUseInChat} icon="send" />
@@ -154,13 +174,16 @@ export function ImageGeneratorModal({ visible, onClose, conversationId, onGenera
                         key={a.v}
                         onPress={() => setAspectRatio(a.v)}
                         className={`flex-1 items-center py-3 rounded-xl border ${
-                          aspectRatio === a.v ? 'border-ink-900 bg-ink-50' : 'border-slate-200 bg-white'
+                          aspectRatio === a.v
+                            ? 'border-ink-900 bg-ink-50'
+                            : 'border-slate-200 bg-white'
                         }`}
                       >
                         <View
                           className="rounded"
                           style={{
-                            width: a.w / 2, height: a.h / 2,
+                            width: a.w / 2,
+                            height: a.h / 2,
                             backgroundColor: aspectRatio === a.v ? '#1E1B4B' : '#CBD5E1',
                           }}
                         />
@@ -176,7 +199,9 @@ export function ImageGeneratorModal({ visible, onClose, conversationId, onGenera
                     <Pressable
                       onPress={() => setModel('flux-schnell')}
                       className={`flex-1 p-3 rounded-xl border ${
-                        model === 'flux-schnell' ? 'border-ink-900 bg-ink-50' : 'border-slate-200 bg-white'
+                        model === 'flux-schnell'
+                          ? 'border-ink-900 bg-ink-50'
+                          : 'border-slate-200 bg-white'
                       }`}
                     >
                       <Text className="font-semibold text-ink-900 text-xs">Flux Schnell</Text>
@@ -185,11 +210,15 @@ export function ImageGeneratorModal({ visible, onClose, conversationId, onGenera
                     <Pressable
                       onPress={() => setModel('flux-dev')}
                       className={`flex-1 p-3 rounded-xl border ${
-                        model === 'flux-dev' ? 'border-ink-900 bg-ink-50' : 'border-slate-200 bg-white'
+                        model === 'flux-dev'
+                          ? 'border-ink-900 bg-ink-50'
+                          : 'border-slate-200 bg-white'
                       }`}
                     >
                       <Text className="font-semibold text-ink-900 text-xs">Flux Dev</Text>
-                      <Text className="text-[10px] text-slate-500 mt-0.5">Kaliteli · ~15sn · 2 kredi</Text>
+                      <Text className="text-[10px] text-slate-500 mt-0.5">
+                        Kaliteli · ~15sn · 2 kredi
+                      </Text>
                     </Pressable>
                   </View>
 

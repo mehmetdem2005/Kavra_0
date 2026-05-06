@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal } from 'react-native'
+import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native'
 import { useTranslateSentence } from '../../hooks/useDictionary'
 import { useIsPro } from '../../hooks/useEntitlement'
 import { Icon } from '../ui/Icon'
@@ -23,17 +23,18 @@ interface Props {
  *  - Alternatifler
  *  - Notlar (deyim, kayıt vb)
  */
-export function SentenceTranslator({
-  text, sourceLang, targetLang, onClose, onTranslated,
-}: Props) {
+export function SentenceTranslator({ text, sourceLang, targetLang, onClose, onTranslated }: Props) {
   const isPro = useIsPro()
   const translate = useTranslateSentence()
   const [literary, setLiterary] = useState(false)
 
   useEffect(() => {
-    translate.mutate({ text, sourceLang, targetLang, literary }, {
-      onSuccess: () => onTranslated?.(),
-    })
+    translate.mutate(
+      { text, sourceLang, targetLang, literary },
+      {
+        onSuccess: () => onTranslated?.(),
+      },
+    )
   }, [literary])
 
   return (
@@ -87,7 +88,9 @@ export function SentenceTranslator({
                       </View>
                     )}
                   </View>
-                  <Text className="text-ink-900 text-base leading-6">{translate.data.translation}</Text>
+                  <Text className="text-ink-900 text-base leading-6">
+                    {translate.data.translation}
+                  </Text>
                 </View>
 
                 {/* Alternatives */}
@@ -97,7 +100,10 @@ export function SentenceTranslator({
                       Alternatif Çeviriler
                     </Text>
                     {translate.data.alternatives.map((alt, i) => (
-                      <View key={i} className="bg-white border border-slate-100 rounded-xl p-3 mb-2">
+                      <View
+                        key={i}
+                        className="bg-white border border-slate-100 rounded-xl p-3 mb-2"
+                      >
                         <Text className="text-ink-900 text-sm">{alt.translation}</Text>
                         {alt.note && (
                           <Text className="text-slate-500 text-xs mt-1 italic">→ {alt.note}</Text>
@@ -111,7 +117,9 @@ export function SentenceTranslator({
                 {translate.data.notes && (
                   <View className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-3 flex-row gap-2">
                     <Icon name="lightbulb" size={16} color="#059669" />
-                    <Text className="flex-1 text-emerald-900 text-xs leading-5">{translate.data.notes}</Text>
+                    <Text className="flex-1 text-emerald-900 text-xs leading-5">
+                      {translate.data.notes}
+                    </Text>
                   </View>
                 )}
               </>
@@ -159,9 +167,13 @@ export function SentenceTranslator({
             </View>
 
             <Text className="text-[10px] text-slate-400 mt-4 text-center">
-              {translate.data?.source === 'cache' ? '⚡ Cache' :
-               translate.data?.source === 'gemini-pro' ? 'Claude Sonnet' :
-               translate.data?.source === 'gemini-flash' ? 'Gemini Flash' : ''}
+              {translate.data?.source === 'cache'
+                ? '⚡ Cache'
+                : translate.data?.source === 'gemini-pro'
+                  ? 'Claude Sonnet'
+                  : translate.data?.source === 'gemini-flash'
+                    ? 'Gemini Flash'
+                    : ''}
             </Text>
           </ScrollView>
         </Pressable>

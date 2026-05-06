@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import { View, Text, Pressable, ActivityIndicator } from 'react-native'
 import { Audio } from 'expo-av'
+import { useEffect, useRef, useState } from 'react'
+import { ActivityIndicator, Pressable, Text, View } from 'react-native'
 import { useSynthesizeSentence } from '../../hooks/useBookTTS'
 import { Icon } from '../ui/Icon'
 
@@ -32,9 +32,18 @@ interface Props {
  * Engine seçimi prop'tan; Edge default (free), ElevenLabs (Pro).
  */
 export function KaraokeTTSPlayer({
-  text, language, bookId, voiceId, engine = 'edge', speed = 1.0,
-  highlightMode = 'word', highlightColor = '#F59E0B',
-  autoPlay = false, onComplete, onWordHighlight, compact = false,
+  text,
+  language,
+  bookId,
+  voiceId,
+  engine = 'edge',
+  speed = 1.0,
+  highlightMode = 'word',
+  highlightColor = '#F59E0B',
+  autoPlay = false,
+  onComplete,
+  onWordHighlight,
+  compact = false,
 }: Props) {
   const synth = useSynthesizeSentence()
   const soundRef = useRef<Audio.Sound | null>(null)
@@ -52,7 +61,11 @@ export function KaraokeTTSPlayer({
 
     try {
       const result = await synth.mutateAsync({
-        text, language, voiceId, engine, bookId,
+        text,
+        language,
+        voiceId,
+        engine,
+        bookId,
       })
 
       // Audio yükle
@@ -132,12 +145,16 @@ export function KaraokeTTSPlayer({
   // Auto-play
   useEffect(() => {
     if (autoPlay) loadAndPlay()
-    return () => { stop() }
+    return () => {
+      stop()
+    }
   }, [text])
 
   // Cleanup
   useEffect(() => {
-    return () => { stop() }
+    return () => {
+      stop()
+    }
   }, [])
 
   if (compact) {
@@ -198,7 +215,10 @@ export function KaraokeTTSPlayer({
           )}
         </Pressable>
 
-        <Pressable onPress={cycleSpeed} className="bg-amber-50 border border-amber-200 rounded-full px-3 py-1.5">
+        <Pressable
+          onPress={cycleSpeed}
+          className="bg-amber-50 border border-amber-200 rounded-full px-3 py-1.5"
+        >
           <Text className="text-amber-700 text-xs font-mono font-bold">x{currentSpeed}</Text>
         </Pressable>
 

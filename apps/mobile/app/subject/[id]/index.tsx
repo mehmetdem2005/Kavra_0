@@ -1,18 +1,18 @@
-import { useState } from 'react'
-import {
-  View, Text, ScrollView, Pressable, Modal, Alert, ActivityIndicator,
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../../src/components/ui/Button'
 import { Input } from '../../../src/components/ui/Input'
-import { useSubject, useUpdateSubject, useDeleteSubject } from '../../../src/hooks/useSubjects'
 import {
-  useConcepts, useCreateConcept, type ConceptWithProgress,
+  type ConceptWithProgress,
+  useConcepts,
+  useCreateConcept,
 } from '../../../src/hooks/useConcepts'
+import { useSubjectStats } from '../../../src/hooks/useErrors'
 import { useCreateLesson } from '../../../src/hooks/useLessons'
 import { useGenerateQuiz } from '../../../src/hooks/useQuiz'
-import { useSubjectStats } from '../../../src/hooks/useErrors'
+import { useDeleteSubject, useSubject, useUpdateSubject } from '../../../src/hooks/useSubjects'
 
 export default function SubjectDetail() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -31,10 +31,7 @@ export default function SubjectDetail() {
   const generateQuiz = () => {
     if (!id) return
     if (!concepts || concepts.length === 0) {
-      Alert.alert(
-        'Konsept ekle',
-        'Quiz üretmek için bu konuya en az bir konsept eklemelisin.',
-      )
+      Alert.alert('Konsept ekle', 'Quiz üretmek için bu konuya en az bir konsept eklemelisin.')
       return
     }
     Alert.alert(
@@ -103,7 +100,8 @@ export default function SubjectDetail() {
     Alert.alert('Konuyu Sil', `"${subject.name}" konusunu silmek istiyor musun?`, [
       { text: 'İptal', style: 'cancel' },
       {
-        text: 'Sil', style: 'destructive',
+        text: 'Sil',
+        style: 'destructive',
         onPress: () => deleteSubject.mutate(id!, { onSuccess: () => router.back() }),
       },
     ])
@@ -126,7 +124,11 @@ export default function SubjectDetail() {
         {/* Konu başlığı */}
         <View
           className="rounded-3xl p-5 mb-4"
-          style={{ backgroundColor: `${subject.color}15`, borderWidth: 1, borderColor: `${subject.color}40` }}
+          style={{
+            backgroundColor: `${subject.color}15`,
+            borderWidth: 1,
+            borderColor: `${subject.color}40`,
+          }}
         >
           <View className="flex-row items-center gap-3">
             <View
@@ -178,11 +180,18 @@ export default function SubjectDetail() {
         {/* Hızlı eylemler */}
         <View className="gap-2 mb-4">
           <View className="flex-row gap-2">
-            <ActionChip emoji="💬" label="Sohbet" onPress={() => {
-              createLesson.mutate({ subjectId: id }, {
-                onSuccess: (l) => router.push(`/lesson/${l.id}`),
-              })
-            }} />
+            <ActionChip
+              emoji="💬"
+              label="Sohbet"
+              onPress={() => {
+                createLesson.mutate(
+                  { subjectId: id },
+                  {
+                    onSuccess: (l) => router.push(`/lesson/${l.id}`),
+                  },
+                )
+              }}
+            />
             <ActionChip
               emoji="📝"
               label={generateQuizMutation.isPending ? 'Üretiliyor...' : 'Quiz Üret'}
@@ -190,8 +199,16 @@ export default function SubjectDetail() {
             />
           </View>
           <View className="flex-row gap-2">
-            <ActionChip emoji="🗺️" label="2D Harita" onPress={() => router.push(`/subject/${id}/map`)} />
-            <ActionChip emoji="🌐" label="3D Harita" onPress={() => router.push(`/subject/${id}/map3d`)} />
+            <ActionChip
+              emoji="🗺️"
+              label="2D Harita"
+              onPress={() => router.push(`/subject/${id}/map`)}
+            />
+            <ActionChip
+              emoji="🌐"
+              label="3D Harita"
+              onPress={() => router.push(`/subject/${id}/map3d`)}
+            />
           </View>
           <View className="flex-row gap-2">
             <ActionChip
@@ -205,7 +222,10 @@ export default function SubjectDetail() {
         {/* Kavramlar */}
         <View className="flex-row items-center justify-between mb-3 mt-2">
           <Text className="text-lg font-serif text-brand-950">Kavramlar</Text>
-          <Pressable onPress={() => setAddConceptOpen(true)} className="px-3 py-1 bg-brand-950 rounded-full">
+          <Pressable
+            onPress={() => setAddConceptOpen(true)}
+            className="px-3 py-1 bg-brand-950 rounded-full"
+          >
             <Text className="text-white text-sm font-semibold">+ Ekle</Text>
           </Pressable>
         </View>
@@ -214,9 +234,7 @@ export default function SubjectDetail() {
           <ActivityIndicator color="#1E1B4B" style={{ marginVertical: 20 }} />
         ) : !concepts || concepts.length === 0 ? (
           <View className="bg-white rounded-2xl p-6 items-center border border-slate-100">
-            <Text className="text-slate-500 text-center">
-              Henüz kavram yok. İlk kavramı ekle.
-            </Text>
+            <Text className="text-slate-500 text-center">Henüz kavram yok. İlk kavramı ekle.</Text>
           </View>
         ) : (
           <View className="gap-2">
@@ -254,14 +272,20 @@ function Stat({ label, value, highlight }: { label: string; value: string; highl
   )
 }
 
-function ActionChip({ emoji, label, onPress }: { emoji: string; label: string; onPress: () => void }) {
+function ActionChip({
+  emoji,
+  label,
+  onPress,
+}: { emoji: string; label: string; onPress: () => void }) {
   return (
     <Pressable
       onPress={onPress}
       className="flex-1 bg-white rounded-xl p-3 border border-slate-100 items-center active:opacity-70"
     >
       <Text style={{ fontSize: 20 }}>{emoji}</Text>
-      <Text className="text-xs text-brand-950 font-medium mt-1" numberOfLines={1}>{label}</Text>
+      <Text className="text-xs text-brand-950 font-medium mt-1" numberOfLines={1}>
+        {label}
+      </Text>
     </Pressable>
   )
 }
@@ -313,7 +337,9 @@ function ConceptRow({ concept, onStart }: { concept: ConceptWithProgress; onStar
 }
 
 function AddConceptModal({
-  visible, onClose, subjectId,
+  visible,
+  onClose,
+  subjectId,
 }: { visible: boolean; onClose: () => void; subjectId: string }) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -321,11 +347,19 @@ function AddConceptModal({
   const create = useCreateConcept()
 
   const handleAdd = () => {
-    if (!name.trim()) { Alert.alert('', 'Kavram ismi boş olamaz'); return }
+    if (!name.trim()) {
+      Alert.alert('', 'Kavram ismi boş olamaz')
+      return
+    }
     create.mutate(
       { subjectId, name: name.trim(), description: description.trim() || undefined, difficulty },
       {
-        onSuccess: () => { setName(''); setDescription(''); setDifficulty(3); onClose() },
+        onSuccess: () => {
+          setName('')
+          setDescription('')
+          setDifficulty(3)
+          onClose()
+        },
         onError: (e: any) => Alert.alert('Hata', e.message),
       },
     )
@@ -338,7 +372,12 @@ function AddConceptModal({
           <View className="w-12 h-1 bg-slate-200 rounded-full self-center mb-4" />
           <Text className="text-2xl font-serif text-brand-950 mb-4">Yeni Kavram</Text>
 
-          <Input label="İsim" value={name} onChangeText={setName} placeholder="Örn: Türev, Fotosentez" />
+          <Input
+            label="İsim"
+            value={name}
+            onChangeText={setName}
+            placeholder="Örn: Türev, Fotosentez"
+          />
           <Input
             label="Açıklama (ops.)"
             value={description}
@@ -361,7 +400,12 @@ function AddConceptModal({
 
           <View className="flex-row gap-3 mt-2">
             <View className="flex-1">
-              <Button title="İptal" variant="secondary" onPress={onClose} disabled={create.isPending} />
+              <Button
+                title="İptal"
+                variant="secondary"
+                onPress={onClose}
+                disabled={create.isPending}
+              />
             </View>
             <View className="flex-1">
               <Button title="Ekle" onPress={handleAdd} loading={create.isPending} />

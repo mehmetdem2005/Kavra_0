@@ -1,9 +1,9 @@
-import { View, Text, ScrollView, Pressable, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { useAuth } from '../../src/stores/auth'
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useMyRole } from '../../src/hooks/useAdmin'
+import { useAuth } from '../../src/stores/auth'
 
 export default function Profile() {
   const { t } = useTranslation()
@@ -37,13 +37,29 @@ export default function Profile() {
 
         <View className="px-5 gap-2">
           <Section title="Kişiselleştirme">
-            <Row emoji="🔑" title={t('profile.apiKeys')} onPress={() => router.push('/settings/api-keys')} />
+            <Row
+              emoji="🔑"
+              title={t('profile.apiKeys')}
+              onPress={() => router.push('/settings/api-keys')}
+            />
             <Row emoji="🏆" title="Rozetlerim" onPress={() => router.push('/achievements')} />
             <Row emoji="🎯" title="Hedeflerim" onPress={() => router.push('/goals')} />
             <Row emoji="📊" title="Haftalık Rapor" onPress={() => router.push('/weekly-report')} />
-            <Row emoji="🎭" title={t('profile.personalities')} onPress={() => Alert.alert('', 'Yakında')} />
-            <Row emoji="🎙️" title={t('profile.voice')} onPress={() => router.push('/settings/voice')} />
-            <Row emoji="🎤" title="Ses Klonlarım" onPress={() => router.push('/settings/voice-clones')} />
+            <Row
+              emoji="🎭"
+              title={t('profile.personalities')}
+              onPress={() => Alert.alert('', 'Yakında')}
+            />
+            <Row
+              emoji="🎙️"
+              title={t('profile.voice')}
+              onPress={() => router.push('/settings/voice')}
+            />
+            <Row
+              emoji="🎤"
+              title="Ses Klonlarım"
+              onPress={() => router.push('/settings/voice-clones')}
+            />
             <Row emoji="📖" title="Kitap Dağarcığım" onPress={() => router.push('/vocabulary')} />
             <Row emoji="🃏" title="Egzersizler" onPress={() => router.push('/exercises')} />
           </Section>
@@ -51,19 +67,35 @@ export default function Profile() {
           <Section title="Uygulama">
             <Row emoji="🎨" title="Tema" onPress={() => router.push('/settings/theme')} />
             <Row emoji="🔒" title="App Lock" onPress={() => router.push('/settings/app-lock')} />
-            <Row emoji="🌍" title={t('profile.language')} onPress={() => Alert.alert('', 'Yakında')} />
-            <Row emoji="⚙️" title={t('profile.preferences')} onPress={() => Alert.alert('', 'Yakında')} />
+            <Row
+              emoji="🌍"
+              title={t('profile.language')}
+              onPress={() => Alert.alert('', 'Yakında')}
+            />
+            <Row
+              emoji="⚙️"
+              title={t('profile.preferences')}
+              onPress={() => Alert.alert('', 'Yakında')}
+            />
           </Section>
 
           <Section title="Hesap">
             <Row emoji="👑" title="Pro Üyelik" onPress={() => router.push('/upgrade')} />
             <Row emoji="📦" title={t('profile.data')} onPress={() => Alert.alert('', 'Yakında')} />
-            <Row emoji="ℹ️" title={t('profile.about')} onPress={() => Alert.alert('', 'Kavra v0.8.0')} />
+            <Row
+              emoji="ℹ️"
+              title={t('profile.about')}
+              onPress={() => Alert.alert('', 'Kavra v0.8.0')}
+            />
           </Section>
 
           {isAdmin && (
             <Section title={role === 'super_admin' ? '⚡ Super Admin' : '⚡ Admin'}>
-              <Row emoji="🛡️" title="Yönetim Paneli" onPress={() => router.push('/(admin)/dashboard')} />
+              <Row
+                emoji="🛡️"
+                title="Yönetim Paneli"
+                onPress={() => router.push('/(admin)/dashboard')}
+              />
             </Section>
           )}
 
@@ -82,9 +114,7 @@ export default function Profile() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View>
-      <Text className="text-xs font-semibold text-slate-400 uppercase mt-4 mb-2 px-1">
-        {title}
-      </Text>
+      <Text className="text-xs font-semibold text-slate-400 uppercase mt-4 mb-2 px-1">{title}</Text>
       <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         {children}
       </View>

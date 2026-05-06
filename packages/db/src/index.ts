@@ -1,5 +1,5 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from './types'
+import { type SupabaseClient, createClient } from '@supabase/supabase-js'
+import type { Database } from './types.js'
 
 export type Kavra = SupabaseClient<Database>
 
@@ -22,4 +22,4 @@ export function createServiceClient(url: string, serviceKey: string): Kavra {
   })
 }
 
-export type { Database } from './types'
+export type { Database } from './types.js'

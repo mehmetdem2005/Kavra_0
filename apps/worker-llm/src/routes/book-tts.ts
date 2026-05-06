@@ -1,8 +1,8 @@
+import crypto from 'node:crypto'
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import crypto from 'node:crypto'
+import { defaultVoiceForLanguage, edgeTTS } from '../edge-tts.js'
 import { supabase, verifyUserToken } from '../supabase.js'
-import { edgeTTS, defaultVoiceForLanguage } from '../edge-tts.js'
 
 /**
  * Book TTS Routes — sentence-level audio + word timings
@@ -33,10 +33,15 @@ const SynthesizeSentenceSchema = z.object({
 const SynthesizeChapterSchema = z.object({
   bookId: z.string().uuid(),
   chapterIndex: z.number().int().nonnegative(),
-  sentences: z.array(z.object({
-    text: z.string().min(1),
-    sentenceIndex: z.number().int().nonnegative(),
-  })).min(1).max(200),
+  sentences: z
+    .array(
+      z.object({
+        text: z.string().min(1),
+        sentenceIndex: z.number().int().nonnegative(),
+      }),
+    )
+    .min(1)
+    .max(200),
   language: z.string().length(2),
   voiceId: z.string().optional(),
   engine: z.enum(['edge', 'elevenlabs']).default('edge'),
@@ -106,7 +111,7 @@ function characterAlignmentToWords(text: string, alignment: any): WordTiming[] {
   let wordEnd = 0
 
   for (let i = 0; i < chars.length; i++) {
-    const c = chars[i]
+    const c = chars[i] ?? ''
     if (/\s/.test(c)) {
       if (currentWord.length > 0 && wordStart >= 0) {
         words.push({
@@ -118,9 +123,9 @@ function characterAlignmentToWords(text: string, alignment: any): WordTiming[] {
         wordStart = -1
       }
     } else {
-      if (currentWord === '') wordStart = starts[i]
+      if (currentWord === '') wordStart = starts[i] ?? 0
       currentWord += c
-      wordEnd = ends[i]
+      wordEnd = ends[i] ?? wordEnd
     }
   }
   if (currentWord && wordStart >= 0) {
@@ -161,9 +166,7 @@ function estimateWordTimings(text: string, durationMs: number): WordTiming[] {
 }
 
 function makeCacheKey(text: string, voiceId: string, lang: string): string {
-  return crypto.createHash('sha256')
-    .update(`${voiceId}|${lang}|${text}`)
-    .digest('hex')
+  return crypto.createHash('sha256').update(`${voiceId}|${lang}|${text}`).digest('hex')
 }
 
 async function getCachedSentenceAudio(
@@ -248,11 +251,12 @@ async function uploadSentenceAudio(
     contentType: 'audio/mpeg',
     upsert: true,
   })
-  await supabase.storage.from('book-audio').upload(
-    metaPath,
-    Buffer.from(JSON.stringify(meta)),
-    { contentType: 'application/json', upsert: true },
-  )
+  await supabase.storage
+    .from('book-audio')
+    .upload(metaPath, Buffer.from(JSON.stringify(meta)), {
+      contentType: 'application/json',
+      upsert: true,
+    })
 
   return path
 }
@@ -260,7 +264,6 @@ async function uploadSentenceAudio(
 // ===== Routes =====
 
 export async function bookTTSRoutes(fastify: FastifyInstance) {
-
   /**
    * POST /api/books/tts/sentence
    * Tek cümle TTS — anlık dinleme + word timings.
@@ -277,11 +280,14 @@ export async function bookTTSRoutes(fastify: FastifyInstance) {
     // ElevenLabs Pro guard
     if (engine === 'elevenlabs') {
       const { data: ent } = await supabase
-        .from('user_entitlements').select('is_pro').eq('user_id', userId).single()
+        .from('user_entitlements')
+        .select('is_pro')
+        .eq('user_id', userId)
+        .single()
       if (!ent?.is_pro) {
         return reply.code(403).send({
           error: 'pro_required',
-          message: 'ElevenLabs karaoke alignment Pro özelliği. Edge TTS\'i kullan.',
+          message: "ElevenLabs karaoke alignment Pro özelliği. Edge TTS'i kullan.",
         })
       }
     }
@@ -303,9 +309,10 @@ export async function bookTTSRoutes(fastify: FastifyInstance) {
         const result = await elevenLabsWithTimestamps(text, selectedVoice)
         audio = result.audio
         wordTimings = characterAlignmentToWords(text, result.alignment)
-        durationMs = wordTimings.length > 0
-          ? wordTimings[wordTimings.length - 1].endMs
-          : Math.round(audio.length / 24)  // 24kbps mp3 rough estimate
+        durationMs =
+          wordTimings.length > 0
+            ? (wordTimings[wordTimings.length - 1]?.endMs ?? 0)
+            : Math.round(audio.length / 24) // 24kbps mp3 rough estimate
       } else {
         // Edge TTS
         audio = await edgeTTS({ text, voice: selectedVoice })
@@ -325,12 +332,15 @@ export async function bookTTSRoutes(fastify: FastifyInstance) {
 
       // Update book_sentences if sentenceId provided
       if (sentenceId) {
-        await supabase.from('book_sentences').update({
-          audio_url: audioPath,
-          duration_ms: durationMs,
-          word_timings: wordTimings,
-          tts_voice_id: selectedVoice,
-        }).eq('id', sentenceId)
+        await supabase
+          .from('book_sentences')
+          .update({
+            audio_url: audioPath,
+            duration_ms: durationMs,
+            word_timings: wordTimings,
+            tts_voice_id: selectedVoice,
+          })
+          .eq('id', sentenceId)
       }
 
       const { data: urlData } = await supabase.storage
@@ -368,7 +378,13 @@ export async function bookTTSRoutes(fastify: FastifyInstance) {
     const results = await Promise.all(
       sentences.map(async (s) => {
         const cacheKey = makeCacheKey(s.text, selectedVoice, language)
-        const cached = await getCachedSentenceAudio(undefined, undefined, s.text, selectedVoice, language)
+        const cached = await getCachedSentenceAudio(
+          undefined,
+          undefined,
+          s.text,
+          selectedVoice,
+          language,
+        )
         if (cached) {
           return { sentenceIndex: s.sentenceIndex, ...cached }
         }
@@ -378,10 +394,14 @@ export async function bookTTSRoutes(fastify: FastifyInstance) {
             const audio = await edgeTTS({ text: s.text, voice: selectedVoice })
             const durationMs = Math.round((audio.length / 6000) * 1000)
             const wordTimings = estimateWordTimings(s.text, durationMs)
-            const audioPath = await uploadSentenceAudio(cacheKey, audio, { durationMs, wordTimings })
+            const audioPath = await uploadSentenceAudio(cacheKey, audio, {
+              durationMs,
+              wordTimings,
+            })
 
             const { data: urlData } = await supabase.storage
-              .from('book-audio').createSignedUrl(audioPath, 3600)
+              .from('book-audio')
+              .createSignedUrl(audioPath, 3600)
 
             return {
               sentenceIndex: s.sentenceIndex,
@@ -413,15 +433,17 @@ export async function bookTTSRoutes(fastify: FastifyInstance) {
       .eq('user_id', userId)
       .maybeSingle()
 
-    return data ?? {
-      engine: 'edge',
-      voice_id: null,
-      speed: 1.0,
-      pitch: 0,
-      highlight_color: '#F59E0B',
-      highlight_mode: 'word',
-      auto_advance: true,
-    }
+    return (
+      data ?? {
+        engine: 'edge',
+        voice_id: null,
+        speed: 1.0,
+        pitch: 0,
+        highlight_color: '#F59E0B',
+        highlight_mode: 'word',
+        auto_advance: true,
+      }
+    )
   })
 
   /** PUT /api/books/tts/settings */
@@ -434,7 +456,10 @@ export async function bookTTSRoutes(fastify: FastifyInstance) {
       voice_id: z.string().nullable().optional(),
       speed: z.number().min(0.5).max(3.0).optional(),
       pitch: z.number().optional(),
-      highlight_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+      highlight_color: z
+        .string()
+        .regex(/^#[0-9A-Fa-f]{6}$/)
+        .optional(),
       highlight_mode: z.enum(['word', 'sentence', 'off']).optional(),
       auto_advance: z.boolean().optional(),
     })

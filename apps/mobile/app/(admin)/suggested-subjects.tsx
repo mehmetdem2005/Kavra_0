@@ -1,14 +1,55 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, Modal, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '../../src/lib/supabase'
-import { apiFetch } from '../../src/lib/api'
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
+import { Button } from '../../src/components/ui/Button'
 import { Icon, type IconName } from '../../src/components/ui/Icon'
 import { Input } from '../../src/components/ui/Input'
-import { Button } from '../../src/components/ui/Button'
+import { apiFetch } from '../../src/lib/api'
+import { supabase } from '../../src/lib/supabase'
 
-const COLOR_PALETTE = ['#1E1B4B', '#7C3AED', '#059669', '#0891B2', '#B4452D', '#CA8A04', '#0F172A', '#DB2777', '#92400E', '#0E7490', '#7C2D12', '#1E40AF']
-const ICON_OPTIONS: IconName[] = ['languages', 'calculator', 'flask-conical', 'dna', 'atom', 'scroll', 'book-text', 'globe', 'lightbulb', 'code', 'palette', 'music', 'sparkles', 'building', 'microscope', 'telescope']
+const COLOR_PALETTE = [
+  '#1E1B4B',
+  '#7C3AED',
+  '#059669',
+  '#0891B2',
+  '#B4452D',
+  '#CA8A04',
+  '#0F172A',
+  '#DB2777',
+  '#92400E',
+  '#0E7490',
+  '#7C2D12',
+  '#1E40AF',
+]
+const ICON_OPTIONS: IconName[] = [
+  'languages',
+  'calculator',
+  'flask-conical',
+  'dna',
+  'atom',
+  'scroll',
+  'book-text',
+  'globe',
+  'lightbulb',
+  'code',
+  'palette',
+  'music',
+  'sparkles',
+  'building',
+  'microscope',
+  'telescope',
+]
 const CATEGORIES = ['language', 'science', 'humanities', 'tech', 'art', 'other']
 
 export default function AdminSuggestedSubjects() {
@@ -37,7 +78,9 @@ export default function AdminSuggestedSubjects() {
       </View>
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center"><ActivityIndicator color="#1E1B4B" /></View>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color="#1E1B4B" />
+        </View>
       ) : (
         <ScrollView contentContainerStyle={{ padding: 16 }}>
           <Text className="text-xs text-slate-500 mb-3 leading-5">
@@ -46,7 +89,10 @@ export default function AdminSuggestedSubjects() {
           </Text>
 
           {(data ?? []).map((s: any) => (
-            <View key={s.id} className="bg-white border border-slate-100 rounded-2xl p-3 mb-2 flex-row items-center gap-3">
+            <View
+              key={s.id}
+              className="bg-white border border-slate-100 rounded-2xl p-3 mb-2 flex-row items-center gap-3"
+            >
               <View
                 className="w-12 h-12 rounded-xl items-center justify-center"
                 style={{ backgroundColor: `${s.color}20` }}
@@ -66,7 +112,9 @@ export default function AdminSuggestedSubjects() {
                     </View>
                   )}
                 </View>
-                {s.description && <Text className="text-xs text-slate-500 mt-0.5">{s.description}</Text>}
+                {s.description && (
+                  <Text className="text-xs text-slate-500 mt-0.5">{s.description}</Text>
+                )}
                 <Text className="text-[10px] text-slate-400 mt-1">{s.category}</Text>
               </View>
             </View>
@@ -83,7 +131,11 @@ export default function AdminSuggestedSubjects() {
   )
 }
 
-function CreatorModal({ visible, onClose, onCreated }: { visible: boolean; onClose: () => void; onCreated: () => void }) {
+function CreatorModal({
+  visible,
+  onClose,
+  onCreated,
+}: { visible: boolean; onClose: () => void; onCreated: () => void }) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [emoji, setEmoji] = useState('')
@@ -94,21 +146,25 @@ function CreatorModal({ visible, onClose, onCreated }: { visible: boolean; onClo
   const [useEmoji, setUseEmoji] = useState(false)
 
   const create = useMutation({
-    mutationFn: async () => apiFetch('/api/admin/suggested-subjects', {
-      method: 'POST',
-      body: JSON.stringify({
-        name: name.trim(),
-        description: description.trim() || undefined,
-        emoji: useEmoji ? (emoji || undefined) : undefined,
-        iconName: useEmoji ? undefined : iconName,
-        color,
-        category,
-        isFeatured,
+    mutationFn: async () =>
+      apiFetch('/api/admin/suggested-subjects', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: name.trim(),
+          description: description.trim() || undefined,
+          emoji: useEmoji ? emoji || undefined : undefined,
+          iconName: useEmoji ? undefined : iconName,
+          color,
+          category,
+          isFeatured,
+        }),
       }),
-    }),
     onSuccess: () => {
       onCreated()
-      setName(''); setDescription(''); setEmoji(''); setIsFeatured(false)
+      setName('')
+      setDescription('')
+      setEmoji('')
+      setIsFeatured(false)
       onClose()
     },
     onError: (e: any) => Alert.alert('Hata', e.message),
@@ -116,20 +172,36 @@ function CreatorModal({ visible, onClose, onCreated }: { visible: boolean; onClo
 
   return (
     <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
         <View className="flex-1 justify-end bg-black/50">
           <View className="bg-cream-50 rounded-t-3xl pt-4 pb-8" style={{ maxHeight: '90%' }}>
             <View className="w-12 h-1 bg-slate-200 rounded-full self-center mb-3" />
             <View className="flex-row items-center justify-between px-6 mb-4">
-              <Text className="font-serif text-2xl text-ink-900">Yeni <Text className="text-amber-500 italic">öneri</Text></Text>
-              <Pressable onPress={onClose}><Icon name="x" size={24} color="#64748B" /></Pressable>
+              <Text className="font-serif text-2xl text-ink-900">
+                Yeni <Text className="text-amber-500 italic">öneri</Text>
+              </Text>
+              <Pressable onPress={onClose}>
+                <Icon name="x" size={24} color="#64748B" />
+              </Pressable>
             </View>
 
             <ScrollView contentContainerStyle={{ paddingHorizontal: 24 }}>
               <Input label="İSİM" value={name} onChangeText={setName} placeholder="Almanca A2" />
-              <View className="mt-3"><Input label="AÇIKLAMA" value={description} onChangeText={setDescription} placeholder="Goethe sertifikası" /></View>
+              <View className="mt-3">
+                <Input
+                  label="AÇIKLAMA"
+                  value={description}
+                  onChangeText={setDescription}
+                  placeholder="Goethe sertifikası"
+                />
+              </View>
 
-              <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mt-4 mb-2">KATEGORİ</Text>
+              <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mt-4 mb-2">
+                KATEGORİ
+              </Text>
               <View className="flex-row flex-wrap gap-2 mb-3">
                 {CATEGORIES.map((c) => (
                   <Pressable
@@ -137,17 +209,35 @@ function CreatorModal({ visible, onClose, onCreated }: { visible: boolean; onClo
                     onPress={() => setCategory(c)}
                     className={`px-3 py-1.5 rounded-full ${category === c ? 'bg-ink-900' : 'bg-slate-100'}`}
                   >
-                    <Text className={`text-xs font-semibold ${category === c ? 'text-cream-50' : 'text-slate-600'}`}>{c}</Text>
+                    <Text
+                      className={`text-xs font-semibold ${category === c ? 'text-cream-50' : 'text-slate-600'}`}
+                    >
+                      {c}
+                    </Text>
                   </Pressable>
                 ))}
               </View>
 
               <View className="flex-row mt-3 mb-2 bg-slate-100 rounded-xl p-1">
-                <Pressable onPress={() => setUseEmoji(false)} className={`flex-1 py-2 rounded-lg ${!useEmoji ? 'bg-white' : ''}`}>
-                  <Text className={`text-center text-xs font-semibold ${!useEmoji ? 'text-ink-900' : 'text-slate-500'}`}>İkon</Text>
+                <Pressable
+                  onPress={() => setUseEmoji(false)}
+                  className={`flex-1 py-2 rounded-lg ${!useEmoji ? 'bg-white' : ''}`}
+                >
+                  <Text
+                    className={`text-center text-xs font-semibold ${!useEmoji ? 'text-ink-900' : 'text-slate-500'}`}
+                  >
+                    İkon
+                  </Text>
                 </Pressable>
-                <Pressable onPress={() => setUseEmoji(true)} className={`flex-1 py-2 rounded-lg ${useEmoji ? 'bg-white' : ''}`}>
-                  <Text className={`text-center text-xs font-semibold ${useEmoji ? 'text-ink-900' : 'text-slate-500'}`}>Emoji</Text>
+                <Pressable
+                  onPress={() => setUseEmoji(true)}
+                  className={`flex-1 py-2 rounded-lg ${useEmoji ? 'bg-white' : ''}`}
+                >
+                  <Text
+                    className={`text-center text-xs font-semibold ${useEmoji ? 'text-ink-900' : 'text-slate-500'}`}
+                  >
+                    Emoji
+                  </Text>
                 </Pressable>
               </View>
 
@@ -173,7 +263,9 @@ function CreatorModal({ visible, onClose, onCreated }: { visible: boolean; onClo
                 />
               )}
 
-              <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mb-2">RENK</Text>
+              <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mb-2">
+                RENK
+              </Text>
               <View className="flex-row flex-wrap gap-2 mb-3">
                 {COLOR_PALETTE.map((c) => (
                   <Pressable
@@ -191,11 +283,21 @@ function CreatorModal({ visible, onClose, onCreated }: { visible: boolean; onClo
                 onPress={() => setIsFeatured(!isFeatured)}
                 className={`p-3 rounded-xl border flex-row items-center gap-2 mb-4 ${isFeatured ? 'bg-amber-50 border-amber-300' : 'bg-white border-slate-200'}`}
               >
-                <Icon name={isFeatured ? 'check-circle' : 'star'} size={18} color={isFeatured ? '#F59E0B' : '#94A3B8'} />
+                <Icon
+                  name={isFeatured ? 'check-circle' : 'star'}
+                  size={18}
+                  color={isFeatured ? '#F59E0B' : '#94A3B8'}
+                />
                 <Text className="text-sm text-ink-900">⭐ Popüler grid'de göster</Text>
               </Pressable>
 
-              <Button title="Öneri Ekle" onPress={() => create.mutate()} loading={create.isPending} disabled={!name.trim()} fullWidth />
+              <Button
+                title="Öneri Ekle"
+                onPress={() => create.mutate()}
+                loading={create.isPending}
+                disabled={!name.trim()}
+                fullWidth
+              />
             </ScrollView>
           </View>
         </View>

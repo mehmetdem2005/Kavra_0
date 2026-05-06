@@ -1,14 +1,19 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, ActivityIndicator, Image } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Stack } from 'expo-router'
 import * as ImagePicker from 'expo-image-picker'
+import { Stack } from 'expo-router'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Image, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../src/components/ui/Button'
-import { useAnalyzeImage, type VisionTask } from '../src/hooks/useVision'
+import { type VisionTask, useAnalyzeImage } from '../src/hooks/useVision'
 
 const TASKS: Array<{ id: VisionTask; emoji: string; label: string; desc: string }> = [
   { id: 'solve_math', emoji: '🔢', label: 'Matematik Sorusu', desc: 'Adım adım çözüm üret' },
-  { id: 'explain_handwriting', emoji: '✍️', label: 'El Yazısı Notu', desc: 'Önce oku, sonra konuyu açıkla' },
+  {
+    id: 'explain_handwriting',
+    emoji: '✍️',
+    label: 'El Yazısı Notu',
+    desc: 'Önce oku, sonra konuyu açıkla',
+  },
   { id: 'extract_text', emoji: '📝', label: 'Metni Çıkar', desc: 'Resimdeki yazıyı transkribe et' },
   { id: 'analyze_diagram', emoji: '📊', label: 'Diyagram', desc: 'Şemayı parça parça açıkla' },
   { id: 'describe', emoji: '🖼️', label: 'Genel Tanım', desc: 'Resimde ne var, ne anlatıyor?' },
@@ -87,14 +92,20 @@ export default function Scan() {
             <View className="bg-brand-50 border border-brand-200 rounded-2xl p-4 mb-4">
               <Text className="text-brand-900 font-semibold mb-1">📸 Fotoğrafla</Text>
               <Text className="text-brand-800 text-sm leading-5">
-                Bir matematik sorusu, el yazısı not veya diyagram fotoğrafı çek.
-                Kavra Llama 4 Scout vision'ıyla analiz etsin.
+                Bir matematik sorusu, el yazısı not veya diyagram fotoğrafı çek. Kavra Llama 4 Scout
+                vision'ıyla analiz etsin.
               </Text>
             </View>
 
             <View className="gap-3">
               <Button title="📷 Kamera ile Çek" onPress={pickFromCamera} fullWidth size="lg" />
-              <Button title="🖼️ Galeriden Seç" onPress={pickFromGallery} variant="secondary" fullWidth size="lg" />
+              <Button
+                title="🖼️ Galeriden Seç"
+                onPress={pickFromGallery}
+                variant="secondary"
+                fullWidth
+                size="lg"
+              />
             </View>
           </>
         ) : (
@@ -125,7 +136,9 @@ export default function Scan() {
                       onPress={() => setTask(t.id)}
                       className={[
                         'rounded-xl p-3 border flex-row items-center gap-3',
-                        task === t.id ? 'border-brand-950 bg-brand-50' : 'border-slate-100 bg-white',
+                        task === t.id
+                          ? 'border-brand-950 bg-brand-50'
+                          : 'border-slate-100 bg-white',
                       ].join(' ')}
                     >
                       <Text style={{ fontSize: 24 }}>{t.emoji}</Text>
@@ -153,17 +166,13 @@ export default function Scan() {
             {analyze.isPending && (
               <View className="mt-6 p-6 bg-white rounded-2xl items-center">
                 <ActivityIndicator color="#1E1B4B" size="large" />
-                <Text className="text-slate-500 text-sm mt-3">
-                  Llama 4 Scout düşünüyor...
-                </Text>
+                <Text className="text-slate-500 text-sm mt-3">Llama 4 Scout düşünüyor...</Text>
               </View>
             )}
 
             {result && (
               <View className="mt-6 bg-white rounded-2xl p-5 border border-slate-100">
-                <Text className="text-xs font-semibold text-slate-400 uppercase mb-2">
-                  Sonuç
-                </Text>
+                <Text className="text-xs font-semibold text-slate-400 uppercase mb-2">Sonuç</Text>
                 <Text className="text-brand-950 leading-7" selectable>
                   {result}
                 </Text>

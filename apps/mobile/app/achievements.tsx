@@ -1,9 +1,9 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from '../src/lib/api'
+import { Stack, useRouter } from 'expo-router'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Icon } from '../src/components/ui/Icon'
+import { apiFetch } from '../src/lib/api'
 
 const RARITY_COLORS: Record<string, string> = {
   common: '#94A3B8',
@@ -52,7 +52,9 @@ export default function AchievementsScreen() {
         <View className="h-2 bg-white rounded-full mt-3 overflow-hidden">
           <View
             className="h-full bg-amber-500"
-            style={{ width: `${((data?.unlockedCount ?? 0) / Math.max(1, data?.totalCount ?? 1)) * 100}%` }}
+            style={{
+              width: `${((data?.unlockedCount ?? 0) / Math.max(1, data?.totalCount ?? 1)) * 100}%`,
+            }}
           />
         </View>
       </View>
@@ -80,10 +82,16 @@ export default function AchievementsScreen() {
                     }}
                   >
                     <Text className="text-3xl">{a.isUnlocked ? a.emoji : '🔒'}</Text>
-                    <Text className="text-[10px] text-ink-900 font-bold mt-1.5 text-center" numberOfLines={2}>
+                    <Text
+                      className="text-[10px] text-ink-900 font-bold mt-1.5 text-center"
+                      numberOfLines={2}
+                    >
                       {a.name}
                     </Text>
-                    <Text className="text-[8px] text-slate-500 mt-0.5 text-center" numberOfLines={2}>
+                    <Text
+                      className="text-[8px] text-slate-500 mt-0.5 text-center"
+                      numberOfLines={2}
+                    >
                       {a.description}
                     </Text>
                     <View

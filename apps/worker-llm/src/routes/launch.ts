@@ -21,7 +21,7 @@ const FeedbackSchema = z.object({
 
 const DeleteAccountSchema = z.object({
   reason: z.string().max(500).optional(),
-  confirmText: z.literal('HESABIMI SİL'),         // explicit consent
+  confirmText: z.literal('HESABIMI SİL'), // explicit consent
 })
 
 const AnnouncementSchema = z.object({
@@ -37,7 +37,6 @@ const AnnouncementSchema = z.object({
 })
 
 export async function launchRoutes(fastify: FastifyInstance) {
-
   // ============ FEEDBACK ============
 
   /** POST /api/feedback */
@@ -110,7 +109,10 @@ export async function launchRoutes(fastify: FastifyInstance) {
 
     // Pro abonelik aktifse uyar
     const { data: ent } = await supabase
-      .from('user_entitlements').select('is_pro, valid_until').eq('user_id', userId).single()
+      .from('user_entitlements')
+      .select('is_pro, valid_until')
+      .eq('user_id', userId)
+      .single()
 
     if (ent?.is_pro && ent.valid_until && new Date(ent.valid_until) > new Date()) {
       return reply.code(400).send({
@@ -122,12 +124,15 @@ export async function launchRoutes(fastify: FastifyInstance) {
     // Schedule deletion
     const { data, error } = await supabase
       .from('account_deletion_requests')
-      .upsert({
-        user_id: userId,
-        reason: parsed.data.reason,
-        scheduled_for: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'pending',
-      }, { onConflict: 'user_id' })
+      .upsert(
+        {
+          user_id: userId,
+          reason: parsed.data.reason,
+          scheduled_for: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'pending',
+        },
+        { onConflict: 'user_id' },
+      )
       .select()
       .single()
 
@@ -178,27 +183,31 @@ export async function launchRoutes(fastify: FastifyInstance) {
 
     // Tüm kullanıcı verisini topla
     const tables = [
-      'profiles', 'subjects', 'concepts', 'reviews', 'reflections',
-      'notebooks', 'notebook_sources', 'notebook_messages', 'generated_content',
-      'books', 'user_vocabulary', 'vocabulary_srs', 'exercise_sessions',
-      'user_devices', 'user_feedback',
+      'profiles',
+      'subjects',
+      'concepts',
+      'reviews',
+      'reflections',
+      'notebooks',
+      'notebook_sources',
+      'notebook_messages',
+      'generated_content',
+      'books',
+      'user_vocabulary',
+      'vocabulary_srs',
+      'exercise_sessions',
+      'user_devices',
+      'user_feedback',
     ]
 
     const exportData: Record<string, any> = {}
     for (const table of tables) {
-      const { data } = await supabase
-        .from(table)
-        .select('*')
-        .eq('user_id', userId)
+      const { data } = await supabase.from(table).select('*').eq('user_id', userId)
       exportData[table] = data
     }
 
     // Profil dahil
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single()
     exportData.profile = profile
 
     return {
@@ -235,7 +244,10 @@ export async function launchRoutes(fastify: FastifyInstance) {
 
     // User entitlements
     const { data: ent } = await supabase
-      .from('user_entitlements').select('is_pro').eq('user_id', userId).single()
+      .from('user_entitlements')
+      .select('is_pro')
+      .eq('user_id', userId)
+      .single()
 
     const visible = announcements.filter((a) => {
       if (dismissedIds.has(a.id)) return false
@@ -255,14 +267,12 @@ export async function launchRoutes(fastify: FastifyInstance) {
       const userId = await verifyUserToken(req.headers.authorization)
       if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      await supabase
-        .from('user_announcement_state')
-        .upsert({
-          user_id: userId,
-          announcement_id: req.params.id,
-          dismissed_at: new Date().toISOString(),
-          clicked: req.body.clicked ?? false,
-        })
+      await supabase.from('user_announcement_state').upsert({
+        user_id: userId,
+        announcement_id: req.params.id,
+        dismissed_at: new Date().toISOString(),
+        clicked: req.body.clicked ?? false,
+      })
 
       return { ok: true }
     },
@@ -327,7 +337,8 @@ export async function launchRoutes(fastify: FastifyInstance) {
 
     // 7 günden önce sorma
     if (state?.last_prompted_at) {
-      const daysSince = (Date.now() - new Date(state.last_prompted_at).getTime()) / (1000 * 60 * 60 * 24)
+      const daysSince =
+        (Date.now() - new Date(state.last_prompted_at).getTime()) / (1000 * 60 * 60 * 24)
       if (daysSince < 30) return { shouldAsk: false }
     }
 
@@ -359,9 +370,7 @@ export async function launchRoutes(fastify: FastifyInstance) {
       if (req.body.response === 'reviewed') updates.has_reviewed = true
       if (req.body.response === 'declined') updates.declined_at = new Date().toISOString()
 
-      await supabase
-        .from('review_prompt_state')
-        .upsert({ user_id: userId, ...updates })
+      await supabase.from('review_prompt_state').upsert({ user_id: userId, ...updates })
 
       return { ok: true }
     },

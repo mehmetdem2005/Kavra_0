@@ -7,25 +7,25 @@
  * Teknik seçiminin en önemli girdisi.
  */
 export type LearningContext =
-  | 'first_exposure'    // İlk kez karşılaşıyor
-  | 'practice'          // Öğrendiğini uyguluyor
-  | 'review'            // Tekrar / aralıklı tekrar
-  | 'weak_spot'         // Zayıf olduğu konuyu güçlendiriyor
-  | 'exam_prep'         // Sınav yaklaşıyor
-  | 'creativity_block'  // Yaratıcı çıkmaz / açık uçlu
+  | 'first_exposure' // İlk kez karşılaşıyor
+  | 'practice' // Öğrendiğini uyguluyor
+  | 'review' // Tekrar / aralıklı tekrar
+  | 'weak_spot' // Zayıf olduğu konuyu güçlendiriyor
+  | 'exam_prep' // Sınav yaklaşıyor
+  | 'creativity_block' // Yaratıcı çıkmaz / açık uçlu
 
 /**
  * User intent: Son mesajın amacı.
  * Groq ile sınıflandırılıp cache'lenir.
  */
 export type UserIntent =
-  | 'learn_new'         // "X nedir?"
-  | 'deepen'            // "Daha detay"
-  | 'test_me'           // "Sına beni"
-  | 'solve_problem'     // "Bu soruyu çöz"
-  | 'review_mistake'    // "Yanlışımı anla"
-  | 'explore'           // "Bu konuda ne var?"
-  | 'chat'              // Genel sohbet
+  | 'learn_new' // "X nedir?"
+  | 'deepen' // "Daha detay"
+  | 'test_me' // "Sına beni"
+  | 'solve_problem' // "Bu soruyu çöz"
+  | 'review_mistake' // "Yanlışımı anla"
+  | 'explore' // "Bu konuda ne var?"
+  | 'chat' // Genel sohbet
 
 /**
  * Behavior: Engine'in arka planda uygulayacağı pedagojik davranış.
@@ -57,39 +57,39 @@ export type BehaviorCode =
 export interface UserSnapshot {
   userId: string
   localTime: Date
-  sessionDurationMinutes: number  // Bu seansta ne kadar çalıştı
+  sessionDurationMinutes: number // Bu seansta ne kadar çalıştı
   streakDays: number
-  recentRatings: number[]          // Son 5 dersin rating'leri (1-5)
+  recentRatings: number[] // Son 5 dersin rating'leri (1-5)
   totalMessagesLast24h: number
-  blockedTechniques: string[]      // Kullanıcının kapalı tuttukları
-  preferredContentTypes: string[]  // text/video/diagram
-  fatigueSigml: number            // 0-1, yorgunluk tahmini
+  blockedTechniques: string[] // Kullanıcının kapalı tuttukları
+  preferredContentTypes: string[] // text/video/diagram
+  fatigueSigml: number // 0-1, yorgunluk tahmini
 }
 
 /** Concept modelinin anlık özeti. */
 export interface ConceptSnapshot {
   conceptId: string
   name: string
-  difficulty: number              // 1-5
-  easeFactor: number              // SM-2
+  difficulty: number // 1-5
+  easeFactor: number // SM-2
   repetitions: number
-  masteryScore: number            // 0-100
-  confidence: number              // 0-1, kullanıcının kendine güveni
+  masteryScore: number // 0-100
+  confidence: number // 0-1, kullanıcının kendine güveni
   lastReviewedAt: Date | null
   isDue: boolean
-  prerequisitesMastered: boolean  // Önkoşulları tamam mı
+  prerequisitesMastered: boolean // Önkoşulları tamam mı
 }
 
 /** Technique metadata — library'den yüklenir. */
 export interface TechniqueMeta {
   id: string
-  code: string                    // "M1-T01"
+  code: string // "M1-T01"
   name: string
   kind: 'student_facing' | 'engine_behavior'
   suitableFor: LearningContext[]
-  contraindications: string[]    // ['exam_anxiety', 'fatigue']
-  difficultyLevel: number         // 1-5
-  cognitiveLoad: number           // 1-5
+  contraindications: string[] // ['exam_anxiety', 'fatigue']
+  difficultyLevel: number // 1-5
+  cognitiveLoad: number // 1-5
   estimatedDurationMinutes?: number
   promptTemplate?: string
   systemPromptFragment?: string
@@ -149,9 +149,9 @@ export interface LessonOutcome {
   lessonId: string
   userId: string
   techniqueId: string
-  userRating?: number       // 1-5, ders sonu anketi
-  duration: number          // Saniye
+  userRating?: number // 1-5, ders sonu anketi
+  duration: number // Saniye
   messageCount: number
   completed: boolean
-  quizPerformance?: number  // 0-1, o ders içinde quiz yapıldıysa
+  quizPerformance?: number // 0-1, o ders içinde quiz yapıldıysa
 }

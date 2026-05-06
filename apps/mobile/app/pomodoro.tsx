@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
-import { View, Text, Pressable, Animated, Easing, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useRouter } from 'expo-router'
-import { usePomodoro, formatSeconds, type PomodoroPhase } from '../src/hooks/usePomodoro'
-import { useStartFocus, useCompleteFocus, useTodayFocus } from '../src/hooks/useMotivation'
+import { useEffect, useRef, useState } from 'react'
+import { Alert, Animated, Easing, Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useCompleteFocus, useStartFocus, useTodayFocus } from '../src/hooks/useMotivation'
+import { type PomodoroPhase, formatSeconds, usePomodoro } from '../src/hooks/usePomodoro'
 
 const PHASE_META: Record<PomodoroPhase, { color: string; label: string; emoji: string }> = {
   idle: { color: '#1E1B4B', label: 'Hazır', emoji: '🧘' },
@@ -52,12 +52,16 @@ export default function Pomodoro() {
       }
 
       Alert.alert(
-        next === 'focus' ? '🍅 Odak vakti' : next === 'long_break' ? '🌊 Uzun mola' : '☕ Kısa mola',
+        next === 'focus'
+          ? '🍅 Odak vakti'
+          : next === 'long_break'
+            ? '🌊 Uzun mola'
+            : '☕ Kısa mola',
         next === 'focus'
           ? '25 dakika derin çalışma başlasın'
           : next === 'long_break'
-          ? '15 dakika tamamen dinlen — ekrandan uzaklaş'
-          : '5 dakika ayağa kalk, su iç',
+            ? '15 dakika tamamen dinlen — ekrandan uzaklaş'
+            : '5 dakika ayağa kalk, su iç',
       )
     },
   })
@@ -67,8 +71,18 @@ export default function Pomodoro() {
     if (pomo.isRunning && pomo.phase !== 'idle') {
       const anim = Animated.loop(
         Animated.sequence([
-          Animated.timing(pulse, { toValue: 1.05, duration: 1500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-          Animated.timing(pulse, { toValue: 1, duration: 1500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+          Animated.timing(pulse, {
+            toValue: 1.05,
+            duration: 1500,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulse, {
+            toValue: 1,
+            duration: 1500,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
         ]),
       )
       anim.start()
@@ -95,10 +109,11 @@ export default function Pomodoro() {
   }
 
   const handleReset = () => {
-    Alert.alert('Sıfırla', 'Pomodoro\'yu sıfırlamak istiyor musun?', [
+    Alert.alert('Sıfırla', "Pomodoro'yu sıfırlamak istiyor musun?", [
       { text: 'İptal', style: 'cancel' },
       {
-        text: 'Sıfırla', style: 'destructive',
+        text: 'Sıfırla',
+        style: 'destructive',
         onPress: () => {
           if (focusIdRef.current) {
             const actualMinutes = Math.round((Date.now() - focusStartedAtRef.current) / 60000)
@@ -129,7 +144,8 @@ export default function Pomodoro() {
         <View className="items-center">
           <Text className="text-white/60 text-xs">BUGÜN</Text>
           <Text className="text-white font-bold text-lg">
-            {today?.totalMinutes ?? 0} dk · {today?.sessions.filter((s) => s.completed).length ?? 0} 🍅
+            {today?.totalMinutes ?? 0} dk · {today?.sessions.filter((s) => s.completed).length ?? 0}{' '}
+            🍅
           </Text>
         </View>
         <View className="w-10" />
@@ -160,7 +176,8 @@ export default function Pomodoro() {
                 key={n}
                 className="w-3 h-3 rounded-full"
                 style={{
-                  backgroundColor: n <= pomo.completedCycles % 4 ? 'white' : 'rgba(255,255,255,0.3)',
+                  backgroundColor:
+                    n <= pomo.completedCycles % 4 ? 'white' : 'rgba(255,255,255,0.3)',
                 }}
               />
             ))}
@@ -171,10 +188,7 @@ export default function Pomodoro() {
       {/* Alt: kontroller */}
       <View className="pb-10 px-8">
         {pomo.phase === 'idle' ? (
-          <Pressable
-            onPress={handleStart}
-            className="bg-white py-4 rounded-2xl items-center"
-          >
+          <Pressable onPress={handleStart} className="bg-white py-4 rounded-2xl items-center">
             <Text className="font-bold text-lg" style={{ color: meta.color }}>
               🍅 İlk Pomodoro'yu Başlat
             </Text>

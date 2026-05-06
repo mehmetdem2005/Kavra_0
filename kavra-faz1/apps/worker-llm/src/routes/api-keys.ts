@@ -1,7 +1,7 @@
+import { AddApiKeySchema } from '@kavra/shared/schemas'
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { AddApiKeySchema } from '@kavra/shared/schemas'
-import { encryptApiKey, decryptApiKey } from '../crypto.js'
+import { decryptApiKey, encryptApiKey } from '../crypto.js'
 import { groqTestKey } from '../groq.js'
 import { supabase, verifyUserToken } from '../supabase.js'
 
@@ -13,7 +13,9 @@ export async function apiKeysRoutes(fastify: FastifyInstance) {
 
     const { data, error } = await supabase
       .from('api_keys')
-      .select('id, provider, label, key_last4, is_default, is_active, last_test_success, last_used_at, created_at')
+      .select(
+        'id, provider, label, key_last4, is_default, is_active, last_test_success, last_used_at, created_at',
+      )
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
@@ -127,10 +129,7 @@ export async function apiKeysRoutes(fastify: FastifyInstance) {
       .eq('provider', target.provider)
 
     // Yenisi true
-    await supabase
-      .from('api_keys')
-      .update({ is_default: true })
-      .eq('id', req.params.id)
+    await supabase.from('api_keys').update({ is_default: true }).eq('id', req.params.id)
 
     return { ok: true }
   })

@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { View, Text, Dimensions, Pressable, PanResponder, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Alert, Dimensions, PanResponder, Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import Svg, { Circle, Line, Text as SvgText, G } from 'react-native-svg'
-import { useConcepts, type ConceptWithProgress } from '../../../src/hooks/useConcepts'
+import { type ConceptWithProgress, useConcepts } from '../../../src/hooks/useConcepts'
 import { useSubject } from '../../../src/hooks/useSubjects'
 
 const { width, height } = Dimensions.get('window')
@@ -143,9 +143,7 @@ export default function ConceptMap() {
     return simulateLayout(concepts, width / 2, MAP_HEIGHT / 2)
   }, [concepts])
 
-  const selectedConcept = selectedId
-    ? concepts?.find((c) => c.id === selectedId)
-    : null
+  const selectedConcept = selectedId ? concepts?.find((c) => c.id === selectedId) : null
 
   return (
     <SafeAreaView className="flex-1 bg-ink-50" edges={['bottom']}>
@@ -199,10 +197,7 @@ export default function ConceptMap() {
               const fill = colorForMastery(mastery, subject?.color ?? '#1E1B4B')
 
               return (
-                <G
-                  key={n.id}
-                  onPress={() => setSelectedId(n.id === selectedId ? null : n.id)}
-                >
+                <G key={n.id} onPress={() => setSelectedId(n.id === selectedId ? null : n.id)}>
                   {isSelected && (
                     <Circle
                       cx={n.x}
@@ -222,7 +217,9 @@ export default function ConceptMap() {
                     fill="#1E1B4B"
                     fontWeight="600"
                   >
-                    {n.concept.name.length > 15 ? n.concept.name.slice(0, 14) + '…' : n.concept.name}
+                    {n.concept.name.length > 15
+                      ? n.concept.name.slice(0, 14) + '…'
+                      : n.concept.name}
                   </SvgText>
                 </G>
               )

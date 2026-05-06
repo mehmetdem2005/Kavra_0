@@ -1,4 +1,4 @@
-import type { LearningContext, TechniqueMeta, UserSnapshot, ConceptSnapshot } from './types.js'
+import type { ConceptSnapshot, LearningContext, TechniqueMeta, UserSnapshot } from './types.js'
 
 /**
  * Her context için o context'e en uygun teknik kodları.
@@ -90,7 +90,7 @@ export class CandidateSelector {
     context: LearningContext
     user: UserSnapshot
     concept?: ConceptSnapshot
-    availableTechniqueIds: string[]  // DB'deki gerçek ID'ler (code'dan maplemek için)
+    availableTechniqueIds: string[] // DB'deki gerçek ID'ler (code'dan maplemek için)
   }): TechniqueMeta[] {
     const { context, user, concept, availableTechniqueIds } = params
 
@@ -122,7 +122,10 @@ export class CandidateSelector {
    */
   getContextsForTechnique(code: string): LearningContext[] {
     const contexts: LearningContext[] = []
-    for (const [ctx, codes] of Object.entries(CONTEXT_TO_TECHNIQUES) as [LearningContext, string[]][]) {
+    for (const [ctx, codes] of Object.entries(CONTEXT_TO_TECHNIQUES) as [
+      LearningContext,
+      string[],
+    ][]) {
       if (codes.includes(code)) contexts.push(ctx)
     }
     return contexts

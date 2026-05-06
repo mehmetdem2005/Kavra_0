@@ -42,7 +42,12 @@ export function useSubjects() {
 export function useCreateSubject() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (input: { name: string; description?: string; color?: string; icon?: string }) => {
+    mutationFn: async (input: {
+      name: string
+      description?: string
+      color?: string
+      icon?: string
+    }) => {
       const { data: userData } = await supabase.auth.getUser()
       if (!userData.user) throw new Error('Giriş yapılmamış')
 

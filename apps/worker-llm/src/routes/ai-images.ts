@@ -25,7 +25,6 @@ const GenerateImageSchema = z.object({
  * Pro lifetime: ayda 200 görsel
  */
 export async function aiImagesRoutes(fastify: FastifyInstance) {
-
   /**
    * POST /api/ai-images/generate
    */
@@ -87,27 +86,30 @@ export async function aiImagesRoutes(fastify: FastifyInstance) {
       const modelMap = {
         'flux-schnell': 'black-forest-labs/flux-schnell',
         'flux-dev': 'black-forest-labs/flux-dev',
-        'sdxl': 'stability-ai/sdxl',
+        sdxl: 'stability-ai/sdxl',
       }
 
-      const createRes = await fetch(`https://api.replicate.com/v1/models/${modelMap[parsed.data.model]}/predictions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${REPLICATE_TOKEN}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'wait',
-        },
-        body: JSON.stringify({
-          input: {
-            prompt: refinedPrompt,
-            aspect_ratio: parsed.data.aspectRatio,
-            output_format: 'webp',
-            output_quality: 85,
-            num_outputs: 1,
-            num_inference_steps: parsed.data.model === 'flux-schnell' ? 4 : 28,
+      const createRes = await fetch(
+        `https://api.replicate.com/v1/models/${modelMap[parsed.data.model]}/predictions`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${REPLICATE_TOKEN}`,
+            'Content-Type': 'application/json',
+            Prefer: 'wait',
           },
-        }),
-      })
+          body: JSON.stringify({
+            input: {
+              prompt: refinedPrompt,
+              aspect_ratio: parsed.data.aspectRatio,
+              output_format: 'webp',
+              output_quality: 85,
+              num_outputs: 1,
+              num_inference_steps: parsed.data.model === 'flux-schnell' ? 4 : 28,
+            },
+          }),
+        },
+      )
 
       if (!createRes.ok) {
         const err = await createRes.text()
@@ -135,9 +137,7 @@ export async function aiImagesRoutes(fastify: FastifyInstance) {
         return reply.code(500).send({ error: 'storage_failed', detail: uploadErr.message })
       }
 
-      const { data: publicUrl } = supabase.storage
-        .from('ai-images')
-        .getPublicUrl(fileName)
+      const { data: publicUrl } = supabase.storage.from('ai-images').getPublicUrl(fileName)
 
       const generationTime = Date.now() - startedAt
 
@@ -159,13 +159,14 @@ export async function aiImagesRoutes(fastify: FastifyInstance) {
         .single()
 
       // Kota update
-      await supabase
-        .from('usage_quotas')
-        .upsert({
+      await supabase.from('usage_quotas').upsert(
+        {
           user_id: userId,
           period_start: periodStartStr,
           ai_images_generated: used + 1,
-        }, { onConflict: 'user_id,period_start' })
+        },
+        { onConflict: 'user_id,period_start' },
+      )
 
       return {
         id: imageRecord?.id,
@@ -235,7 +236,8 @@ async function refinePrompt(originalTr: string): Promise<string> {
 
   // Kavram pedagojik bağlam ekle
   if (!refined.match(/illustration|diagram|infographic|painting|photo/i)) {
-    refined += ', educational illustration, clean composition, soft colors, instructional diagram style'
+    refined +=
+      ', educational illustration, clean composition, soft colors, instructional diagram style'
   }
 
   return refined

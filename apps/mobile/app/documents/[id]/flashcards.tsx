@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { View, Text, ActivityIndicator, Pressable, Animated, Dimensions } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { useState } from 'react'
+import { ActivityIndicator, Animated, Dimensions, Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import {
-  usePendingFlashcards,
-  useAcceptFlashcard,
-  useRejectFlashcard,
   type GeneratedFlashcard,
+  useAcceptFlashcard,
+  usePendingFlashcards,
+  useRejectFlashcard,
 } from '../../../src/hooks/useDocuments'
 
 const { width } = Dimensions.get('window')
@@ -63,9 +63,7 @@ export default function FlashcardReview() {
         />
         <View className="flex-1 items-center justify-center p-8">
           <Text style={{ fontSize: 64 }}>🎉</Text>
-          <Text className="text-2xl font-serif text-brand-950 mt-4">
-            Hepsini bitirdin
-          </Text>
+          <Text className="text-2xl font-serif text-brand-950 mt-4">Hepsini bitirdin</Text>
           <Text className="text-slate-500 text-center mt-2">
             Onayladığın kartlar artık tekrar listende.
           </Text>
@@ -106,9 +104,7 @@ export default function FlashcardReview() {
         >
           {!showBack ? (
             <>
-              <Text className="text-xs font-semibold text-slate-400 uppercase mb-4">
-                ÖN — soru
-              </Text>
+              <Text className="text-xs font-semibold text-slate-400 uppercase mb-4">ÖN — soru</Text>
               <Text className="text-brand-950 text-2xl font-serif text-center leading-9">
                 {current.front}
               </Text>
@@ -126,13 +122,9 @@ export default function FlashcardReview() {
               <Text className="text-xs font-semibold text-accent-600 uppercase mb-4">
                 ARKA — cevap
               </Text>
-              <Text className="text-brand-950 text-xl text-center leading-7">
-                {current.back}
-              </Text>
+              <Text className="text-brand-950 text-xl text-center leading-7">{current.back}</Text>
               <View className="mt-6 pt-6 border-t border-slate-100 w-full">
-                <Text className="text-slate-400 text-xs text-center mb-2">
-                  Kart kalitesi
-                </Text>
+                <Text className="text-slate-400 text-xs text-center mb-2">Kart kalitesi</Text>
                 <View className="flex-row justify-center gap-1">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Text key={i} style={{ fontSize: 16 }}>

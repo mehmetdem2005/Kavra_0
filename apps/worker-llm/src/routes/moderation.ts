@@ -26,7 +26,9 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 
 const ModerateTextSchema = z.object({
   text: z.string().min(1).max(20_000),
-  contentType: z.enum(['user_message', 'reflection', 'audio_transcript', 'generated']).default('user_message'),
+  contentType: z
+    .enum(['user_message', 'reflection', 'audio_transcript', 'generated'])
+    .default('user_message'),
   sourceTable: z.string().optional(),
   sourceId: z.string().uuid().optional(),
 })
@@ -55,16 +57,12 @@ const HARD_BLOCK_CATEGORIES = [
 ]
 
 // Uyarı kategorileri (flagged)
-const SOFT_FLAG_CATEGORIES = [
-  'sexual',
-  'self-harm',
-  'violence',
-  'hate',
-  'harassment',
-  'illicit',
-]
+const SOFT_FLAG_CATEGORIES = ['sexual', 'self-harm', 'violence', 'hate', 'harassment', 'illicit']
 
-async function moderateWithOpenAI(input: { text?: string; imageUrl?: string }): Promise<ModerationResult> {
+async function moderateWithOpenAI(input: {
+  text?: string
+  imageUrl?: string
+}): Promise<ModerationResult> {
   if (!OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not configured')
 
   const inputArray: any[] = []
@@ -138,7 +136,6 @@ async function logModeration(args: {
 }
 
 export async function moderationRoutes(fastify: FastifyInstance) {
-
   /** POST /api/moderation/text */
   fastify.post('/api/moderation/text', async (req, reply) => {
     const userId = await verifyUserToken(req.headers.authorization)
@@ -150,9 +147,12 @@ export async function moderationRoutes(fastify: FastifyInstance) {
     try {
       const result = await moderateWithOpenAI({ text: parsed.data.text })
 
-      const action = result.verdict === 'blocked' ? 'hide'
-                   : result.verdict === 'flagged' ? 'show_warning'
-                   : 'show'
+      const action =
+        result.verdict === 'blocked'
+          ? 'hide'
+          : result.verdict === 'flagged'
+            ? 'show_warning'
+            : 'show'
 
       await logModeration({
         userId,
@@ -182,9 +182,8 @@ export async function moderationRoutes(fastify: FastifyInstance) {
     try {
       const result = await moderateWithOpenAI({ imageUrl: parsed.data.imageUrl })
 
-      const action = result.verdict === 'blocked' ? 'hide'
-                   : result.verdict === 'flagged' ? 'blur'
-                   : 'show'
+      const action =
+        result.verdict === 'blocked' ? 'hide' : result.verdict === 'flagged' ? 'blur' : 'show'
 
       await logModeration({
         userId,
@@ -223,7 +222,7 @@ export async function moderationRoutes(fastify: FastifyInstance) {
         .from('moderation_log')
         .select('*, profiles(email, full_name)')
         .order('created_at', { ascending: false })
-        .limit(Math.min(parseInt(req.query.limit ?? '50'), 200))
+        .limit(Math.min(Number.parseInt(req.query.limit ?? '50'), 200))
 
       if (req.query.verdict) q = q.eq('verdict', req.query.verdict)
 

@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { View, Text, Pressable, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
+import { useState } from 'react'
+import { Alert, Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../src/components/ui/Button'
 import { Input } from '../src/components/ui/Input'
 import { useAddApiKey } from '../src/hooks/useApiKeys'
@@ -92,9 +92,7 @@ function Step1() {
       <View className="w-24 h-24 bg-brand-950 rounded-3xl items-center justify-center mb-8">
         <Text className="text-white text-5xl font-serif">K</Text>
       </View>
-      <Text className="text-4xl font-serif text-brand-950 text-center">
-        Kavra'ya hoş geldin
-      </Text>
+      <Text className="text-4xl font-serif text-brand-950 text-center">Kavra'ya hoş geldin</Text>
       <View className="w-16 h-0.5 bg-accent-500 my-4" />
       <Text className="text-slate-600 text-center text-lg leading-7 px-4">
         150 pedagojik teknikle donanmış, Türkçe konuşan kişisel öğrenme AI'ın.
@@ -109,7 +107,13 @@ function Step1() {
   )
 }
 
-function Step2({ keyInput, setKeyInput, onSave, onSkip, loading }: {
+function Step2({
+  keyInput,
+  setKeyInput,
+  onSave,
+  onSkip,
+  loading,
+}: {
   keyInput: string
   setKeyInput: (s: string) => void
   onSave: () => void
@@ -119,12 +123,10 @@ function Step2({ keyInput, setKeyInput, onSave, onSkip, loading }: {
   return (
     <View>
       <Text style={{ fontSize: 48, textAlign: 'center' }}>🔑</Text>
-      <Text className="text-3xl font-serif text-brand-950 text-center mt-4">
-        Anahtarın sende
-      </Text>
+      <Text className="text-3xl font-serif text-brand-950 text-center mt-4">Anahtarın sende</Text>
       <Text className="text-slate-600 text-center text-base mt-3 leading-6 px-2">
-        Kendi Groq anahtarınla sınırsız sohbet. Ücretsiz tier cömerttir —
-        çoğu kullanıcı hiç para ödemez.
+        Kendi Groq anahtarınla sınırsız sohbet. Ücretsiz tier cömerttir — çoğu kullanıcı hiç para
+        ödemez.
       </Text>
 
       <View className="bg-brand-50 border border-brand-200 rounded-2xl p-4 mt-6">
@@ -158,18 +160,18 @@ function Step3() {
   return (
     <View className="items-center">
       <Text style={{ fontSize: 64 }}>🎉</Text>
-      <Text className="text-3xl font-serif text-brand-950 text-center mt-6">
-        Her şey hazır
-      </Text>
+      <Text className="text-3xl font-serif text-brand-950 text-center mt-6">Her şey hazır</Text>
       <Text className="text-slate-600 text-center text-lg leading-7 mt-4 px-4">
-        Artık konuşmaya başlayabilirsin. Aklına ne gelirse sor — Kavra
-        150 tekniğin en uygun olanıyla cevaplasın.
+        Artık konuşmaya başlayabilirsin. Aklına ne gelirse sor — Kavra 150 tekniğin en uygun
+        olanıyla cevaplasın.
       </Text>
 
       <View className="mt-8 bg-white rounded-2xl p-4 border border-slate-100 w-full">
         <Text className="text-sm text-slate-500 mb-2">İlk sorular için öneriler:</Text>
         <Text className="text-brand-950">• "Fotosentezi basitçe anlat"</Text>
-        <Text className="text-brand-950 mt-1">• "Türev konusunda bana Feynman tekniğiyle ders ver"</Text>
+        <Text className="text-brand-950 mt-1">
+          • "Türev konusunda bana Feynman tekniğiyle ders ver"
+        </Text>
         <Text className="text-brand-950 mt-1">• "Almanca A2 için kelime sınavı hazırla"</Text>
       </View>
     </View>

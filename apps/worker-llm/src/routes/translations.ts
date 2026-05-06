@@ -18,7 +18,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY
 
 const TranslateSchema = z.object({
   sourceId: z.string().uuid(),
-  targetLanguage: z.string().min(2).max(10),    // 'tr', 'en', 'es', vb.
+  targetLanguage: z.string().min(2).max(10), // 'tr', 'en', 'es', vb.
 })
 
 const SUPPORTED_LANGUAGES: Record<string, string> = {
@@ -69,7 +69,7 @@ Translated chunks (same format, same count):`
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.2,                   // düşük: tutarlı çeviri
+          temperature: 0.2, // düşük: tutarlı çeviri
           maxOutputTokens: 8192,
         },
       }),
@@ -84,7 +84,7 @@ Translated chunks (same format, same count):`
   const result: Record<number, string> = {}
   const matches = translatedText.matchAll(/\[(\d+)\]\s*([\s\S]*?)(?=\n\[\d+\]|\n*$)/g)
   for (const m of matches) {
-    const idx = parseInt(m[1])
+    const idx = Number.parseInt(m[1])
     const text = m[2].trim()
     if (text) result[idx] = text
   }
@@ -93,7 +93,6 @@ Translated chunks (same format, same count):`
 }
 
 export async function translationsRoutes(fastify: FastifyInstance) {
-
   /** GET /api/translations/:sourceId/:lang */
   fastify.get<{ Params: { sourceId: string; lang: string } }>(
     '/api/translations/:sourceId/:lang',
@@ -159,7 +158,10 @@ export async function translationsRoutes(fastify: FastifyInstance) {
 
     // Pro check
     const { data: ent } = await supabase
-      .from('user_entitlements').select('is_pro').eq('user_id', userId).single()
+      .from('user_entitlements')
+      .select('is_pro')
+      .eq('user_id', userId)
+      .single()
 
     if (!ent?.is_pro) {
       return reply.code(402).send({ error: 'pro_required', message: 'Çeviri Pro özelliğidir.' })
@@ -180,16 +182,19 @@ export async function translationsRoutes(fastify: FastifyInstance) {
     // Cache row oluştur
     const { data: cacheRow } = await supabase
       .from('youtube_translation_cache')
-      .upsert({
-        source_id: sourceId,
-        user_id: userId,
-        source_language: sourceLanguage,
-        target_language: targetLanguage,
-        total_chunks: chunks.length,
-        translated_chunks: 0,
-        status: 'processing',
-        translations: {},
-      }, { onConflict: 'source_id,target_language' })
+      .upsert(
+        {
+          source_id: sourceId,
+          user_id: userId,
+          source_language: sourceLanguage,
+          target_language: targetLanguage,
+          total_chunks: chunks.length,
+          translated_chunks: 0,
+          status: 'processing',
+          translations: {},
+        },
+        { onConflict: 'source_id,target_language' },
+      )
       .select()
       .single()
 
@@ -208,7 +213,7 @@ export async function translationsRoutes(fastify: FastifyInstance) {
 
           const translated = await translateBatch(
             batch,
-            SUPPORTED_LANGUAGES[targetLanguage],
+            SUPPORTED_LANGUAGES[targetLanguage] ?? targetLanguage,
             SUPPORTED_LANGUAGES[sourceLanguage] ?? sourceLanguage,
           )
 

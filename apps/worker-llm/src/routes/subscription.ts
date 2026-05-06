@@ -6,9 +6,7 @@ import { supabase, verifyUserToken } from '../supabase.js'
 const stripeKey = process.env.STRIPE_SECRET_KEY
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
-const stripe = stripeKey
-  ? new Stripe(stripeKey, { apiVersion: '2024-12-18.acacia' as any })
-  : null
+const stripe = stripeKey ? new Stripe(stripeKey, { apiVersion: '2024-12-18.acacia' as any }) : null
 
 const PRICE_IDS = {
   pro_monthly: process.env.STRIPE_PRICE_MONTHLY,
@@ -62,9 +60,27 @@ export async function subscriptionRoutes(fastify: FastifyInstance) {
       return {
         plans: [
           { id: 'free', name: 'Free', price_cents: 0, features: ['150 teknik', 'Kendi Groq key'] },
-          { id: 'pro_monthly', name: 'Pro Aylık', price_cents: 499, period: 'ay', features: ['Voice cloning', 'Sınırsız PDF', '7 kişilik', '3D map', 'Kaliteli TTS'] },
-          { id: 'pro_yearly', name: 'Pro Yıllık', price_cents: 3900, period: 'yıl', features: ['Aylığa göre %35 indirim'] },
-          { id: 'pro_lifetime', name: 'Lifetime', price_cents: 9900, period: 'tek seferlik', features: ['Ömür boyu Pro — early bird'] },
+          {
+            id: 'pro_monthly',
+            name: 'Pro Aylık',
+            price_cents: 499,
+            period: 'ay',
+            features: ['Voice cloning', 'Sınırsız PDF', '7 kişilik', '3D map', 'Kaliteli TTS'],
+          },
+          {
+            id: 'pro_yearly',
+            name: 'Pro Yıllık',
+            price_cents: 3900,
+            period: 'yıl',
+            features: ['Aylığa göre %35 indirim'],
+          },
+          {
+            id: 'pro_lifetime',
+            name: 'Lifetime',
+            price_cents: 9900,
+            period: 'tek seferlik',
+            features: ['Ömür boyu Pro — early bird'],
+          },
         ],
         earlyBirdRemaining: await getEarlyBirdRemaining(),
       }
@@ -145,7 +161,8 @@ export async function subscriptionRoutes(fastify: FastifyInstance) {
         customer: customerId,
         mode: isLifetime ? 'payment' : 'subscription',
         line_items: [{ price: priceId, quantity: 1 }],
-        success_url: parsed.data.successUrl ?? 'https://kavra.app/success?sid={CHECKOUT_SESSION_ID}',
+        success_url:
+          parsed.data.successUrl ?? 'https://kavra.app/success?sid={CHECKOUT_SESSION_ID}',
         cancel_url: parsed.data.cancelUrl ?? 'https://kavra.app/cancel',
         client_reference_id: userId,
         metadata: { user_id: userId, tier: parsed.data.tier },
