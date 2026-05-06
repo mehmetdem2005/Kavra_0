@@ -17,3 +17,5 @@ export async function verifyUserToken(authHeader?: string): Promise<string | nul
   if (error || !data.user) return null
   return data.user.id
 }
+
+export { getActiveGroqKey } from './routes/api-keys.js'

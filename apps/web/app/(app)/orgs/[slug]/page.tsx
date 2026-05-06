@@ -1,8 +1,8 @@
 'use client'
-import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
+import { BookOpen, GraduationCap, TrendingUp, Users } from 'lucide-react'
+import { useParams } from 'next/navigation'
 import { apiFetch } from '../../../../lib/api'
-import { Users, GraduationCap, BookOpen, TrendingUp } from 'lucide-react'
 
 export default function OrgDashboard() {
   const params = useParams()
@@ -20,7 +20,10 @@ export default function OrgDashboard() {
   if (!org) return null
 
   const trialDaysLeft = org.trial_ends_at
-    ? Math.max(0, Math.ceil((new Date(org.trial_ends_at).getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
+    ? Math.max(
+        0,
+        Math.ceil((new Date(org.trial_ends_at).getTime() - Date.now()) / (24 * 60 * 60 * 1000)),
+      )
     : 0
 
   return (
@@ -29,9 +32,7 @@ export default function OrgDashboard() {
       {org.subscription_status === 'trialing' && trialDaysLeft > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-3xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-sm text-amber-900 font-bold">
-              {trialDaysLeft} gün deneme kaldı
-            </p>
+            <p className="text-sm text-amber-900 font-bold">{trialDaysLeft} gün deneme kaldı</p>
             <p className="text-xs text-amber-700 mt-0.5">
               Plan seçip ödeme yapmadan tüm özellikleri deneyebilirsin.
             </p>
@@ -55,11 +56,7 @@ export default function OrgDashboard() {
           value={`${org.seats_used}/${org.max_seats}`}
           highlight={org.seats_used >= org.max_seats * 0.8}
         />
-        <StatCard
-          icon={TrendingUp}
-          label="Plan"
-          value={org.plan?.toUpperCase() ?? 'TEAM'}
-        />
+        <StatCard icon={TrendingUp} label="Plan" value={org.plan?.toUpperCase() ?? 'TEAM'} />
       </div>
 
       {/* Quick actions */}
@@ -94,7 +91,9 @@ export default function OrgDashboard() {
 
 function StatCard({ icon: Icon, label, value, highlight }: any) {
   return (
-    <div className={`bg-white rounded-2xl p-4 border ${highlight ? 'border-amber-300' : 'border-slate-100'}`}>
+    <div
+      className={`bg-white rounded-2xl p-4 border ${highlight ? 'border-amber-300' : 'border-slate-100'}`}
+    >
       <Icon size={16} className={highlight ? 'text-amber-500' : 'text-slate-400'} />
       <p className="text-2xl font-serif text-ink-900 mt-2">{value}</p>
       <p className="text-[10px] text-slate-500 uppercase tracking-widest font-mono mt-1">{label}</p>

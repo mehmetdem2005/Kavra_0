@@ -1,14 +1,14 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { supabase, verifyUserToken } from '../supabase.js'
 import { modalClonedTTS, validateReferenceAudio } from '../modal-f5tts.js'
+import { supabase, verifyUserToken } from '../supabase.js'
 
 const REFERENCE_BUCKET = 'voice-references'
 
 const CreateCloneSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
-  storagePath: z.string(),                  // 'voice-references/<user>/<id>.wav'
+  storagePath: z.string(), // 'voice-references/<user>/<id>.wav'
   durationSeconds: z.number().min(3).max(60),
   referenceText: z.string().min(10).max(500),
   language: z.string().default('tr'),
@@ -45,7 +45,9 @@ export async function voiceCloneRoutes(fastify: FastifyInstance) {
 
     const { data } = await supabase
       .from('voice_clones')
-      .select('id, name, description, language, status, is_default, use_count, created_at, ready_at')
+      .select(
+        'id, name, description, language, status, is_default, use_count, created_at, ready_at',
+      )
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
@@ -65,7 +67,8 @@ export async function voiceCloneRoutes(fastify: FastifyInstance) {
 
     // Bu ay kaç voice clone oluşturmuş kontrol et
     const periodStart = new Date()
-    periodStart.setDate(1); periodStart.setHours(0, 0, 0, 0)
+    periodStart.setDate(1)
+    periodStart.setHours(0, 0, 0, 0)
 
     const { count } = await supabase
       .from('voice_clones')
@@ -221,56 +224,43 @@ export async function voiceCloneRoutes(fastify: FastifyInstance) {
   )
 
   /** POST /api/voice-clones/:id/default — varsayılan yap */
-  fastify.post<{ Params: { id: string } }>(
-    '/api/voice-clones/:id/default',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.post<{ Params: { id: string } }>('/api/voice-clones/:id/default', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      // Önce diğerlerini false yap
-      await supabase
-        .from('voice_clones')
-        .update({ is_default: false })
-        .eq('user_id', userId)
+    // Önce diğerlerini false yap
+    await supabase.from('voice_clones').update({ is_default: false }).eq('user_id', userId)
 
-      // Sonra bunu true yap
-      const { error } = await supabase
-        .from('voice_clones')
-        .update({ is_default: true })
-        .eq('id', req.params.id)
-        .eq('user_id', userId)
+    // Sonra bunu true yap
+    const { error } = await supabase
+      .from('voice_clones')
+      .update({ is_default: true })
+      .eq('id', req.params.id)
+      .eq('user_id', userId)
 
-      if (error) return reply.code(500).send({ error: error.message })
-      return { ok: true }
-    },
-  )
+    if (error) return reply.code(500).send({ error: error.message })
+    return { ok: true }
+  })
 
   /** DELETE /api/voice-clones/:id */
-  fastify.delete<{ Params: { id: string } }>(
-    '/api/voice-clones/:id',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.delete<{ Params: { id: string } }>('/api/voice-clones/:id', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      // Storage temizle
-      const { data: clone } = await supabase
-        .from('voice_clones')
-        .select('reference_audio_path')
-        .eq('id', req.params.id)
-        .eq('user_id', userId)
-        .single()
+    // Storage temizle
+    const { data: clone } = await supabase
+      .from('voice_clones')
+      .select('reference_audio_path')
+      .eq('id', req.params.id)
+      .eq('user_id', userId)
+      .single()
 
-      if (clone?.reference_audio_path) {
-        await supabase.storage.from(REFERENCE_BUCKET).remove([clone.reference_audio_path])
-      }
+    if (clone?.reference_audio_path) {
+      await supabase.storage.from(REFERENCE_BUCKET).remove([clone.reference_audio_path])
+    }
 
-      await supabase
-        .from('voice_clones')
-        .delete()
-        .eq('id', req.params.id)
-        .eq('user_id', userId)
+    await supabase.from('voice_clones').delete().eq('id', req.params.id).eq('user_id', userId)
 
-      return { ok: true }
-    },
-  )
+    return { ok: true }
+  })
 }

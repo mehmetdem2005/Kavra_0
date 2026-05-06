@@ -36,7 +36,6 @@ Türkçe veya orijinal dilde tut.`,
 }
 
 export async function handwritingRoutes(fastify: FastifyInstance) {
-
   /** POST /api/handwriting/recognize */
   fastify.post('/api/handwriting/recognize', async (req, reply) => {
     const userId = await verifyUserToken(req.headers.authorization)
@@ -56,17 +55,19 @@ export async function handwritingRoutes(fastify: FastifyInstance) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: PROMPTS[parsed.data.mode] },
-                {
-                  inline_data: {
-                    mime_type: 'image/png',
-                    data: parsed.data.imageBase64,
+            contents: [
+              {
+                parts: [
+                  { text: PROMPTS[parsed.data.mode] },
+                  {
+                    inline_data: {
+                      mime_type: 'image/png',
+                      data: parsed.data.imageBase64,
+                    },
                   },
-                },
-              ],
-            }],
+                ],
+              },
+            ],
             generationConfig: {
               temperature: 0.1,
               maxOutputTokens: 2048,

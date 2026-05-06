@@ -41,10 +41,7 @@ export function sm2(previous: SM2State, quality: 0 | 1 | 2 | 3 | 4 | 5): SM2Resu
   else newInterval = Math.round(interval * easeFactor)
 
   // Ease factor güncelle (doğru cevapta)
-  const newEase = Math.max(
-    1.3,
-    easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)),
-  )
+  const newEase = Math.max(1.3, easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)))
 
   return {
     repetitions: repetitions + 1,

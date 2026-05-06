@@ -1,4 +1,4 @@
-import type { BehaviorCode, LearningContext, UserSnapshot, ConceptSnapshot } from './types.js'
+import type { BehaviorCode, ConceptSnapshot, LearningContext, UserSnapshot } from './types.js'
 
 /**
  * Engine behaviors (C1-C10): öğrenciye açıkça söylenmeyen,
@@ -16,14 +16,14 @@ export interface BehaviorContext {
   sessionMessageCount: number
   isSessionEnding: boolean
   lastAssistantMessageWasLong: boolean
-  recentErrorCount: number  // Son N quiz'de kaç yanlış
+  recentErrorCount: number // Son N quiz'de kaç yanlış
 }
 
 interface Behavior {
   code: BehaviorCode
   shouldActivate: (ctx: BehaviorContext) => boolean
   promptFragment: string
-  priority: number  // Yüksek = daha önce injekte et
+  priority: number // Yüksek = daha önce injekte et
 }
 
 const BEHAVIORS: Behavior[] = [
@@ -57,9 +57,7 @@ const BEHAVIORS: Behavior[] = [
     code: 'C3-scaffolding-fading',
     priority: 85,
     shouldActivate: (ctx) =>
-      ctx.learningContext === 'practice' &&
-      !!ctx.concept &&
-      ctx.concept.repetitions >= 2,
+      ctx.learningContext === 'practice' && !!ctx.concept && ctx.concept.repetitions >= 2,
     promptFragment:
       'KADEMELİ İPUCU (Scaffolding Fading): Öğrenci bu konuyu daha önce görmüş. Direkt cevap verme — önce %10 ipucu ver, sonra gerekiyorsa %50, en son tam cevap. Öğrencinin kendi düşünmesine yer bırak.',
   },
@@ -67,8 +65,7 @@ const BEHAVIORS: Behavior[] = [
   {
     code: 'C1-misconception-mining',
     priority: 85,
-    shouldActivate: (ctx) =>
-      ctx.learningContext === 'weak_spot' && ctx.recentErrorCount >= 2,
+    shouldActivate: (ctx) => ctx.learningContext === 'weak_spot' && ctx.recentErrorCount >= 2,
     promptFragment:
       'YANLIŞ KAVRAMSALLAŞTIRMA TARAMASI: Öğrenci bu konuda tekrarlayan hatalar yapıyor. Önce SENARYOLAR üzerinden "şunu mu karıştırıyorsun?" diye sor. Hatanın kökündeki kavramsal yanlışı bul, sonra düzelt.',
   },
@@ -105,8 +102,7 @@ const BEHAVIORS: Behavior[] = [
   {
     code: 'C4-concept-blending',
     priority: 60,
-    shouldActivate: (ctx) =>
-      ctx.learningContext === 'first_exposure' && !!ctx.concept,
+    shouldActivate: (ctx) => ctx.learningContext === 'first_exposure' && !!ctx.concept,
     promptFragment:
       'KAVRAM MELEZLEME: Eğer öğrenci konuyu anlamakta zorlanırsa, farklı bir alandan bir örnekle açıkla (fizik ↔ tarih, müzik ↔ matematik vb.). Beklenmedik bağlantı → kalıcı öğrenme.',
   },
@@ -114,8 +110,7 @@ const BEHAVIORS: Behavior[] = [
   {
     code: 'C6-multi-perspective',
     priority: 55,
-    shouldActivate: (ctx) =>
-      ctx.learningContext === 'practice' && ctx.sessionMessageCount > 3,
+    shouldActivate: (ctx) => ctx.learningContext === 'practice' && ctx.sessionMessageCount > 3,
     promptFragment:
       'ÇOKLU PERSPEKTİF: Bu noktada aynı konuyu bir başka açıdan ele al — alternatif bir yaklaşım, bir eleştirmen gözünden, ya da farklı bir disiplinden. Tek perspektif kalıplaşmaya yol açar.',
   },
@@ -155,8 +150,7 @@ const BEHAVIORS: Behavior[] = [
   {
     code: 'C2-ikea-effect',
     priority: 35,
-    shouldActivate: (ctx) =>
-      ctx.learningContext === 'practice' && ctx.sessionMessageCount > 2,
+    shouldActivate: (ctx) => ctx.learningContext === 'practice' && ctx.sessionMessageCount > 2,
     promptFragment:
       'IKEA ETKİSİ: Bilgiyi tam vermek yerine yarısını ver, kalanını öğrenci tamamlasın. Örn: "Tanımın yarısı şu... kalan kelimeleri sen düşün." Öğrenciyi yapan durumuna geçir.',
   },

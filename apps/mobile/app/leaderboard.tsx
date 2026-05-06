@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from '../src/lib/api'
+import { Stack, useRouter } from 'expo-router'
+import { useState } from 'react'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Icon } from '../src/components/ui/Icon'
+import { apiFetch } from '../src/lib/api'
 
 export default function LeaderboardScreen() {
   const router = useRouter()
@@ -37,7 +37,9 @@ export default function LeaderboardScreen() {
             onPress={() => setPeriod(p)}
             className={`flex-1 py-2 rounded-full ${period === p ? 'bg-ink-900' : 'bg-white border border-slate-200'}`}
           >
-            <Text className={`text-center text-xs font-bold ${period === p ? 'text-cream-50' : 'text-slate-600'}`}>
+            <Text
+              className={`text-center text-xs font-bold ${period === p ? 'text-cream-50' : 'text-slate-600'}`}
+            >
               {p === 'weekly' ? 'Bu Hafta' : 'Bu Ay'}
             </Text>
           </Pressable>
@@ -71,13 +73,20 @@ export default function LeaderboardScreen() {
               onPress={() => e.username && router.push(`/u/${e.username}`)}
               className="bg-white border border-slate-100 rounded-2xl p-3 mb-2 flex-row items-center gap-3"
             >
-              <View className={`w-9 h-9 rounded-full items-center justify-center ${
-                e.rank === 1 ? 'bg-amber-500'
-                  : e.rank === 2 ? 'bg-slate-300'
-                  : e.rank === 3 ? 'bg-orange-300'
-                  : 'bg-cream-50 border border-slate-100'
-              }`}>
-                <Text className={`font-bold text-sm ${e.rank <= 3 ? 'text-ink-900' : 'text-slate-600'}`}>
+              <View
+                className={`w-9 h-9 rounded-full items-center justify-center ${
+                  e.rank === 1
+                    ? 'bg-amber-500'
+                    : e.rank === 2
+                      ? 'bg-slate-300'
+                      : e.rank === 3
+                        ? 'bg-orange-300'
+                        : 'bg-cream-50 border border-slate-100'
+                }`}
+              >
+                <Text
+                  className={`font-bold text-sm ${e.rank <= 3 ? 'text-ink-900' : 'text-slate-600'}`}
+                >
                   {e.rank}
                 </Text>
               </View>
@@ -89,7 +98,9 @@ export default function LeaderboardScreen() {
               </View>
 
               <View className="flex-1">
-                <Text className="text-sm text-ink-900 font-semibold">@{e.username ?? 'anonim'}</Text>
+                <Text className="text-sm text-ink-900 font-semibold">
+                  @{e.username ?? 'anonim'}
+                </Text>
                 <Text className="text-[10px] text-slate-500 mt-0.5">
                   {e.review_count} tekrar · {e.active_days} aktif gün
                 </Text>

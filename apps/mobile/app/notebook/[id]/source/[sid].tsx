@@ -1,10 +1,18 @@
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Dimensions, Alert } from 'react-native'
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router'
 import YoutubePlayer from 'react-native-youtube-iframe'
-import { apiFetch } from '../../../src/lib/api'
-import { Icon } from '../../../src/components/ui/Icon'
+import { Icon } from '../../../../src/components/ui/Icon'
+import { apiFetch } from '../../../../src/lib/api'
 
 interface Source {
   id: string
@@ -63,7 +71,7 @@ export default function YouTubeSourceViewer() {
   const chunkRefs = useRef<Map<number, number>>(new Map())
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       try {
         const s = await apiFetch<Source>(`/api/sources/${sid}`)
         setSource(s)
@@ -201,7 +209,7 @@ export default function YouTubeSourceViewer() {
             if (state === 'paused') setPlaying(false)
             if (state === 'playing') setPlaying(true)
           }}
-          webViewStyle={{ opacity: 0.99 }}                    // iOS layout fix
+          webViewStyle={{ opacity: 0.99 }} // iOS layout fix
         />
       </View>
 
@@ -211,23 +219,31 @@ export default function YouTubeSourceViewer() {
           <Icon name="play" size={18} color="#DB2777" />
         </View>
         <View className="flex-1">
-          <Text className="font-serif text-sm text-ink-900" numberOfLines={1}>{source.title}</Text>
+          <Text className="font-serif text-sm text-ink-900" numberOfLines={1}>
+            {source.title}
+          </Text>
           <Text className="text-[10px] text-slate-500 mt-0.5">
             {chunks.length} pasaj · {Math.round((source.youtube_duration_seconds ?? 0) / 60)} dk
-            {source.transcript_source ? ` · ${transcriptSourceLabel(source.transcript_source)}` : ''}
+            {source.transcript_source
+              ? ` · ${transcriptSourceLabel(source.transcript_source)}`
+              : ''}
             {translateLang ? ` · → ${translateLang.toUpperCase()}` : ''}
           </Text>
         </View>
 
         {/* Çeviri butonu */}
         <Pressable
-          onPress={() => translation ? clearTranslation() : setTranslateMenuOpen(!translateMenuOpen)}
+          onPress={() =>
+            translation ? clearTranslation() : setTranslateMenuOpen(!translateMenuOpen)
+          }
           className={`rounded-full px-3 py-1.5 flex-row items-center gap-1.5 ${
             translation ? 'bg-amber-500' : 'bg-cyan-50 border border-cyan-200'
           }`}
         >
           <Icon name="languages" size={11} color={translation ? '#1E1B4B' : '#0891B2'} />
-          <Text className={`text-[10px] font-bold ${translation ? 'text-ink-900' : 'text-cyan-700'}`}>
+          <Text
+            className={`text-[10px] font-bold ${translation ? 'text-ink-900' : 'text-cyan-700'}`}
+          >
             {translation ? 'Orijinal' : 'Çevir'}
           </Text>
         </Pressable>
@@ -278,7 +294,8 @@ export default function YouTubeSourceViewer() {
         </Text>
 
         {chunks.map((chunk) => {
-          const isActive = currentTimeMs >= chunk.start_time_ms && currentTimeMs <= chunk.end_time_ms
+          const isActive =
+            currentTimeMs >= chunk.start_time_ms && currentTimeMs <= chunk.end_time_ms
           const translatedText = translation?.translations?.[String(chunk.chunk_index)]
           const displayText = translatedText ?? chunk.text
           return (
@@ -291,8 +308,12 @@ export default function YouTubeSourceViewer() {
               }`}
             >
               <View className="flex-row items-center gap-2 mb-1.5">
-                <View className={`px-2 py-0.5 rounded ${isActive ? 'bg-amber-500' : 'bg-slate-100'}`}>
-                  <Text className={`font-mono text-[10px] font-bold ${isActive ? 'text-ink-900' : 'text-slate-700'}`}>
+                <View
+                  className={`px-2 py-0.5 rounded ${isActive ? 'bg-amber-500' : 'bg-slate-100'}`}
+                >
+                  <Text
+                    className={`font-mono text-[10px] font-bold ${isActive ? 'text-ink-900' : 'text-slate-700'}`}
+                  >
                     {formatTimestamp(chunk.start_time_ms)}
                   </Text>
                 </View>
@@ -338,10 +359,15 @@ function formatTimestamp(ms: number): string {
 
 function transcriptSourceLabel(src: string): string {
   switch (src) {
-    case 'supadata-auto': return 'Resmi altyazı'
-    case 'supadata-asr': return 'Otomatik altyazı'
-    case 'youtube-scrape': return 'Altyazı'
-    case 'whisper-fallback': return 'Whisper transkripti'
-    default: return 'Transkript'
+    case 'supadata-auto':
+      return 'Resmi altyazı'
+    case 'supadata-asr':
+      return 'Otomatik altyazı'
+    case 'youtube-scrape':
+      return 'Altyazı'
+    case 'whisper-fallback':
+      return 'Whisper transkripti'
+    default:
+      return 'Transkript'
   }
 }

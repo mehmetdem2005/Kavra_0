@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { View, Text, Pressable, ActivityIndicator, Alert, Platform } from 'react-native'
 import { useRouter } from 'expo-router'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Platform, Pressable, Text, View } from 'react-native'
 import { useRevenueCat } from '../../hooks/useRevenueCat'
 import { Icon } from '../ui/Icon'
 
@@ -105,7 +105,9 @@ export function MobileIAPPaywall({ onClose }: { onClose?: () => void }) {
               <Text className="text-xs text-ink-900/70 mt-1">Bir kez öde, ömür boyu Pro</Text>
             </View>
             <View className="items-end">
-              <Text className="font-serif text-3xl text-ink-900">{lifetime.product.priceString}</Text>
+              <Text className="font-serif text-3xl text-ink-900">
+                {lifetime.product.priceString}
+              </Text>
               {selectedPkg === lifetime.identifier && purchasing && (
                 <ActivityIndicator size="small" color="#1E1B4B" />
               )}
@@ -132,7 +134,9 @@ export function MobileIAPPaywall({ onClose }: { onClose?: () => void }) {
               <Text className="text-xs text-cream-50/60 mt-1">~%30 indirim, taahhüt yok</Text>
             </View>
             <View className="items-end">
-              <Text className="font-serif text-2xl text-cream-50">{annual.product.priceString}</Text>
+              <Text className="font-serif text-2xl text-cream-50">
+                {annual.product.priceString}
+              </Text>
               <Text className="text-[10px] text-cream-50/60">/ yıl</Text>
               {selectedPkg === annual.identifier && purchasing && (
                 <ActivityIndicator size="small" color="#F59E0B" />
@@ -155,7 +159,9 @@ export function MobileIAPPaywall({ onClose }: { onClose?: () => void }) {
               <Text className="text-xs text-slate-500 mt-1">İstediğin zaman iptal et</Text>
             </View>
             <View className="items-end">
-              <Text className="font-serif text-2xl text-ink-900">{monthly.product.priceString}</Text>
+              <Text className="font-serif text-2xl text-ink-900">
+                {monthly.product.priceString}
+              </Text>
               <Text className="text-[10px] text-slate-500">/ ay</Text>
               {selectedPkg === monthly.identifier && purchasing && (
                 <ActivityIndicator size="small" color="#1E1B4B" />

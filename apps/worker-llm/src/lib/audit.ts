@@ -1,4 +1,4 @@
-import { supabase } from './supabase.js'
+import { supabase } from '../supabase.js'
 
 /**
  * Audit Log — compliance event tracking
@@ -67,8 +67,8 @@ export const AUDIT_EVENTS = {
   USER_JOINED: 'user.joined',
   USER_REMOVED: 'user.removed',
   USER_ROLE_CHANGED: 'user.role_changed',
-  USER_PROVISIONED: 'user.provisioned',                 // SCIM
-  USER_DEPROVISIONED: 'user.deprovisioned',             // SCIM
+  USER_PROVISIONED: 'user.provisioned', // SCIM
+  USER_DEPROVISIONED: 'user.deprovisioned', // SCIM
 
   // Class
   CLASS_CREATED: 'class.created',
@@ -80,7 +80,7 @@ export const AUDIT_EVENTS = {
   // Data
   DATA_EXPORTED: 'data.exported',
   DATA_DELETED: 'data.deleted',
-  DATA_ACCESSED: 'data.accessed',                       // sensitive query
+  DATA_ACCESSED: 'data.accessed', // sensitive query
 
   // Security
   SCIM_TOKEN_GENERATED: 'security.scim_token_generated',

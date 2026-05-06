@@ -1,17 +1,23 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, Modal, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
 import { Input } from '../../src/components/ui/Input'
-import {
-  useSubjects,
-  useCreateSubject,
-  type Subject,
-} from '../../src/hooks/useSubjects'
+import { type Subject, useCreateSubject, useSubjects } from '../../src/hooks/useSubjects'
 
 const ICONS = ['📘', '📗', '📙', '📕', '🧮', '🧬', '⚗️', '🌍', '💻', '🎨', '🎵', '📐']
-const COLORS = ['#1E1B4B', '#7C3AED', '#DB2777', '#DC2626', '#EA580C', '#CA8A04', '#65A30D', '#059669', '#0891B2']
+const COLORS = [
+  '#1E1B4B',
+  '#7C3AED',
+  '#DB2777',
+  '#DC2626',
+  '#EA580C',
+  '#CA8A04',
+  '#65A30D',
+  '#059669',
+  '#0891B2',
+]
 
 export default function LearnTab() {
   const router = useRouter()
@@ -41,7 +47,11 @@ export default function LearnTab() {
           <>
             <View className="gap-3">
               {subjects.map((s) => (
-                <SubjectCard key={s.id} subject={s} onPress={() => router.push(`/subject/${s.id}`)} />
+                <SubjectCard
+                  key={s.id}
+                  subject={s}
+                  onPress={() => router.push(`/subject/${s.id}`)}
+                />
               ))}
             </View>
             <View className="mt-4 mb-8">
@@ -88,9 +98,15 @@ function SubjectCard({ subject, onPress }: { subject: Subject; onPress: () => vo
         )}
         {daysToExam !== null && daysToExam >= 0 && (
           <View className="flex-row items-center gap-1 mt-1">
-            <Text className={`text-xs font-semibold ${
-              daysToExam <= 7 ? 'text-red-600' : daysToExam <= 30 ? 'text-amber-600' : 'text-slate-500'
-            }`}>
+            <Text
+              className={`text-xs font-semibold ${
+                daysToExam <= 7
+                  ? 'text-red-600'
+                  : daysToExam <= 30
+                    ? 'text-amber-600'
+                    : 'text-slate-500'
+              }`}
+            >
               📅 Sınav: {daysToExam} gün
             </Text>
           </View>
@@ -109,15 +125,24 @@ function CreateSubjectModal({ visible, onClose }: { visible: boolean; onClose: (
   const create = useCreateSubject()
 
   const reset = () => {
-    setName(''); setDescription(''); setIcon(ICONS[0]!); setColor(COLORS[0]!)
+    setName('')
+    setDescription('')
+    setIcon(ICONS[0]!)
+    setColor(COLORS[0]!)
   }
 
   const handleCreate = () => {
-    if (!name.trim()) { Alert.alert('', 'Konu ismi boş olamaz'); return }
+    if (!name.trim()) {
+      Alert.alert('', 'Konu ismi boş olamaz')
+      return
+    }
     create.mutate(
       { name: name.trim(), description: description.trim() || undefined, icon, color },
       {
-        onSuccess: () => { reset(); onClose() },
+        onSuccess: () => {
+          reset()
+          onClose()
+        },
         onError: (e: any) => Alert.alert('Hata', e.message),
       },
     )
@@ -130,8 +155,18 @@ function CreateSubjectModal({ visible, onClose }: { visible: boolean; onClose: (
           <View className="w-12 h-1 bg-slate-200 rounded-full self-center mb-4" />
           <Text className="text-2xl font-serif text-brand-950 mb-4">Yeni Konu</Text>
 
-          <Input label="İsim" value={name} onChangeText={setName} placeholder="Örn: Kimya, YDS, Almanca A2" />
-          <Input label="Açıklama (ops.)" value={description} onChangeText={setDescription} placeholder="Kısa not" />
+          <Input
+            label="İsim"
+            value={name}
+            onChangeText={setName}
+            placeholder="Örn: Kimya, YDS, Almanca A2"
+          />
+          <Input
+            label="Açıklama (ops.)"
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Kısa not"
+          />
 
           <Text className="text-xs font-semibold text-slate-400 uppercase mt-2 mb-2">İkon</Text>
           <View className="flex-row flex-wrap gap-2 mb-4">
@@ -172,7 +207,12 @@ function CreateSubjectModal({ visible, onClose }: { visible: boolean; onClose: (
 
           <View className="flex-row gap-3 mt-2">
             <View className="flex-1">
-              <Button title="İptal" variant="secondary" onPress={onClose} disabled={create.isPending} />
+              <Button
+                title="İptal"
+                variant="secondary"
+                onPress={onClose}
+                disabled={create.isPending}
+              />
             </View>
             <View className="flex-1">
               <Button title="Oluştur" onPress={handleCreate} loading={create.isPending} />

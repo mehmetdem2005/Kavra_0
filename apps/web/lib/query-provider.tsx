@@ -1,8 +1,9 @@
 'use client'
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
 import { QueryClient } from '@tanstack/react-query'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
-import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
-import { useState, type ReactNode } from 'react'
+import type * as React from 'react'
+import { type ReactNode, useState } from 'react'
 
 /**
  * Offline-first sync stratejisi:
@@ -26,25 +27,28 @@ const browserStorage = {
 }
 
 export function QueryProvider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 60 * 1000,             // 1 dk fresh
-        gcTime: 24 * 60 * 60 * 1000,      // 24 saat in cache
-        retry: (failureCount, error: any) => {
-          if (error?.status === 401 || error?.status === 403) return false
-          return failureCount < 2
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000, // 1 dk fresh
+            gcTime: 24 * 60 * 60 * 1000, // 24 saat in cache
+            retry: (failureCount, error: any) => {
+              if (error?.status === 401 || error?.status === 403) return false
+              return failureCount < 2
+            },
+            refetchOnWindowFocus: false,
+          },
+          mutations: {
+            retry: (failureCount, error: any) => {
+              if (error?.status === 400 || error?.status === 401) return false
+              return failureCount < 1
+            },
+          },
         },
-        refetchOnWindowFocus: false,
-      },
-      mutations: {
-        retry: (failureCount, error: any) => {
-          if (error?.status === 400 || error?.status === 401) return false
-          return failureCount < 1
-        },
-      },
-    },
-  }))
+      }),
+  )
 
   const [persister] = useState(() =>
     createAsyncStoragePersister({
@@ -54,16 +58,22 @@ export function QueryProvider({ children }: { children: ReactNode }) {
     }),
   )
 
+  const Provider = PersistQueryClientProvider as unknown as React.ComponentType<{
+    client: typeof queryClient
+    persistOptions: { persister: typeof persister; maxAge: number; buster: string }
+    children?: ReactNode
+  }>
+
   return (
-    <PersistQueryClientProvider
+    <Provider
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: 24 * 60 * 60 * 1000,      // 24 saat persist
-        buster: 'v1',                      // schema değişirse bump
+        maxAge: 24 * 60 * 60 * 1000, // 24 saat persist
+        buster: 'v1', // schema değişirse bump
       }}
     >
       {children}
-    </PersistQueryClientProvider>
+    </Provider>
   )
 }

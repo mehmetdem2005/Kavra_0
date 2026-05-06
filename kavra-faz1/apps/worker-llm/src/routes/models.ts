@@ -1,13 +1,14 @@
 import type { FastifyInstance } from 'fastify'
 import { groqListModels } from '../groq.js'
-import { getActiveGroqKey } from './api-keys.js'
 import { supabase, verifyUserToken } from '../supabase.js'
+import { getActiveGroqKey } from './api-keys.js'
 
 function inferCategory(modelId: string): string {
   const id = modelId.toLowerCase()
   if (id.includes('whisper')) return 'stt'
   if (id.includes('scout') || id.includes('maverick') || id.includes('vision')) return 'vision'
-  if (id.includes('r1') || id.includes('reasoning') || id.includes('gpt-oss-120b')) return 'reasoning'
+  if (id.includes('r1') || id.includes('reasoning') || id.includes('gpt-oss-120b'))
+    return 'reasoning'
   if (id.includes('compound')) return 'compound'
   if (id.includes('guard') || id.includes('safeguard')) return 'safety'
   if (id.includes('8b') || id.includes('instant')) return 'fast'

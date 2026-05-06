@@ -1,6 +1,6 @@
-import * as Notifications from 'expo-notifications'
-import * as Device from 'expo-device'
 import Constants from 'expo-constants'
+import * as Device from 'expo-device'
+import * as Notifications from 'expo-notifications'
 import { Platform } from 'react-native'
 import { apiFetch } from './api'
 
@@ -43,9 +43,7 @@ export async function registerPushNotifications(): Promise<{ token?: string; err
   }
 
   try {
-    const projectId =
-      Constants.expoConfig?.extra?.eas?.projectId ??
-      Constants.easConfig?.projectId
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId
 
     const tokenResp = await Notifications.getExpoPushTokenAsync(
       projectId ? { projectId } : undefined,
@@ -74,9 +72,7 @@ export async function registerPushNotifications(): Promise<{ token?: string; err
 /** Kullanıcı çıkış yaparken çağrılır */
 export async function unregisterPushNotifications(): Promise<void> {
   try {
-    const projectId =
-      Constants.expoConfig?.extra?.eas?.projectId ??
-      Constants.easConfig?.projectId
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId
     const tokenResp = await Notifications.getExpoPushTokenAsync(
       projectId ? { projectId } : undefined,
     )

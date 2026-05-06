@@ -59,10 +59,9 @@ export function useCheckAchievements() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async () => {
-      return await apiFetch<{ newAchievements: Achievement[] }>(
-        '/api/achievements/check',
-        { method: 'POST' },
-      )
+      return await apiFetch<{ newAchievements: Achievement[] }>('/api/achievements/check', {
+        method: 'POST',
+      })
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['achievements'] }),
   })
@@ -169,9 +168,7 @@ export function useTodayFocus() {
   return useQuery({
     queryKey: ['focus-today'],
     queryFn: async () => {
-      return await apiFetch<{ sessions: FocusSession[]; totalMinutes: number }>(
-        '/api/focus/today',
-      )
+      return await apiFetch<{ sessions: FocusSession[]; totalMinutes: number }>('/api/focus/today')
     },
   })
 }

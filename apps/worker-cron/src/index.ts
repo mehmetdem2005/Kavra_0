@@ -2,14 +2,12 @@ import 'dotenv/config'
 import cron from 'node-cron'
 import pino from 'pino'
 import { runDailyReviewReminder } from './jobs/daily-review-reminder.js'
-import { runWeeklyReportGeneration } from './jobs/weekly-report-generation.js'
 import { runStreakWarning } from './jobs/streak-warning.js'
+import { runWeeklyReportGeneration } from './jobs/weekly-report-generation.js'
 
 const logger = pino({
   level: process.env.LOG_LEVEL ?? 'info',
-  transport: process.env.NODE_ENV !== 'production'
-    ? { target: 'pino-pretty' }
-    : undefined,
+  transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty' } : undefined,
 })
 
 /**

@@ -1,5 +1,5 @@
-import { View, Text, Modal, Pressable, ScrollView, ActivityIndicator } from 'react-native'
-import { useChatModels, type LLMModel } from '../../hooks/useModels'
+import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native'
+import { type LLMModel, useChatModels } from '../../hooks/useModels'
 
 interface Props {
   visible: boolean

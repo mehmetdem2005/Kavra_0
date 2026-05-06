@@ -12,7 +12,7 @@ const CreateBookSchema = z.object({
   author: z.string().max(200).optional(),
   language: z.string().length(2),
   format: z.enum(['epub', 'pdf', 'txt']),
-  storagePath: z.string().optional(),         // user upload
+  storagePath: z.string().optional(), // user upload
   libraryDocumentId: z.string().uuid().optional(),
   totalPages: z.number().int().positive().optional(),
   totalWords: z.number().int().positive().optional(),
@@ -46,11 +46,13 @@ const CreateBookmarkSchema = z.object({
   position: z.number().min(0).max(1).optional(),
   selectedText: z.string().max(2000).optional(),
   note: z.string().max(2000).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).default('#F59E0B'),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .default('#F59E0B'),
 })
 
 export async function booksRoutes(fastify: FastifyInstance) {
-
   /** POST /api/books/upload-url - PDF/EPUB için signed URL */
   fastify.post<{ Body: { fileName: string; format: 'epub' | 'pdf' | 'txt' } }>(
     '/api/books/upload-url',
@@ -58,12 +60,11 @@ export async function booksRoutes(fastify: FastifyInstance) {
       const userId = await verifyUserToken(req.headers.authorization)
       if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      const fileExt = req.body.format === 'epub' ? 'epub' : req.body.format === 'pdf' ? 'pdf' : 'txt'
+      const fileExt =
+        req.body.format === 'epub' ? 'epub' : req.body.format === 'pdf' ? 'pdf' : 'txt'
       const fileName = `${userId}/${Date.now()}-${crypto.randomUUID()}.${fileExt}`
 
-      const { data, error } = await supabase.storage
-        .from('books')
-        .createSignedUploadUrl(fileName)
+      const { data, error } = await supabase.storage.from('books').createSignedUploadUrl(fileName)
 
       if (error) return reply.code(500).send({ error: error.message })
 
@@ -85,11 +86,15 @@ export async function booksRoutes(fastify: FastifyInstance) {
 
     // Free tier limiti — aylık 5 kitap
     const { data: ent } = await supabase
-      .from('user_entitlements').select('is_pro').eq('user_id', userId).single()
+      .from('user_entitlements')
+      .select('is_pro')
+      .eq('user_id', userId)
+      .single()
 
     if (!ent?.is_pro) {
       const monthStart = new Date()
-      monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0)
+      monthStart.setDate(1)
+      monthStart.setHours(0, 0, 0, 0)
       const { count } = await supabase
         .from('books')
         .select('*', { count: 'exact', head: true })
@@ -99,13 +104,13 @@ export async function booksRoutes(fastify: FastifyInstance) {
       if ((count ?? 0) >= 5) {
         return reply.code(403).send({
           error: 'free_limit',
-          message: 'Free üyeler ayda 5 kitap yükleyebilir. Pro\'ya geç, sınırsız aç.',
+          message: "Free üyeler ayda 5 kitap yükleyebilir. Pro'ya geç, sınırsız aç.",
         })
       }
     }
 
     const estimatedMinutes = parsed.data.totalWords
-      ? Math.ceil(parsed.data.totalWords / 200)   // ortalama okuma hızı
+      ? Math.ceil(parsed.data.totalWords / 200) // ortalama okuma hızı
       : null
 
     const { data, error } = await supabase
@@ -145,7 +150,7 @@ export async function booksRoutes(fastify: FastifyInstance) {
         .eq('user_id', userId)
         .order('last_read_at', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false })
-        .limit(Math.min(parseInt(req.query.limit ?? '50'), 200))
+        .limit(Math.min(Number.parseInt(req.query.limit ?? '50'), 200))
 
       if (req.query.status) query = query.eq('status', req.query.status)
       if (req.query.language) query = query.eq('language', req.query.language)

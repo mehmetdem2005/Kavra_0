@@ -25,9 +25,7 @@ export class TechniqueFilter {
 
     // Emniyet: eğer hiçbir teknik geçemezse en az 1 taneyi geri al (lowest difficulty)
     if (passed.length === 0 && candidates.length > 0) {
-      const lowest = [...candidates].sort(
-        (a, b) => a.cognitiveLoad - b.cognitiveLoad,
-      )[0]!
+      const lowest = [...candidates].sort((a, b) => a.cognitiveLoad - b.cognitiveLoad)[0]!
       passed.push(lowest)
       // filtered'dan sil
       const idx = filtered.findIndex((f) => f.technique.id === lowest.id)

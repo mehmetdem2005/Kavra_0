@@ -1,9 +1,17 @@
-import { useState, useEffect } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, TextInput, ActivityIndicator } from 'react-native'
+import { Stack, useRouter } from 'expo-router'
+import { useEffect, useState } from 'react'
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
-import { apiFetch } from '../../src/lib/api'
 import { Icon } from '../../src/components/ui/Icon'
+import { apiFetch } from '../../src/lib/api'
 
 export default function AccountManagementScreen() {
   const router = useRouter()
@@ -43,9 +51,7 @@ export default function AccountManagementScreen() {
         method: 'POST',
         body: JSON.stringify({ confirmText, reason }),
       })
-      Alert.alert('Onaylandı', res.message, [
-        { text: 'Tamam', onPress: () => router.replace('/') },
-      ])
+      Alert.alert('Onaylandı', res.message, [{ text: 'Tamam', onPress: () => router.replace('/') }])
     } catch (e: any) {
       if (e.message?.includes('active_subscription')) {
         Alert.alert('Aktif Abonelik', 'Önce App Store/Play Store ayarlarından aboneliği iptal et.')
@@ -87,7 +93,8 @@ export default function AccountManagementScreen() {
               <Text className="font-serif text-base text-red-700">Hesap Siliniyor</Text>
             </View>
             <Text className="text-xs text-red-700 mb-3">
-              Hesabın {new Date(pendingDeletion.scheduled_for).toLocaleDateString('tr-TR')} tarihinde silinecek.
+              Hesabın {new Date(pendingDeletion.scheduled_for).toLocaleDateString('tr-TR')}{' '}
+              tarihinde silinecek.
             </Text>
             <Pressable
               onPress={handleCancelDelete}
@@ -114,7 +121,9 @@ export default function AccountManagementScreen() {
                 </View>
                 <View className="flex-1">
                   <Text className="font-semibold text-ink-900">Verilerini İndir</Text>
-                  <Text className="text-xs text-slate-500 mt-0.5">GDPR uyumlu, tüm veriler JSON</Text>
+                  <Text className="text-xs text-slate-500 mt-0.5">
+                    GDPR uyumlu, tüm veriler JSON
+                  </Text>
                 </View>
               </View>
               <Pressable
@@ -122,7 +131,9 @@ export default function AccountManagementScreen() {
                 disabled={loading}
                 className="bg-cyan-600 rounded-full py-2.5 items-center mt-2"
               >
-                <Text className="text-white font-semibold text-sm">{loading ? 'Hazırlanıyor...' : 'İndir'}</Text>
+                <Text className="text-white font-semibold text-sm">
+                  {loading ? 'Hazırlanıyor...' : 'İndir'}
+                </Text>
               </Pressable>
             </View>
 
@@ -134,7 +145,9 @@ export default function AccountManagementScreen() {
                 </View>
                 <View className="flex-1">
                   <Text className="font-semibold text-ink-900">Gizlilik & Şartlar</Text>
-                  <Text className="text-xs text-slate-500 mt-0.5">kavra.app/privacy + kavra.app/terms</Text>
+                  <Text className="text-xs text-slate-500 mt-0.5">
+                    kavra.app/privacy + kavra.app/terms
+                  </Text>
                 </View>
               </View>
             </View>
@@ -177,9 +190,9 @@ export default function AccountManagementScreen() {
             <View className="mt-3 mb-5 gap-2">
               {[
                 'Tüm defterler, kaynaklar, sohbet geçmişi silinir',
-                'Pro abonelik (varsa) iptal edilmez — App Store/Play Store\'dan iptal et',
+                "Pro abonelik (varsa) iptal edilmez — App Store/Play Store'dan iptal et",
                 'Anonim istatistikler analitik amaçla saklanır',
-                'Email\'ine veri export gönderilir',
+                "Email'ine veri export gönderilir",
               ].map((s) => (
                 <View key={s} className="flex-row gap-2 items-start">
                   <Text className="text-amber-600 font-bold">•</Text>
@@ -223,7 +236,9 @@ export default function AccountManagementScreen() {
               {loading ? (
                 <ActivityIndicator color="white" />
               ) : (
-                <Text className={`font-bold ${confirmText === 'HESABIMI SİL' ? 'text-white' : 'text-slate-500'}`}>
+                <Text
+                  className={`font-bold ${confirmText === 'HESABIMI SİL' ? 'text-white' : 'text-slate-500'}`}
+                >
                   Hesabımı Sil (14 gün)
                 </Text>
               )}

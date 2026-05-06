@@ -1,8 +1,8 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useRouter } from 'expo-router'
-import { useThemes, useUserTheme, useSetTheme, type Theme } from '../../src/hooks/useTheme'
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useIsPro } from '../../src/hooks/useEntitlement'
+import { type Theme, useSetTheme, useThemes, useUserTheme } from '../../src/hooks/useTheme'
 
 export default function ThemeSettings() {
   const router = useRouter()
@@ -18,7 +18,7 @@ export default function ThemeSettings() {
         `${theme.name} sadece Pro kullanıcılar için. Pro'ya geçmek ister misin?`,
         [
           { text: 'Şimdi değil', style: 'cancel' },
-          { text: 'Pro\'ya Geç', onPress: () => router.push('/upgrade') },
+          { text: "Pro'ya Geç", onPress: () => router.push('/upgrade') },
         ],
       )
       return
@@ -87,9 +87,18 @@ export default function ThemeSettings() {
 
                     {/* Renk dots */}
                     <View className="flex-row gap-1 mt-2">
-                      <View className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.primary_color }} />
-                      <View className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.accent_color }} />
-                      <View className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.text_color }} />
+                      <View
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: theme.primary_color }}
+                      />
+                      <View
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: theme.accent_color }}
+                      />
+                      <View
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: theme.text_color }}
+                      />
                     </View>
                   </View>
 

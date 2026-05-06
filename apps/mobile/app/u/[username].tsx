@@ -1,9 +1,9 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiFetch } from '../../src/lib/api'
 import { Icon } from '../../src/components/ui/Icon'
+import { apiFetch } from '../../src/lib/api'
 
 export default function ProfileScreen() {
   const router = useRouter()
@@ -17,10 +17,10 @@ export default function ProfileScreen() {
   })
 
   const followMut = useMutation({
-    mutationFn: () => apiFetch<{ following: boolean }>(
-      `/api/profiles/${data.profile.id}/follow`,
-      { method: 'POST' },
-    ),
+    mutationFn: () =>
+      apiFetch<{ following: boolean }>(`/api/profiles/${data.profile.id}/follow`, {
+        method: 'POST',
+      }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['profile', username] }),
   })
 
@@ -53,7 +53,10 @@ export default function ProfileScreen() {
 
       <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
         {/* Banner */}
-        <View style={{ backgroundColor: p.banner_color ?? '#1E1B4B', height: 120 }} className="relative">
+        <View
+          style={{ backgroundColor: p.banner_color ?? '#1E1B4B', height: 120 }}
+          className="relative"
+        >
           <Pressable onPress={() => router.back()} className="absolute top-4 left-4">
             <Icon name="chevron-left" size={22} color="#FBF8F0" />
           </Pressable>
@@ -71,9 +74,7 @@ export default function ProfileScreen() {
 
           <View className="mt-3 flex-row items-start justify-between">
             <View className="flex-1">
-              <Text className="font-serif text-2xl text-ink-900">
-                {p.full_name ?? p.username}
-              </Text>
+              <Text className="font-serif text-2xl text-ink-900">{p.full_name ?? p.username}</Text>
               <Text className="text-sm text-slate-500">@{p.username}</Text>
               {p.pronouns && (
                 <Text className="text-[10px] text-slate-400 mt-0.5">{p.pronouns}</Text>
@@ -88,16 +89,16 @@ export default function ProfileScreen() {
                   data.isFollowing ? 'bg-white border border-slate-200' : 'bg-ink-900'
                 }`}
               >
-                <Text className={`text-xs font-bold ${data.isFollowing ? 'text-slate-700' : 'text-cream-50'}`}>
+                <Text
+                  className={`text-xs font-bold ${data.isFollowing ? 'text-slate-700' : 'text-cream-50'}`}
+                >
                   {data.isFollowing ? 'Takipte' : 'Takip Et'}
                 </Text>
               </Pressable>
             )}
           </View>
 
-          {p.bio && (
-            <Text className="text-sm text-ink-900 mt-3 leading-5">{p.bio}</Text>
-          )}
+          {p.bio && <Text className="text-sm text-ink-900 mt-3 leading-5">{p.bio}</Text>}
         </View>
 
         {/* Stats */}
@@ -122,7 +123,10 @@ export default function ProfileScreen() {
                   style={{ width: 80 }}
                 >
                   <Text className="text-2xl">{a.achievements?.emoji}</Text>
-                  <Text className="text-[9px] text-slate-700 mt-1 text-center font-bold" numberOfLines={2}>
+                  <Text
+                    className="text-[9px] text-slate-700 mt-1 text-center font-bold"
+                    numberOfLines={2}
+                  >
                     {a.achievements?.name}
                   </Text>
                 </View>
@@ -142,9 +146,13 @@ export default function ProfileScreen() {
               onPress={() => router.push(`/n/${n.public_slug}`)}
               className="bg-white border border-slate-100 rounded-2xl p-3 mb-2"
             >
-              <Text className="font-serif text-base text-ink-900" numberOfLines={2}>{n.title}</Text>
+              <Text className="font-serif text-base text-ink-900" numberOfLines={2}>
+                {n.title}
+              </Text>
               {n.description && (
-                <Text className="text-xs text-slate-500 mt-1" numberOfLines={2}>{n.description}</Text>
+                <Text className="text-xs text-slate-500 mt-1" numberOfLines={2}>
+                  {n.description}
+                </Text>
               )}
               <View className="flex-row items-center gap-3 mt-2">
                 <View className="flex-row items-center gap-1">
@@ -167,7 +175,9 @@ export default function ProfileScreen() {
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <View className="flex-1 items-center">
-      <Text className="font-serif text-xl text-ink-900">{value > 999 ? `${(value / 1000).toFixed(1)}K` : value}</Text>
+      <Text className="font-serif text-xl text-ink-900">
+        {value > 999 ? `${(value / 1000).toFixed(1)}K` : value}
+      </Text>
       <Text className="text-[9px] text-slate-500 mt-0.5">{label}</Text>
     </View>
   )

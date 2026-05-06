@@ -1,6 +1,9 @@
 import type { FastifyInstance } from 'fastify'
-import pptxgen from 'pptxgenjs'
+import pptxgenjs from 'pptxgenjs'
 import { supabase, verifyUserToken } from '../supabase.js'
+
+const PptxGenJS = pptxgenjs as unknown as new () => any
+type pptxgen = any
 
 /**
  * Slides .pptx Export
@@ -38,7 +41,10 @@ interface Slide {
   bullets?: string[]
   quote?: string
   author?: string
-  comparison?: { left: { title: string; bullets: string[] }; right: { title: string; bullets: string[] } }
+  comparison?: {
+    left: { title: string; bullets: string[] }
+    right: { title: string; bullets: string[] }
+  }
   speakerNotes?: string
 }
 
@@ -47,7 +53,10 @@ function renderTitleSlide(pres: pptxgen, slide: Slide) {
   sl.background = { color: COLORS.ink }
 
   sl.addText(slide.title ?? '', {
-    x: 0.5, y: 2.0, w: 9, h: 1.8,
+    x: 0.5,
+    y: 2.0,
+    w: 9,
+    h: 1.8,
     fontFace: 'Georgia',
     fontSize: 54,
     color: COLORS.cream,
@@ -57,7 +66,10 @@ function renderTitleSlide(pres: pptxgen, slide: Slide) {
 
   if (slide.subtitle) {
     sl.addText(slide.subtitle, {
-      x: 0.5, y: 4.0, w: 9, h: 0.8,
+      x: 0.5,
+      y: 4.0,
+      w: 9,
+      h: 0.8,
       fontFace: 'Helvetica',
       fontSize: 22,
       color: COLORS.amber,
@@ -67,7 +79,10 @@ function renderTitleSlide(pres: pptxgen, slide: Slide) {
 
   // Branding
   sl.addText('Kavra', {
-    x: 0.5, y: 4.9, w: 2, h: 0.4,
+    x: 0.5,
+    y: 4.9,
+    w: 2,
+    h: 0.4,
     fontFace: 'Helvetica',
     fontSize: 11,
     color: COLORS.amber,
@@ -82,7 +97,10 @@ function renderBulletSlide(pres: pptxgen, slide: Slide, slideNumber: number) {
   sl.background = { color: COLORS.cream }
 
   sl.addText(slide.title ?? '', {
-    x: 0.5, y: 0.4, w: 9, h: 1.0,
+    x: 0.5,
+    y: 0.4,
+    w: 9,
+    h: 1.0,
     fontFace: 'Georgia',
     fontSize: 36,
     color: COLORS.ink,
@@ -90,7 +108,10 @@ function renderBulletSlide(pres: pptxgen, slide: Slide, slideNumber: number) {
 
   // Amber underline
   sl.addShape(pres.ShapeType.line, {
-    x: 0.5, y: 1.4, w: 1, h: 0,
+    x: 0.5,
+    y: 1.4,
+    w: 1,
+    h: 0,
     line: { color: COLORS.amber, width: 3 },
   })
 
@@ -101,7 +122,10 @@ function renderBulletSlide(pres: pptxgen, slide: Slide, slideNumber: number) {
     }))
 
     sl.addText(bulletText as any, {
-      x: 0.7, y: 1.8, w: 8.6, h: 4.0,
+      x: 0.7,
+      y: 1.8,
+      w: 8.6,
+      h: 4.0,
       fontFace: 'Helvetica',
       fontSize: 20,
       color: COLORS.slateDark,
@@ -111,7 +135,10 @@ function renderBulletSlide(pres: pptxgen, slide: Slide, slideNumber: number) {
 
   // Page number
   sl.addText(`${slideNumber}`, {
-    x: 9.0, y: 6.8, w: 0.5, h: 0.3,
+    x: 9.0,
+    y: 6.8,
+    w: 0.5,
+    h: 0.3,
     fontFace: 'Helvetica',
     fontSize: 9,
     color: COLORS.slateMid,
@@ -126,7 +153,10 @@ function renderQuoteSlide(pres: pptxgen, slide: Slide) {
   sl.background = { color: COLORS.amber }
 
   sl.addText('"', {
-    x: 0.5, y: 0.5, w: 1.5, h: 1.5,
+    x: 0.5,
+    y: 0.5,
+    w: 1.5,
+    h: 1.5,
     fontFace: 'Georgia',
     fontSize: 120,
     color: COLORS.ink,
@@ -134,7 +164,10 @@ function renderQuoteSlide(pres: pptxgen, slide: Slide) {
   })
 
   sl.addText(slide.quote ?? '', {
-    x: 1.0, y: 2.0, w: 8, h: 3,
+    x: 1.0,
+    y: 2.0,
+    w: 8,
+    h: 3,
     fontFace: 'Georgia',
     fontSize: 30,
     italic: true,
@@ -144,7 +177,10 @@ function renderQuoteSlide(pres: pptxgen, slide: Slide) {
 
   if (slide.author) {
     sl.addText(`— ${slide.author}`, {
-      x: 1.0, y: 5.5, w: 8, h: 0.5,
+      x: 1.0,
+      y: 5.5,
+      w: 8,
+      h: 0.5,
       fontFace: 'Helvetica',
       fontSize: 16,
       color: COLORS.slateDark,
@@ -160,22 +196,39 @@ function renderComparisonSlide(pres: pptxgen, slide: Slide) {
   sl.background = { color: COLORS.cream }
 
   sl.addText(slide.title ?? '', {
-    x: 0.5, y: 0.4, w: 9, h: 0.8,
-    fontFace: 'Georgia', fontSize: 30, color: COLORS.ink,
+    x: 0.5,
+    y: 0.4,
+    w: 9,
+    h: 0.8,
+    fontFace: 'Georgia',
+    fontSize: 30,
+    color: COLORS.ink,
   })
 
   // VS divider
   sl.addText('vs.', {
-    x: 4.5, y: 3.0, w: 1, h: 1,
-    fontFace: 'Georgia', fontSize: 36, italic: true,
-    color: COLORS.amber, align: 'center',
+    x: 4.5,
+    y: 3.0,
+    w: 1,
+    h: 1,
+    fontFace: 'Georgia',
+    fontSize: 36,
+    italic: true,
+    color: COLORS.amber,
+    align: 'center',
   })
 
   // Sol kolon
   if (slide.comparison?.left) {
     sl.addText(slide.comparison.left.title, {
-      x: 0.5, y: 1.5, w: 4, h: 0.6,
-      fontFace: 'Helvetica', fontSize: 22, bold: true, color: COLORS.ink,
+      x: 0.5,
+      y: 1.5,
+      w: 4,
+      h: 0.6,
+      fontFace: 'Helvetica',
+      fontSize: 22,
+      bold: true,
+      color: COLORS.ink,
     })
     sl.addText(
       slide.comparison.left.bullets.map((b) => ({
@@ -183,8 +236,13 @@ function renderComparisonSlide(pres: pptxgen, slide: Slide) {
         options: { bullet: { type: 'bullet' } },
       })) as any,
       {
-        x: 0.5, y: 2.2, w: 4, h: 4,
-        fontFace: 'Helvetica', fontSize: 14, color: COLORS.slateDark,
+        x: 0.5,
+        y: 2.2,
+        w: 4,
+        h: 4,
+        fontFace: 'Helvetica',
+        fontSize: 14,
+        color: COLORS.slateDark,
         paraSpaceAfter: 8,
       },
     )
@@ -193,8 +251,14 @@ function renderComparisonSlide(pres: pptxgen, slide: Slide) {
   // Sağ kolon
   if (slide.comparison?.right) {
     sl.addText(slide.comparison.right.title, {
-      x: 5.5, y: 1.5, w: 4, h: 0.6,
-      fontFace: 'Helvetica', fontSize: 22, bold: true, color: COLORS.ink,
+      x: 5.5,
+      y: 1.5,
+      w: 4,
+      h: 0.6,
+      fontFace: 'Helvetica',
+      fontSize: 22,
+      bold: true,
+      color: COLORS.ink,
     })
     sl.addText(
       slide.comparison.right.bullets.map((b) => ({
@@ -202,8 +266,13 @@ function renderComparisonSlide(pres: pptxgen, slide: Slide) {
         options: { bullet: { type: 'bullet' } },
       })) as any,
       {
-        x: 5.5, y: 2.2, w: 4, h: 4,
-        fontFace: 'Helvetica', fontSize: 14, color: COLORS.slateDark,
+        x: 5.5,
+        y: 2.2,
+        w: 4,
+        h: 4,
+        fontFace: 'Helvetica',
+        fontSize: 14,
+        color: COLORS.slateDark,
         paraSpaceAfter: 8,
       },
     )
@@ -217,92 +286,116 @@ function renderClosingSlide(pres: pptxgen, slide: Slide) {
   sl.background = { color: COLORS.ink }
 
   sl.addText(slide.title ?? 'Teşekkürler', {
-    x: 0.5, y: 2.5, w: 9, h: 1.5,
-    fontFace: 'Georgia', fontSize: 64, color: COLORS.cream, align: 'center',
+    x: 0.5,
+    y: 2.5,
+    w: 9,
+    h: 1.5,
+    fontFace: 'Georgia',
+    fontSize: 64,
+    color: COLORS.cream,
+    align: 'center',
   })
 
   if (slide.subtitle) {
     sl.addText(slide.subtitle, {
-      x: 0.5, y: 4.2, w: 9, h: 0.6,
-      fontFace: 'Helvetica', fontSize: 18, color: COLORS.amber,
-      italic: true, align: 'center',
+      x: 0.5,
+      y: 4.2,
+      w: 9,
+      h: 0.6,
+      fontFace: 'Helvetica',
+      fontSize: 18,
+      color: COLORS.amber,
+      italic: true,
+      align: 'center',
     })
   }
 
   sl.addText('Kavra ile hazırlandı · kavra.app', {
-    x: 0.5, y: 6.5, w: 9, h: 0.3,
-    fontFace: 'Helvetica', fontSize: 10, color: COLORS.amber, align: 'center',
+    x: 0.5,
+    y: 6.5,
+    w: 9,
+    h: 0.3,
+    fontFace: 'Helvetica',
+    fontSize: 10,
+    color: COLORS.amber,
+    align: 'center',
   })
 
   if (slide.speakerNotes) sl.addNotes(slide.speakerNotes)
 }
 
 export async function exportPptxRoutes(fastify: FastifyInstance) {
-
   /** POST /api/studio/:id/export-pptx */
-  fastify.post<{ Params: { id: string } }>(
-    '/api/studio/:id/export-pptx',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.post<{ Params: { id: string } }>('/api/studio/:id/export-pptx', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      const { data: gen } = await supabase
-        .from('generated_content')
-        .select('*')
-        .eq('id', req.params.id)
-        .eq('user_id', userId)
-        .single()
+    const { data: gen } = await supabase
+      .from('generated_content')
+      .select('*')
+      .eq('id', req.params.id)
+      .eq('user_id', userId)
+      .single()
 
-      if (!gen) return reply.code(404).send({ error: 'not_found' })
-      if (gen.content_type !== 'slides') {
-        return reply.code(400).send({ error: 'not_slides' })
+    if (!gen) return reply.code(404).send({ error: 'not_found' })
+    if (gen.content_type !== 'slides') {
+      return reply.code(400).send({ error: 'not_slides' })
+    }
+
+    const slides = (gen.raw_content as any)?.slides as Slide[]
+    if (!slides || slides.length === 0) {
+      return reply.code(400).send({ error: 'no_slides' })
+    }
+
+    // PPTX oluştur
+    const pres = new PptxGenJS() as pptxgen
+    pres.layout = 'LAYOUT_WIDE' // 16:9
+    pres.author = 'Kavra'
+    pres.company = 'Kavra'
+    pres.title = gen.title ?? 'Sunum'
+
+    slides.forEach((slide, idx) => {
+      switch (slide.layout) {
+        case 'title':
+          renderTitleSlide(pres, slide)
+          break
+        case 'bullet':
+          renderBulletSlide(pres, slide, idx + 1)
+          break
+        case 'quote':
+          renderQuoteSlide(pres, slide)
+          break
+        case 'comparison':
+          renderComparisonSlide(pres, slide)
+          break
+        case 'closing':
+          renderClosingSlide(pres, slide)
+          break
       }
+    })
 
-      const slides = (gen.raw_content as any)?.slides as Slide[]
-      if (!slides || slides.length === 0) {
-        return reply.code(400).send({ error: 'no_slides' })
-      }
+    // Buffer'a yaz
+    const buffer = (await pres.write({ outputType: 'nodebuffer' })) as Buffer
 
-      // PPTX oluştur
-      const pres = new pptxgen()
-      pres.layout = 'LAYOUT_WIDE'                   // 16:9
-      pres.author = 'Kavra'
-      pres.company = 'Kavra'
-      pres.title = gen.title ?? 'Sunum'
+    // Storage'a yükle
+    const fileName = `${(gen.title ?? 'sunum').replace(/[^a-zA-Z0-9 ]/g, '').slice(0, 50)}.pptx`
+    const storagePath = `${userId}/exports/${gen.id}/${fileName}`
 
-      slides.forEach((slide, idx) => {
-        switch (slide.layout) {
-          case 'title': renderTitleSlide(pres, slide); break
-          case 'bullet': renderBulletSlide(pres, slide, idx + 1); break
-          case 'quote': renderQuoteSlide(pres, slide); break
-          case 'comparison': renderComparisonSlide(pres, slide); break
-          case 'closing': renderClosingSlide(pres, slide); break
-        }
-      })
+    await supabase.storage.from('notebook-outputs').upload(storagePath, buffer, {
+      contentType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      upsert: true,
+    })
 
-      // Buffer'a yaz
-      const buffer = await pres.write({ outputType: 'nodebuffer' }) as Buffer
+    // Signed URL (1 saat)
+    const { data: urlData } = await supabase.storage
+      .from('notebook-outputs')
+      .createSignedUrl(storagePath, 3600)
 
-      // Storage'a yükle
-      const fileName = `${(gen.title ?? 'sunum').replace(/[^a-zA-Z0-9 ]/g, '').slice(0, 50)}.pptx`
-      const storagePath = `${userId}/exports/${gen.id}/${fileName}`
-
-      await supabase.storage.from('notebook-outputs').upload(storagePath, buffer, {
-        contentType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        upsert: true,
-      })
-
-      // Signed URL (1 saat)
-      const { data: urlData } = await supabase.storage
-        .from('notebook-outputs')
-        .createSignedUrl(storagePath, 3600)
-
-      return {
-        url: urlData?.signedUrl,
-        fileName,
-        slideCount: slides.length,
-        sizeBytes: buffer.length,
-      }
-    },
-  )
+    return {
+      url: urlData?.signedUrl,
+      fileName,
+      slideCount: slides.length,
+      sizeBytes: buffer.length,
+    }
+  })
 }

@@ -1,10 +1,10 @@
 'use client'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Building2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiFetch } from '../../../lib/api'
 import { toast } from 'sonner'
-import { Building2, Plus } from 'lucide-react'
+import { apiFetch } from '../../../lib/api'
 
 export default function OrgsPage() {
   const qc = useQueryClient()
@@ -19,12 +19,16 @@ export default function OrgsPage() {
   })
 
   const createMut = useMutation({
-    mutationFn: () => apiFetch<{ org: any }>('/api/orgs', {
-      method: 'POST',
-      body: JSON.stringify({
-        name, slug, billingEmail, orgType: 'school',
+    mutationFn: () =>
+      apiFetch<{ org: any }>('/api/orgs', {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          slug,
+          billingEmail,
+          orgType: 'school',
+        }),
       }),
-    }),
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ['my-orgs'] })
       setCreateOpen(false)
@@ -80,7 +84,9 @@ export default function OrgsPage() {
                 <div className="flex items-center gap-2 text-[10px] text-slate-500">
                   <span className="font-mono uppercase">{m.organizations.plan}</span>
                   <span>·</span>
-                  <span>{m.organizations.seats_used}/{m.organizations.max_seats} koltuk</span>
+                  <span>
+                    {m.organizations.seats_used}/{m.organizations.max_seats} koltuk
+                  </span>
                   <span>·</span>
                   <span className="text-amber-600 font-bold uppercase">{m.role}</span>
                 </div>
@@ -95,7 +101,9 @@ export default function OrgsPage() {
           <div className="bg-white rounded-3xl p-6 max-w-md w-full">
             <h2 className="font-serif text-2xl text-ink-900 mb-4">Organizasyon Kur</h2>
 
-            <label className="text-[10px] uppercase font-mono text-slate-500 tracking-widest">İsim</label>
+            <label className="text-[10px] uppercase font-mono text-slate-500 tracking-widest">
+              İsim
+            </label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -103,7 +111,9 @@ export default function OrgsPage() {
               className="w-full bg-cream-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mb-3 mt-1"
             />
 
-            <label className="text-[10px] uppercase font-mono text-slate-500 tracking-widest">Slug</label>
+            <label className="text-[10px] uppercase font-mono text-slate-500 tracking-widest">
+              Slug
+            </label>
             <input
               value={slug}
               onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
@@ -112,7 +122,9 @@ export default function OrgsPage() {
             />
             <p className="text-[10px] text-slate-400 mb-3">kavra.app/orgs/{slug || 'slug'}</p>
 
-            <label className="text-[10px] uppercase font-mono text-slate-500 tracking-widest">Faturalama Email</label>
+            <label className="text-[10px] uppercase font-mono text-slate-500 tracking-widest">
+              Faturalama Email
+            </label>
             <input
               type="email"
               value={billingEmail}
@@ -128,7 +140,12 @@ export default function OrgsPage() {
             </div>
 
             <div className="flex gap-2">
-              <button onClick={() => setCreateOpen(false)} className="flex-1 py-2.5 text-xs text-slate-600">İptal</button>
+              <button
+                onClick={() => setCreateOpen(false)}
+                className="flex-1 py-2.5 text-xs text-slate-600"
+              >
+                İptal
+              </button>
               <button
                 onClick={() => createMut.mutate()}
                 disabled={!name || !slug || !billingEmail || createMut.isPending}

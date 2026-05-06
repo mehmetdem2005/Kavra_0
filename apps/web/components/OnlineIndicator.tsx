@@ -25,9 +25,7 @@ export function OnlineIndicator() {
           online ? 'bg-emerald-500' : 'bg-amber-500'
         }`}
       />
-      <span className="text-[9px] text-slate-500">
-        {online ? 'Çevrimiçi' : 'Çevrimdışı'}
-      </span>
+      <span className="text-[9px] text-slate-500">{online ? 'Çevrimiçi' : 'Çevrimdışı'}</span>
     </div>
   )
 }

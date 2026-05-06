@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '../lib/api'
 
 export interface Book {
@@ -48,7 +48,10 @@ export function useBooks(filter?: { status?: string; language?: string }) {
 export function useBook(id: string | null) {
   return useQuery({
     queryKey: ['book', id],
-    queryFn: () => apiFetch<{ book: Book; bookmarks: BookBookmark[]; vocabularyCount: number }>(`/api/books/${id}`),
+    queryFn: () =>
+      apiFetch<{ book: Book; bookmarks: BookBookmark[]; vocabularyCount: number }>(
+        `/api/books/${id}`,
+      ),
     enabled: !!id,
   })
 }
@@ -113,12 +116,17 @@ export function useUploadBook() {
     }) => {
       const upload = await apiFetch<{ uploadUrl: string; storagePath: string }>(
         '/api/books/upload-url',
-        { method: 'POST', body: JSON.stringify({ fileName: input.fileName, format: input.format }) },
+        {
+          method: 'POST',
+          body: JSON.stringify({ fileName: input.fileName, format: input.format }),
+        },
       )
 
       const uploadRes = await fetch(upload.uploadUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': input.format === 'epub' ? 'application/epub+zip' : 'application/pdf' },
+        headers: {
+          'Content-Type': input.format === 'epub' ? 'application/epub+zip' : 'application/pdf',
+        },
         body: input.file,
       })
       if (!uploadRes.ok) throw new Error(`Upload failed: ${uploadRes.status}`)

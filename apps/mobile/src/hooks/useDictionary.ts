@@ -51,10 +51,11 @@ export function useLookupWord() {
       bookId?: string
       sentenceText?: string
       saveToVocab?: boolean
-    }) => apiFetch<DictResult>('/api/dictionary/lookup', {
-      method: 'POST',
-      body: JSON.stringify(input),
-    }),
+    }) =>
+      apiFetch<DictResult>('/api/dictionary/lookup', {
+        method: 'POST',
+        body: JSON.stringify(input),
+      }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['vocabulary'] }),
   })
 }
@@ -62,10 +63,13 @@ export function useLookupWord() {
 export function useBatchLookup() {
   return useMutation({
     mutationFn: (input: { words: string[]; sourceLang?: string; targetLang?: string }) =>
-      apiFetch<{ results: Array<DictResult & { error?: string }> }>('/api/dictionary/batch-lookup', {
-        method: 'POST',
-        body: JSON.stringify(input),
-      }),
+      apiFetch<{ results: Array<DictResult & { error?: string }> }>(
+        '/api/dictionary/batch-lookup',
+        {
+          method: 'POST',
+          body: JSON.stringify(input),
+        },
+      ),
   })
 }
 
@@ -76,10 +80,11 @@ export function useTranslateSentence() {
       sourceLang?: string
       targetLang?: string
       literary?: boolean
-    }) => apiFetch<SentenceTranslation>('/api/dictionary/translate-sentence', {
-      method: 'POST',
-      body: JSON.stringify(input),
-    }),
+    }) =>
+      apiFetch<SentenceTranslation>('/api/dictionary/translate-sentence', {
+        method: 'POST',
+        body: JSON.stringify(input),
+      }),
   })
 }
 
@@ -100,7 +105,10 @@ export function useVocabulary(filter?: { status?: string; lang?: string; bookId?
 export function useUpdateVocabStatus() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (input: { id: string; status: 'learning' | 'reviewing' | 'mastered' | 'ignored' }) =>
+    mutationFn: (input: {
+      id: string
+      status: 'learning' | 'reviewing' | 'mastered' | 'ignored'
+    }) =>
       apiFetch(`/api/vocabulary/${input.id}`, {
         method: 'PATCH',
         body: JSON.stringify({ status: input.status }),

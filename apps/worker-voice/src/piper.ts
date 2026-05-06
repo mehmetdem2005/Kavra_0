@@ -1,8 +1,8 @@
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { mkdir, writeFile, readFile } from 'node:fs/promises'
-import path from 'node:path'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
+import path from 'node:path'
 import { supabase } from './supabase.js'
 
 const PIPER_BIN = process.env.PIPER_BIN ?? '/opt/piper/piper'
@@ -44,10 +44,7 @@ export function resolveVoice(language: string, voice?: string): string {
  * Aynı metin + voice + speed kombosu bir kez üretilir, sonra cache'ten gelir.
  */
 export function hashText(text: string, voice: string, speed: number): string {
-  return createHash('sha256')
-    .update(`${voice}::${speed}::${text}`)
-    .digest('hex')
-    .slice(0, 32)
+  return createHash('sha256').update(`${voice}::${speed}::${text}`).digest('hex').slice(0, 32)
 }
 
 /**
@@ -61,19 +58,27 @@ export async function runPiper(input: SynthesizeInput): Promise<Buffer> {
   const modelPath = path.join(MODELS_PATH, `${voiceName}.onnx`)
 
   // Geçici output dosyası
-  const outFile = path.join(tmpdir(), `piper-${Date.now()}-${Math.random().toString(36).slice(2)}.wav`)
+  const outFile = path.join(
+    tmpdir(),
+    `piper-${Date.now()}-${Math.random().toString(36).slice(2)}.wav`,
+  )
 
   return new Promise((resolve, reject) => {
     const args = [
-      '--model', modelPath,
-      '--output_file', outFile,
-      '--length-scale', String(1 / speed), // speed 1.5 => length_scale 0.67 (daha hızlı)
+      '--model',
+      modelPath,
+      '--output_file',
+      outFile,
+      '--length-scale',
+      String(1 / speed), // speed 1.5 => length_scale 0.67 (daha hızlı)
     ]
 
     const proc = spawn(PIPER_BIN, args, { stdio: ['pipe', 'pipe', 'pipe'] })
     let stderrBuf = ''
 
-    proc.stderr.on('data', (d) => { stderrBuf += d.toString() })
+    proc.stderr.on('data', (d) => {
+      stderrBuf += d.toString()
+    })
     proc.on('error', reject)
     proc.on('close', async (code) => {
       if (code !== 0) {
@@ -97,7 +102,10 @@ export async function runPiper(input: SynthesizeInput): Promise<Buffer> {
  * WAV Buffer'ı Supabase Storage'a yükle, signed URL döndür.
  * Aynı hash varsa cache'ten dön.
  */
-export async function synthesizeAndStore(input: SynthesizeInput, userId: string): Promise<{ url: string; cached: boolean }> {
+export async function synthesizeAndStore(
+  input: SynthesizeInput,
+  userId: string,
+): Promise<{ url: string; cached: boolean }> {
   const voice = resolveVoice(input.language, input.voice)
   const speed = input.speed ?? 1.0
   const hash = hashText(input.text, voice, speed)

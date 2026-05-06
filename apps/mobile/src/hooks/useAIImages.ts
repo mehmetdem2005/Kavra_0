@@ -31,10 +31,11 @@ export function useGenerateImage() {
       conversationId?: string
       model?: 'flux-schnell' | 'flux-dev' | 'sdxl'
       aspectRatio?: '1:1' | '16:9' | '9:16' | '4:3' | '3:4'
-    }) => apiFetch<GenerateImageResult>('/api/ai-images/generate', {
-      method: 'POST',
-      body: JSON.stringify(input),
-    }),
+    }) =>
+      apiFetch<GenerateImageResult>('/api/ai-images/generate', {
+        method: 'POST',
+        body: JSON.stringify(input),
+      }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['ai-images'] }),
   })
 }

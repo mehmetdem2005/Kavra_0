@@ -58,11 +58,11 @@ export const ELEVENLABS_VOICES: ElevenLabsVoice[] = [
 export interface ElevenLabsTTSParams {
   text: string
   voiceId?: string
-  stability?: number                          // 0-1
-  similarityBoost?: number                    // 0-1
-  style?: number                              // 0-1
+  stability?: number // 0-1
+  similarityBoost?: number // 0-1
+  style?: number // 0-1
   useSpeakerBoost?: boolean
-  modelId?: string                            // 'eleven_multilingual_v2' (Türkçe)
+  modelId?: string // 'eleven_multilingual_v2' (Türkçe)
 }
 
 export class ElevenLabsNotConfiguredError extends Error {
@@ -79,27 +79,24 @@ export async function elevenLabsTTS(params: ElevenLabsTTSParams): Promise<Buffer
 
   const voiceId = params.voiceId ?? 'XB0fDUnXU5powFXDhCwa' // Charlotte default
 
-  const response = await fetch(
-    `${ELEVENLABS_API_URL}/text-to-speech/${voiceId}`,
-    {
-      method: 'POST',
-      headers: {
-        'xi-api-key': ELEVENLABS_API_KEY,
-        'Content-Type': 'application/json',
-        'Accept': 'audio/mpeg',
-      },
-      body: JSON.stringify({
-        text: params.text,
-        model_id: params.modelId ?? 'eleven_multilingual_v2',
-        voice_settings: {
-          stability: params.stability ?? 0.5,
-          similarity_boost: params.similarityBoost ?? 0.75,
-          style: params.style ?? 0,
-          use_speaker_boost: params.useSpeakerBoost ?? true,
-        },
-      }),
+  const response = await fetch(`${ELEVENLABS_API_URL}/text-to-speech/${voiceId}`, {
+    method: 'POST',
+    headers: {
+      'xi-api-key': ELEVENLABS_API_KEY,
+      'Content-Type': 'application/json',
+      Accept: 'audio/mpeg',
     },
-  )
+    body: JSON.stringify({
+      text: params.text,
+      model_id: params.modelId ?? 'eleven_multilingual_v2',
+      voice_settings: {
+        stability: params.stability ?? 0.5,
+        similarity_boost: params.similarityBoost ?? 0.75,
+        style: params.style ?? 0,
+        use_speaker_boost: params.useSpeakerBoost ?? true,
+      },
+    }),
+  })
 
   if (!response.ok) {
     const err = await response.text()
@@ -120,25 +117,22 @@ export async function elevenLabsTTSStream(
 
   const voiceId = params.voiceId ?? 'XB0fDUnXU5powFXDhCwa'
 
-  const response = await fetch(
-    `${ELEVENLABS_API_URL}/text-to-speech/${voiceId}/stream`,
-    {
-      method: 'POST',
-      headers: {
-        'xi-api-key': ELEVENLABS_API_KEY,
-        'Content-Type': 'application/json',
-        'Accept': 'audio/mpeg',
-      },
-      body: JSON.stringify({
-        text: params.text,
-        model_id: params.modelId ?? 'eleven_multilingual_v2',
-        voice_settings: {
-          stability: params.stability ?? 0.5,
-          similarity_boost: params.similarityBoost ?? 0.75,
-        },
-      }),
+  const response = await fetch(`${ELEVENLABS_API_URL}/text-to-speech/${voiceId}/stream`, {
+    method: 'POST',
+    headers: {
+      'xi-api-key': ELEVENLABS_API_KEY,
+      'Content-Type': 'application/json',
+      Accept: 'audio/mpeg',
     },
-  )
+    body: JSON.stringify({
+      text: params.text,
+      model_id: params.modelId ?? 'eleven_multilingual_v2',
+      voice_settings: {
+        stability: params.stability ?? 0.5,
+        similarity_boost: params.similarityBoost ?? 0.75,
+      },
+    }),
+  })
 
   if (!response.ok) throw new Error(`ElevenLabs stream error: ${response.status}`)
   if (!response.body) throw new Error('No response body')

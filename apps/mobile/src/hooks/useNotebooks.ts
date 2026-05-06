@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '../lib/api'
 
 // ============ TYPES ============
@@ -69,8 +69,9 @@ export function useNotebooks(archived = false) {
   return useQuery({
     queryKey: ['notebooks', { archived }],
     queryFn: () =>
-      apiFetch<{ notebooks: Notebook[] }>(`/api/notebooks?archived=${archived}`)
-        .then((r) => r.notebooks),
+      apiFetch<{ notebooks: Notebook[] }>(`/api/notebooks?archived=${archived}`).then(
+        (r) => r.notebooks,
+      ),
   })
 }
 
@@ -197,8 +198,9 @@ export function useNotebookMessages(notebookId: string | null) {
   return useQuery({
     queryKey: ['notebook-messages', notebookId],
     queryFn: () =>
-      apiFetch<{ messages: NotebookMessage[] }>(`/api/notebooks/${notebookId}/messages`)
-        .then((r) => r.messages),
+      apiFetch<{ messages: NotebookMessage[] }>(`/api/notebooks/${notebookId}/messages`).then(
+        (r) => r.messages,
+      ),
     enabled: !!notebookId,
   })
 }

@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Stack, useRouter, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
+import { useEffect, useState } from 'react'
+import { ActivityIndicator, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { View, ActivityIndicator } from 'react-native'
 import '../global.css'
 import '../src/lib/i18n'
-import { useAuth } from '../src/stores/auth'
 import { supabase } from '../src/lib/supabase'
+import { useAuth } from '../src/stores/auth'
 
 const queryClient = new QueryClient({
   defaultOptions: {

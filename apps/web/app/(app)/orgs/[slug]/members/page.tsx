@@ -1,10 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Mail, Shield, Trash2, Upload } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiFetch } from '../../../../../lib/api'
+import { useState } from 'react'
 import { toast } from 'sonner'
-import { Mail, Upload, Trash2, Shield } from 'lucide-react'
+import { apiFetch } from '../../../../../lib/api'
 
 const ROLE_LABELS: Record<string, string> = {
   owner: 'Owner',
@@ -59,7 +59,8 @@ export default function MembersPage() {
         <div>
           <h1 className="font-serif text-3xl text-ink-900">Üyeler</h1>
           <p className="text-sm text-slate-600 mt-1">
-            {members?.members?.length ?? 0} üye · {org?.org?.max_seats - org?.org?.seats_used} boş koltuk
+            {members?.members?.length ?? 0} üye · {org?.org?.max_seats - org?.org?.seats_used} boş
+            koltuk
           </p>
         </div>
         <div className="flex gap-2">
@@ -97,19 +98,25 @@ export default function MembersPage() {
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-full bg-ink-900 flex items-center justify-center">
                       <span className="text-amber-500 text-[10px] font-bold">
-                        {(m.profiles?.full_name ?? m.invitation_email ?? '?').slice(0, 1).toUpperCase()}
+                        {(m.profiles?.full_name ?? m.invitation_email ?? '?')
+                          .slice(0, 1)
+                          .toUpperCase()}
                       </span>
                     </div>
                     <div>
                       <p className="text-ink-900 font-semibold">
                         {m.profiles?.full_name ?? m.invitation_email}
                       </p>
-                      <p className="text-[10px] text-slate-500">{m.profiles?.email ?? m.invitation_email}</p>
+                      <p className="text-[10px] text-slate-500">
+                        {m.profiles?.email ?? m.invitation_email}
+                      </p>
                     </div>
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${ROLE_COLORS[m.role]}`}>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-1 rounded-full ${ROLE_COLORS[m.role]}`}
+                  >
                     {ROLE_LABELS[m.role]}
                   </span>
                 </td>
@@ -197,7 +204,9 @@ function InviteModal({ orgId, onClose }: { orgId: string; onClose: () => void })
         </div>
 
         <div className="flex gap-2">
-          <button onClick={onClose} className="flex-1 py-2.5 text-xs text-slate-600">İptal</button>
+          <button onClick={onClose} className="flex-1 py-2.5 text-xs text-slate-600">
+            İptal
+          </button>
           <button
             onClick={() => mut.mutate()}
             disabled={!emails.trim() || mut.isPending}
@@ -218,21 +227,24 @@ function BulkImportModal({ orgId, onClose }: { orgId: string; onClose: () => voi
   const mut = useMutation({
     mutationFn: () => {
       const lines = csv.trim().split('\n')
-      const header = lines[0].split(',').map((h) => h.trim().toLowerCase())
+      const header = (lines[0] ?? '').split(',').map((h) => h.trim().toLowerCase())
       const emailIdx = header.indexOf('email')
       const nameIdx = header.indexOf('name')
       const roleIdx = header.indexOf('role')
       const classIdx = header.indexOf('class')
 
-      const rows = lines.slice(1).map((line) => {
-        const cols = line.split(',').map((c) => c.trim())
-        return {
-          email: cols[emailIdx],
-          fullName: nameIdx >= 0 ? cols[nameIdx] : undefined,
-          role: roleIdx >= 0 ? (cols[roleIdx] as any) : 'student',
-          classSlug: classIdx >= 0 ? cols[classIdx] : undefined,
-        }
-      }).filter((r) => r.email && r.email.includes('@'))
+      const rows = lines
+        .slice(1)
+        .map((line) => {
+          const cols = line.split(',').map((c) => c.trim())
+          return {
+            email: cols[emailIdx],
+            fullName: nameIdx >= 0 ? cols[nameIdx] : undefined,
+            role: roleIdx >= 0 ? (cols[roleIdx] as any) : 'student',
+            classSlug: classIdx >= 0 ? cols[classIdx] : undefined,
+          }
+        })
+        .filter((r) => r.email && r.email.includes('@'))
 
       return apiFetch(`/api/orgs/${orgId}/bulk-import`, {
         method: 'POST',
@@ -252,7 +264,9 @@ function BulkImportModal({ orgId, onClose }: { orgId: string; onClose: () => voi
       <div className="bg-white rounded-3xl p-6 max-w-lg w-full">
         <h2 className="font-serif text-2xl text-ink-900 mb-1">CSV Import</h2>
         <p className="text-xs text-slate-500 mb-4">
-          Header: <code className="bg-cream-50 px-1.5 py-0.5 rounded font-mono">email,name,role,class</code><br/>
+          Header:{' '}
+          <code className="bg-cream-50 px-1.5 py-0.5 rounded font-mono">email,name,role,class</code>
+          <br />
           role değerleri: admin, teacher, member, student
         </p>
 
@@ -265,7 +279,9 @@ function BulkImportModal({ orgId, onClose }: { orgId: string; onClose: () => voi
         />
 
         <div className="flex gap-2">
-          <button onClick={onClose} className="flex-1 py-2.5 text-xs text-slate-600">İptal</button>
+          <button onClick={onClose} className="flex-1 py-2.5 text-xs text-slate-600">
+            İptal
+          </button>
           <button
             onClick={() => mut.mutate()}
             disabled={!csv.trim() || mut.isPending}

@@ -1,5 +1,5 @@
 import type { Logger } from 'pino'
-import { supabase, sendExpoPushBatch } from '../supabase.js'
+import { sendExpoPushBatch, supabase } from '../supabase.js'
 
 interface JobContext {
   logger: Logger
@@ -72,7 +72,10 @@ export async function runWeeklyReportGeneration({ logger }: JobContext): Promise
     const alreadyDone = new Set((existing ?? []).map((r: any) => r.user_id))
     const toGenerate = wantingUsers.filter((id) => !alreadyDone.has(id))
 
-    logger.info({ toGenerate: toGenerate.length, alreadyDone: alreadyDone.size }, 'Üretilecek raporlar')
+    logger.info(
+      { toGenerate: toGenerate.length, alreadyDone: alreadyDone.size },
+      'Üretilecek raporlar',
+    )
 
     const messages: Parameters<typeof sendExpoPushBatch>[0] = []
 
@@ -132,7 +135,8 @@ JSON: {"narrative":"3 paragraf markdown","recommendations":["öneri1","öneri2",
         }
 
         const weekEnd = new Date(lastMonday.getTime() + 6 * 24 * 60 * 60 * 1000)
-          .toISOString().slice(0, 10)
+          .toISOString()
+          .slice(0, 10)
 
         await supabase.from('weekly_reports').upsert(
           {

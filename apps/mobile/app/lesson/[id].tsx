@@ -1,21 +1,27 @@
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import {
-  View, Text, ScrollView, KeyboardAvoidingView, Platform,
-  ActivityIndicator, Pressable, Alert,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
-import { MessageBubble } from '../../src/components/chat/MessageBubble'
 import { ChatInput } from '../../src/components/chat/ChatInput'
+import { EngineBadge } from '../../src/components/chat/EngineBadge'
+import { MessageBubble } from '../../src/components/chat/MessageBubble'
 import { ModelPickerModal } from '../../src/components/chat/ModelPickerModal'
 import { PersonalityPickerModal } from '../../src/components/chat/PersonalityPickerModal'
-import { EngineBadge } from '../../src/components/chat/EngineBadge'
 import { RateLessonModal } from '../../src/components/lesson/RateLessonModal'
-import { useLesson, useMessages, useSendMessage, useRateLesson } from '../../src/hooks/useLessons'
-import { useTTS } from '../../src/hooks/useTTS'
-import { supabase } from '../../src/lib/supabase'
+import { useLesson, useMessages, useRateLesson, useSendMessage } from '../../src/hooks/useLessons'
 import type { LLMModel } from '../../src/hooks/useModels'
 import type { Personality } from '../../src/hooks/useSubjects'
+import { useTTS } from '../../src/hooks/useTTS'
+import { supabase } from '../../src/lib/supabase'
 
 export default function LessonChat() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -110,7 +116,10 @@ export default function LessonChat() {
               <Pressable onPress={() => router.push(`/voice-lesson/${id}`)} className="px-2 py-1">
                 <Text style={{ fontSize: 20 }}>🎙️</Text>
               </Pressable>
-              <Pressable onPress={toggleTTS} className={`px-2 py-1 ${autoTTS ? 'bg-brand-50 rounded-lg' : ''}`}>
+              <Pressable
+                onPress={toggleTTS}
+                className={`px-2 py-1 ${autoTTS ? 'bg-brand-50 rounded-lg' : ''}`}
+              >
                 <Text style={{ fontSize: 20 }}>{autoTTS ? '🔊' : '🔇'}</Text>
               </Pressable>
               <Pressable onPress={handleEndLesson} className="px-2 py-1">
@@ -219,7 +228,10 @@ export default function LessonChat() {
       <RateLessonModal
         visible={ratingModalOpen}
         techniqueName={(lesson as any)?.techniques?.name ?? engineMeta?.techniqueName}
-        onClose={() => { setRatingModalOpen(false); router.back() }}
+        onClose={() => {
+          setRatingModalOpen(false)
+          router.back()
+        }}
         onSubmit={submitRating}
         submitting={rateLesson.isPending}
       />

@@ -24,17 +24,17 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY
 
 const GenerateContentSchema = z.object({
   notebookId: z.string().uuid(),
-  contentType: z.enum([
-    'audio_overview', 'flashcards', 'quiz', 'slides', 'summary', 'infographic',
-  ]),
-  config: z.object({
-    duration: z.enum(['short', 'medium', 'long']).optional(),  // 5, 10, 20 dk
-    style: z.string().optional(),                                // 'casual', 'academic'
-    language: z.string().length(2).optional(),
-    cardCount: z.number().int().min(5).max(50).optional(),       // flashcards/quiz için
-    slideCount: z.number().int().min(5).max(30).optional(),
-  }).default({}),
-  sourceIds: z.array(z.string().uuid()).optional(),              // belirli kaynaklara odaklan
+  contentType: z.enum(['audio_overview', 'flashcards', 'quiz', 'slides', 'summary', 'infographic']),
+  config: z
+    .object({
+      duration: z.enum(['short', 'medium', 'long']).optional(), // 5, 10, 20 dk
+      style: z.string().optional(), // 'casual', 'academic'
+      language: z.string().length(2).optional(),
+      cardCount: z.number().int().min(5).max(50).optional(), // flashcards/quiz için
+      slideCount: z.number().int().min(5).max(30).optional(),
+    })
+    .default({}),
+  sourceIds: z.array(z.string().uuid()).optional(), // belirli kaynaklara odaklan
 })
 
 // ===== LLM helpers =====
@@ -64,14 +64,18 @@ async function callGeminiJSON(prompt: string, model = 'gemini-2.0-flash-exp'): P
   return JSON.parse(text)
 }
 
-async function getNotebookContext(notebookId: string, userId: string, sourceIds?: string[]): Promise<string> {
+async function getNotebookContext(
+  notebookId: string,
+  userId: string,
+  sourceIds?: string[],
+): Promise<string> {
   let query = supabase
     .from('source_chunks')
     .select('text, section_title, source_id, notebook_sources!inner(title)')
     .eq('notebook_id', notebookId)
     .eq('user_id', userId)
     .order('chunk_index', { ascending: true })
-    .limit(60)                                  // toplam ~150k char
+    .limit(60) // toplam ~150k char
 
   if (sourceIds && sourceIds.length > 0) {
     query = query.in('source_id', sourceIds)
@@ -88,9 +92,10 @@ async function getNotebookContext(notebookId: string, userId: string, sourceIds?
     grouped[sId].chunks.push(c.text as string)
   }
 
-  return Object.values(grouped).map((g) =>
-    `=== ${g.title} ===\n${g.chunks.join('\n\n')}`,
-  ).join('\n\n').slice(0, 100_000)              // hard cap
+  return Object.values(grouped)
+    .map((g) => `=== ${g.title} ===\n${g.chunks.join('\n\n')}`)
+    .join('\n\n')
+    .slice(0, 100_000) // hard cap
 }
 
 // ===== AUDIO OVERVIEW (Sesli Özet) =====
@@ -108,8 +113,9 @@ async function generateAudioScript(
 ): Promise<{ turns: Array<{ speaker: 'A' | 'B'; text: string }> }> {
   const target = AUDIO_DURATION_TARGETS[duration]
 
-  const prompt = language === 'tr'
-    ? `Sen Kavra'sın. Aşağıdaki kaynaklardan ${target.minutes} dakikalık bir Türkçe podcast diyaloğu üret.
+  const prompt =
+    language === 'tr'
+      ? `Sen Kavra'sın. Aşağıdaki kaynaklardan ${target.minutes} dakikalık bir Türkçe podcast diyaloğu üret.
 
 İKİ KONUŞMACI:
 - KONUŞMACI A: Kadın, "Ela" — meraklı, sorular soran, dinleyici perspektifi
@@ -135,7 +141,7 @@ JSON FORMATINDA döndür, başka metin yok:
 
 KAYNAKLAR:
 ${context.slice(0, 80_000)}`
-    : `Generate a ${target.minutes}-minute ${language} podcast dialog from these sources. 2 speakers (A=female "Ela", B=male "Mert"). ${target.turns} turns. Natural, friendly. JSON: {"turns":[{"speaker":"A","text":"..."}]}.\n\nSOURCES:\n${context.slice(0, 80_000)}`
+      : `Generate a ${target.minutes}-minute ${language} podcast dialog from these sources. 2 speakers (A=female "Ela", B=male "Mert"). ${target.turns} turns. Natural, friendly. JSON: {"turns":[{"speaker":"A","text":"..."}]}.\n\nSOURCES:\n${context.slice(0, 80_000)}`
 
   return await callGeminiJSON(prompt)
 }
@@ -145,8 +151,10 @@ ${context.slice(0, 80_000)}`
 async function generateFlashcards(
   context: string,
   language: string,
-  count: number = 15,
-): Promise<{ cards: Array<{ front: string; back: string; type: 'qa' | 'cloze'; difficulty: 1 | 2 | 3 }> }> {
+  count = 15,
+): Promise<{
+  cards: Array<{ front: string; back: string; type: 'qa' | 'cloze'; difficulty: 1 | 2 | 3 }>
+}> {
   const prompt = `Aşağıdaki kaynaklardan ${count} adet flashcard üret.
 
 KARTA KURALLAR:
@@ -170,14 +178,16 @@ ${context.slice(0, 60_000)}`
 async function generateQuiz(
   context: string,
   language: string,
-  count: number = 10,
-): Promise<{ questions: Array<{
-  question: string
-  options: string[]
-  correctIndex: number
-  explanation: string
-  bloom: string
-}> }> {
+  count = 10,
+): Promise<{
+  questions: Array<{
+    question: string
+    options: string[]
+    correctIndex: number
+    explanation: string
+    bloom: string
+  }>
+}> {
   const prompt = `Aşağıdaki kaynaklardan ${count} çoktan seçmeli soru üret.
 
 KURALLAR:
@@ -203,16 +213,18 @@ ${context.slice(0, 60_000)}`
 async function generateSlides(
   context: string,
   language: string,
-  count: number = 10,
-): Promise<{ slides: Array<{
-  layout: 'title' | 'bullet' | 'quote' | 'comparison' | 'closing'
-  title?: string
-  subtitle?: string
-  bullets?: string[]
-  quote?: string
-  author?: string
-  speakerNotes?: string
-}> }> {
+  count = 10,
+): Promise<{
+  slides: Array<{
+    layout: 'title' | 'bullet' | 'quote' | 'comparison' | 'closing'
+    title?: string
+    subtitle?: string
+    bullets?: string[]
+    quote?: string
+    author?: string
+    speakerNotes?: string
+  }>
+}> {
   const prompt = `Aşağıdaki kaynaklardan ${count} slaytlık bir sunum üret.
 
 SLAYT TÜRLERİ:
@@ -238,7 +250,10 @@ ${context.slice(0, 60_000)}`
 
 // ===== INFOGRAPHIC (Mermaid) =====
 
-async function generateInfographic(context: string, language: string): Promise<{
+async function generateInfographic(
+  context: string,
+  language: string,
+): Promise<{
   mermaid: string
   title: string
   description: string
@@ -264,7 +279,10 @@ ${context.slice(0, 30_000)}`
 
 // ===== SUMMARY =====
 
-async function generateSummary(context: string, language: string): Promise<{
+async function generateSummary(
+  context: string,
+  language: string,
+): Promise<{
   title: string
   summary: string
   keyPoints: string[]
@@ -289,7 +307,6 @@ ${context.slice(0, 80_000)}`
 // ===== Routes =====
 
 export async function studioRoutes(fastify: FastifyInstance) {
-
   /** POST /api/studio/generate */
   fastify.post('/api/studio/generate', async (req, reply) => {
     const userId = await verifyUserToken(req.headers.authorization)
@@ -311,20 +328,24 @@ export async function studioRoutes(fastify: FastifyInstance) {
     if (!notebook) return reply.code(404).send({ error: 'notebook_not_found' })
 
     const { data: ent } = await supabase
-      .from('user_entitlements').select('is_pro').eq('user_id', userId).single()
+      .from('user_entitlements')
+      .select('is_pro')
+      .eq('user_id', userId)
+      .single()
 
     // Audio overview Pro-only (en pahalı)
     if (contentType === 'audio_overview' && !ent?.is_pro) {
       return reply.code(403).send({
         error: 'pro_required',
-        message: 'Sesli Özet Pro özelliği. Ayda 5 podcast Pro tier\'da.',
+        message: "Sesli Özet Pro özelliği. Ayda 5 podcast Pro tier'da.",
       })
     }
 
     // Free user'lara aylık quota
     if (!ent?.is_pro) {
       const monthStart = new Date()
-      monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0)
+      monthStart.setDate(1)
+      monthStart.setHours(0, 0, 0, 0)
       const { count } = await supabase
         .from('generated_content')
         .select('*', { count: 'exact', head: true })
@@ -378,7 +399,7 @@ export async function studioRoutes(fastify: FastifyInstance) {
         }
 
         let result: any
-        let model = 'gemini-2.0-flash'
+        const model = 'gemini-2.0-flash'
 
         if (contentType === 'audio_overview') {
           const script = await generateAudioScript(context, language, config.duration)
@@ -417,7 +438,6 @@ export async function studioRoutes(fastify: FastifyInstance) {
           .eq('id', generated.id)
 
         await supabase.rpc('recount_notebook_aggregates', { p_notebook_id: notebookId })
-
       } catch (err: any) {
         await supabase
           .from('generated_content')

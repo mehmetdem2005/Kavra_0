@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from '../src/lib/api'
+import { Stack, useRouter } from 'expo-router'
+import { useState } from 'react'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Icon } from '../src/components/ui/Icon'
+import { apiFetch } from '../src/lib/api'
 
 interface GalleryNotebook {
   id: string
@@ -45,13 +45,14 @@ const SORTS = [
 export default function GalleryScreen() {
   const router = useRouter()
   const [category, setCategory] = useState<string | null>(null)
-  const [sort, setSort] = useState<typeof SORTS[number]['value']>('popular')
+  const [sort, setSort] = useState<(typeof SORTS)[number]['value']>('popular')
 
   const { data, isLoading } = useQuery({
     queryKey: ['gallery', category, sort],
-    queryFn: () => apiFetch<{ notebooks: GalleryNotebook[]; categories: Record<string, number> }>(
-      `/api/gallery?sort=${sort}${category ? `&category=${category}` : ''}`,
-    ),
+    queryFn: () =>
+      apiFetch<{ notebooks: GalleryNotebook[]; categories: Record<string, number> }>(
+        `/api/gallery?sort=${sort}${category ? `&category=${category}` : ''}`,
+      ),
   })
 
   return (
@@ -70,7 +71,12 @@ export default function GalleryScreen() {
       </View>
 
       {/* Sort tabs */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-5 mt-3 mb-2" contentContainerStyle={{ gap: 8 }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="px-5 mt-3 mb-2"
+        contentContainerStyle={{ gap: 8 }}
+      >
         {SORTS.map((s) => (
           <Pressable
             key={s.value}
@@ -79,7 +85,9 @@ export default function GalleryScreen() {
               sort === s.value ? 'bg-ink-900 border-ink-900' : 'bg-white border-slate-200'
             }`}
           >
-            <Text className={`text-xs font-bold ${sort === s.value ? 'text-cream-50' : 'text-slate-600'}`}>
+            <Text
+              className={`text-xs font-bold ${sort === s.value ? 'text-cream-50' : 'text-slate-600'}`}
+            >
               {s.label}
             </Text>
           </Pressable>
@@ -87,9 +95,14 @@ export default function GalleryScreen() {
       </ScrollView>
 
       {/* Categories */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-5 mb-3" contentContainerStyle={{ gap: 6 }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="px-5 mb-3"
+        contentContainerStyle={{ gap: 6 }}
+      >
         {CATEGORIES.map((c) => {
-          const count = c.value ? data?.categories?.[c.value] ?? 0 : null
+          const count = c.value ? (data?.categories?.[c.value] ?? 0) : null
           return (
             <Pressable
               key={c.value ?? 'all'}
@@ -99,11 +112,15 @@ export default function GalleryScreen() {
               }`}
             >
               <Text className="text-[12px]">{c.emoji}</Text>
-              <Text className={`text-[11px] font-semibold ${category === c.value ? 'text-ink-900' : 'text-slate-600'}`}>
+              <Text
+                className={`text-[11px] font-semibold ${category === c.value ? 'text-ink-900' : 'text-slate-600'}`}
+              >
                 {c.label}
               </Text>
               {count !== null && count > 0 && (
-                <Text className={`text-[9px] font-mono ${category === c.value ? 'text-ink-900/60' : 'text-slate-400'}`}>
+                <Text
+                  className={`text-[9px] font-mono ${category === c.value ? 'text-ink-900/60' : 'text-slate-400'}`}
+                >
                   {count}
                 </Text>
               )}
@@ -127,9 +144,13 @@ export default function GalleryScreen() {
             >
               <View className="flex-row items-start justify-between mb-2">
                 <View className="flex-1 pr-2">
-                  <Text className="font-serif text-lg text-ink-900" numberOfLines={2}>{n.title}</Text>
+                  <Text className="font-serif text-lg text-ink-900" numberOfLines={2}>
+                    {n.title}
+                  </Text>
                   {n.description && (
-                    <Text className="text-xs text-slate-500 mt-1" numberOfLines={2}>{n.description}</Text>
+                    <Text className="text-xs text-slate-500 mt-1" numberOfLines={2}>
+                      {n.description}
+                    </Text>
                   )}
                 </View>
                 {n.category && (

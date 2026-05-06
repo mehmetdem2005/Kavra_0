@@ -44,7 +44,7 @@ export function extractVideoId(url: string): string | null {
   ]
   for (const p of patterns) {
     const m = url.match(p)
-    if (m) return m[1]
+    if (m?.[1]) return m[1]
   }
   return null
 }
@@ -69,9 +69,8 @@ async function fetchSupadata(videoId: string, language?: string): Promise<YouTub
   }))
 
   const fullText = segments.map((s) => s.text).join(' ')
-  const durationSeconds = Math.round(
-    (segments.length > 0 ? segments[segments.length - 1].endMs : 0) / 1000,
-  )
+  const last = segments[segments.length - 1]
+  const durationSeconds = Math.round((last?.endMs ?? 0) / 1000)
 
   return {
     videoId,
@@ -101,10 +100,10 @@ async function fetchPublicScraper(videoId: string): Promise<YouTubeTranscriptRes
   const matches = xml.matchAll(/<text start="([\d.]+)" dur="([\d.]+)"[^>]*>([^<]+)<\/text>/g)
 
   for (const m of matches) {
-    const startMs = Math.round(parseFloat(m[1]) * 1000)
-    const durMs = Math.round(parseFloat(m[2]) * 1000)
+    const startMs = Math.round(Number.parseFloat(m[1] ?? '0') * 1000)
+    const durMs = Math.round(Number.parseFloat(m[2] ?? '0') * 1000)
     segments.push({
-      text: decodeHTMLEntities(m[3]),
+      text: decodeHTMLEntities(m[3] ?? ''),
       startMs,
       endMs: startMs + durMs,
     })
@@ -117,7 +116,7 @@ async function fetchPublicScraper(videoId: string): Promise<YouTubeTranscriptRes
     language: 'auto',
     segments,
     fullText: segments.map((s) => s.text).join(' '),
-    durationSeconds: Math.round(segments[segments.length - 1].endMs / 1000),
+    durationSeconds: Math.round((segments[segments.length - 1]?.endMs ?? 0) / 1000),
     source: 'youtube-scrape',
   }
 }
@@ -202,7 +201,7 @@ function decodeHTMLEntities(text: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, ' ')
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code)))
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number.parseInt(code)))
 }
 
 /**
@@ -218,8 +217,8 @@ export function chunkYouTubeTranscript(
   endMs: number
   index: number
 }> {
-  const targetDuration = opts?.targetDurationMs ?? 30_000      // 30 saniye
-  const minChars = opts?.minChars ?? 200                        // en az 200 karakter
+  const targetDuration = opts?.targetDurationMs ?? 30_000 // 30 saniye
+  const minChars = opts?.minChars ?? 200 // en az 200 karakter
 
   const chunks: Array<any> = []
   let buf: YouTubeTranscriptSegment[] = []
@@ -250,7 +249,7 @@ export function chunkYouTubeTranscript(
     chunks.push({
       text: buf.map((s) => s.text).join(' '),
       startMs: bufStart,
-      endMs: buf[buf.length - 1].endMs,
+      endMs: buf[buf.length - 1]!.endMs,
       index: idx++,
     })
   }

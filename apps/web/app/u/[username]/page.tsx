@@ -1,6 +1,6 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import type { Metadata } from 'next'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.kavra.app'
 
@@ -16,7 +16,9 @@ async function fetchProfile(username: string) {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: { params: Promise<{ username: string }> }): Promise<Metadata> {
   const { username } = await params
   const data = await fetchProfile(username)
   if (!data?.profile) return { title: 'Bulunamadı — Kavra' }
@@ -48,7 +50,9 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
     <div className="min-h-screen bg-cream-50">
       {/* Banner */}
       <div style={{ backgroundColor: p.banner_color ?? '#1E1B4B' }} className="h-32 relative">
-        <Link href="/gallery" className="absolute top-4 left-4 text-cream-50 text-sm">← Keşfet</Link>
+        <Link href="/gallery" className="absolute top-4 left-4 text-cream-50 text-sm">
+          ← Keşfet
+        </Link>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 -mt-12">
@@ -63,7 +67,10 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
 
         <div className="mt-4">
           <h1 className="font-serif text-3xl text-ink-900">{p.full_name ?? p.username}</h1>
-          <p className="text-sm text-slate-500">@{p.username}{p.pronouns && ` · ${p.pronouns}`}</p>
+          <p className="text-sm text-slate-500">
+            @{p.username}
+            {p.pronouns && ` · ${p.pronouns}`}
+          </p>
           {p.bio && <p className="text-sm text-ink-900 mt-3 leading-6 max-w-2xl">{p.bio}</p>}
         </div>
 

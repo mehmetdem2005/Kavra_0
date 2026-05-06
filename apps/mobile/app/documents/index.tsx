@@ -1,9 +1,9 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Stack, useRouter } from 'expo-router'
 import * as DocumentPicker from 'expo-document-picker'
-import { useDocuments, useUploadDocument, type Document } from '../../src/hooks/useDocuments'
+import { Stack, useRouter } from 'expo-router'
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
+import { type Document, useDocuments, useUploadDocument } from '../../src/hooks/useDocuments'
 
 const STATUS_META: Record<Document['status'], { emoji: string; label: string; color: string }> = {
   processing: { emoji: '⏳', label: 'İşleniyor', color: 'text-amber-600' },
@@ -26,7 +26,7 @@ export default function DocumentsList() {
     const asset = result.assets[0]
 
     if ((asset.size ?? 0) > 50 * 1024 * 1024) {
-      Alert.alert('', 'PDF 50 MB\'tan büyük olamaz')
+      Alert.alert('', "PDF 50 MB'tan büyük olamaz")
       return
     }
 
@@ -58,8 +58,8 @@ export default function DocumentsList() {
         <View className="bg-brand-50 border border-brand-200 rounded-2xl p-4 mb-4">
           <Text className="text-brand-900 font-semibold mb-1">📄 PDF Yükle</Text>
           <Text className="text-brand-800 text-sm leading-5">
-            Ders notlarını, makale ya da kitap bölümünü yükle. Kavra
-            otomatik kavram ve flashcard çıkarsın.
+            Ders notlarını, makale ya da kitap bölümünü yükle. Kavra otomatik kavram ve flashcard
+            çıkarsın.
           </Text>
         </View>
 
@@ -119,9 +119,7 @@ function DocCard({ doc, onPress }: { doc: Document; onPress: () => void }) {
               {meta.emoji} {meta.label}
             </Text>
             <Text className="text-xs text-slate-500">·</Text>
-            <Text className="text-xs text-slate-500">
-              {doc.page_count ?? '?'} sayfa
-            </Text>
+            <Text className="text-xs text-slate-500">{doc.page_count ?? '?'} sayfa</Text>
             <Text className="text-xs text-slate-500">·</Text>
             <Text className="text-xs text-slate-500">{sizeMB} MB</Text>
           </View>

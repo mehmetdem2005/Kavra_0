@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
 import Constants from 'expo-constants'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { supabase } from '../lib/supabase'
 import { voiceRecorder } from '../lib/voice/recorder'
 import { uploadAudio } from '../lib/voice/uploader'
-import { supabase } from '../lib/supabase'
 
 const VOICE_URL =
   process.env.EXPO_PUBLIC_VOICE_BASE_URL ??
@@ -98,7 +98,7 @@ export function useVoiceInput(opts: UseVoiceInputOptions = {}) {
         throw new Error(`STT: ${err}`)
       }
 
-      const { text } = await res.json() as { text: string }
+      const { text } = (await res.json()) as { text: string }
       opts.onTranscribed?.(text)
       return text
     } catch (e: any) {

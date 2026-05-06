@@ -1,4 +1,4 @@
-import { View, Text, TextInput as RNTextInput } from 'react-native'
+import { TextInput as RNTextInput, Text, View } from 'react-native'
 import type { TextInputProps } from 'react-native'
 
 interface Props extends TextInputProps {
@@ -10,9 +10,7 @@ interface Props extends TextInputProps {
 export function Input({ label, error, hint, ...props }: Props) {
   return (
     <View className="w-full mb-4">
-      {label && (
-        <Text className="text-sm font-medium text-brand-950 mb-1.5">{label}</Text>
-      )}
+      {label && <Text className="text-sm font-medium text-brand-950 mb-1.5">{label}</Text>}
       <RNTextInput
         {...props}
         placeholderTextColor="#94A3B8"

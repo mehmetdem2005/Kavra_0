@@ -1,10 +1,10 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, Share } from 'react-native'
+import { ActivityIndicator, Alert, Pressable, ScrollView, Share, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiFetch } from '../../src/lib/api'
 import { Icon } from '../../src/components/ui/Icon'
+import { apiFetch } from '../../src/lib/api'
 
 export default function PublicNotebookView() {
   const router = useRouter()
@@ -18,17 +18,18 @@ export default function PublicNotebookView() {
   })
 
   const saveMut = useMutation({
-    mutationFn: () => apiFetch<{ saved: boolean; saveCount: number }>(
-      `/api/notebooks/${data.notebook.id}/save`,
-      { method: 'POST' },
-    ),
+    mutationFn: () =>
+      apiFetch<{ saved: boolean; saveCount: number }>(`/api/notebooks/${data.notebook.id}/save`, {
+        method: 'POST',
+      }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['public-notebook', slug] }),
   })
 
   const cloneMut = useMutation({
-    mutationFn: () => apiFetch<{ cloned: any }>(`/api/notebooks/${data.notebook.id}/clone`, {
-      method: 'POST',
-    }),
+    mutationFn: () =>
+      apiFetch<{ cloned: any }>(`/api/notebooks/${data.notebook.id}/clone`, {
+        method: 'POST',
+      }),
     onSuccess: (res) => {
       Alert.alert('Defter Klonlandı', 'Senin kütüphanene eklendi.', [
         { text: 'Tamam' },
@@ -70,7 +71,10 @@ export default function PublicNotebookView() {
         <Text className="text-sm text-slate-500 text-center mt-2">
           Bu defter silinmiş olabilir veya artık herkese açık değil.
         </Text>
-        <Pressable onPress={() => router.replace('/gallery')} className="mt-6 bg-ink-900 rounded-full px-5 py-3">
+        <Pressable
+          onPress={() => router.replace('/gallery')}
+          className="mt-6 bg-ink-900 rounded-full px-5 py-3"
+        >
           <Text className="text-cream-50 font-semibold">Galeriye Dön</Text>
         </Pressable>
       </SafeAreaView>
@@ -91,7 +95,10 @@ export default function PublicNotebookView() {
             <Icon name="chevron-left" size={22} color="#1E1B4B" />
           </Pressable>
           <View className="flex-row gap-2">
-            <Pressable onPress={handleShare} className="bg-white border border-slate-200 rounded-full p-2.5">
+            <Pressable
+              onPress={handleShare}
+              className="bg-white border border-slate-200 rounded-full p-2.5"
+            >
               <Icon name="share" size={16} color="#1E1B4B" />
             </Pressable>
           </View>
@@ -154,7 +161,9 @@ export default function PublicNotebookView() {
               }`}
             >
               <Icon name="bookmark" size={14} color={data.isSaved ? '#1E1B4B' : '#475569'} />
-              <Text className={`font-bold text-xs ${data.isSaved ? 'text-ink-900' : 'text-slate-700'}`}>
+              <Text
+                className={`font-bold text-xs ${data.isSaved ? 'text-ink-900' : 'text-slate-700'}`}
+              >
                 {data.isSaved ? 'Kaydedildi' : 'Kaydet'}
               </Text>
             </Pressable>
@@ -184,19 +193,32 @@ export default function PublicNotebookView() {
             {data.sources.length} Kaynak
           </Text>
           {data.sources.map((s: any) => (
-            <View key={s.id} className="bg-white border border-slate-100 rounded-2xl p-3 mb-2 flex-row items-center gap-3">
+            <View
+              key={s.id}
+              className="bg-white border border-slate-100 rounded-2xl p-3 mb-2 flex-row items-center gap-3"
+            >
               <View className="w-8 h-8 bg-cream-50 rounded-lg items-center justify-center">
                 <Text className="text-base">
-                  {s.source_type === 'pdf' ? '📄'
-                    : s.source_type === 'youtube' ? '📺'
-                    : s.source_type === 'audio' ? '🎙️'
-                    : s.source_type === 'url' ? '🔗' : '📝'}
+                  {s.source_type === 'pdf'
+                    ? '📄'
+                    : s.source_type === 'youtube'
+                      ? '📺'
+                      : s.source_type === 'audio'
+                        ? '🎙️'
+                        : s.source_type === 'url'
+                          ? '🔗'
+                          : '📝'}
                 </Text>
               </View>
               <View className="flex-1">
-                <Text className="text-sm text-ink-900 font-semibold" numberOfLines={1}>{s.title}</Text>
+                <Text className="text-sm text-ink-900 font-semibold" numberOfLines={1}>
+                  {s.title}
+                </Text>
                 <Text className="text-[10px] text-slate-500 mt-0.5">
-                  {s.source_type}{s.youtube_duration_seconds ? ` · ${Math.round(s.youtube_duration_seconds / 60)} dk` : ''}
+                  {s.source_type}
+                  {s.youtube_duration_seconds
+                    ? ` · ${Math.round(s.youtube_duration_seconds / 60)} dk`
+                    : ''}
                 </Text>
               </View>
             </View>
@@ -210,7 +232,10 @@ export default function PublicNotebookView() {
               {data.studio.length} Hazır Üretim
             </Text>
             {data.studio.map((s: any) => (
-              <View key={s.id} className="bg-amber-50 border border-amber-200 rounded-2xl p-3 mb-2 flex-row items-center gap-3">
+              <View
+                key={s.id}
+                className="bg-amber-50 border border-amber-200 rounded-2xl p-3 mb-2 flex-row items-center gap-3"
+              >
                 <Text className="text-base">
                   {s.content_type === 'audio_overview' ? '🎙️' : '📜'}
                 </Text>
@@ -229,7 +254,8 @@ export default function PublicNotebookView() {
         <View className="mx-5 mt-6 bg-slate-50 border border-slate-200 rounded-2xl p-3 flex-row gap-2">
           <Icon name="info" size={14} color="#64748B" />
           <Text className="flex-1 text-[11px] text-slate-600 leading-5">
-            Bu defter herkese açık. Kaydedersen kendi kütüphanende referans olur. Klonlarsan kaynaklar senin defterine kopyalanır ve istediğin gibi düzenleyebilirsin.
+            Bu defter herkese açık. Kaydedersen kendi kütüphanende referans olur. Klonlarsan
+            kaynaklar senin defterine kopyalanır ve istediğin gibi düzenleyebilirsin.
           </Text>
         </View>
       </ScrollView>

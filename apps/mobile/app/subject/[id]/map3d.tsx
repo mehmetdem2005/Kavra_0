@@ -1,12 +1,12 @@
-import { useMemo, useRef, useState, useEffect, Suspense } from 'react'
-import { View, Text, Pressable, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/native'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { ActivityIndicator, Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import * as THREE from 'three'
-import { useConcepts, type ConceptWithProgress } from '../../../src/hooks/useConcepts'
-import { useSubject } from '../../../src/hooks/useSubjects'
 import { ProGuard } from '../../../src/components/pro/ProGuard'
+import { type ConceptWithProgress, useConcepts } from '../../../src/hooks/useConcepts'
+import { useSubject } from '../../../src/hooks/useSubjects'
 
 interface Node3D {
   id: string
@@ -27,8 +27,8 @@ interface Edge3D {
  */
 function simulate3D(concepts: ConceptWithProgress[]): { nodes: Node3D[]; edges: Edge3D[] } {
   const nodes: Node3D[] = concepts.map((c, i) => {
-    const phi = Math.acos(1 - 2 * (i + 0.5) / concepts.length)
-    const theta = Math.PI * (1 + Math.sqrt(5)) * i  // golden angle
+    const phi = Math.acos(1 - (2 * (i + 0.5)) / concepts.length)
+    const theta = Math.PI * (1 + Math.sqrt(5)) * i // golden angle
     const r = 5
     const mastery = c.progress?.mastery_score ?? 0
     return {
@@ -272,7 +272,8 @@ export default function ConceptMap3D() {
                       </Text>
                     )}
                     <Text className="text-xs text-slate-500 mt-2">
-                      Mastery: %{Math.round(selectedConcept.progress?.mastery_score ?? 0)} · {'⭐'.repeat(selectedConcept.difficulty)}
+                      Mastery: %{Math.round(selectedConcept.progress?.mastery_score ?? 0)} ·{' '}
+                      {'⭐'.repeat(selectedConcept.difficulty)}
                     </Text>
                   </View>
                   <Pressable onPress={() => setSelectedId(null)} className="p-1">

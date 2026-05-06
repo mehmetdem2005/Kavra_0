@@ -7,7 +7,11 @@ const BASE_URL =
   'http://localhost:4001'
 
 export class ApiError extends Error {
-  constructor(message: string, public status: number, public data?: unknown) {
+  constructor(
+    message: string,
+    public status: number,
+    public data?: unknown,
+  ) {
     super(message)
     this.name = 'ApiError'
   }
@@ -20,10 +24,7 @@ async function getAuthHeader(): Promise<Record<string, string>> {
 }
 
 /** JSON response için */
-export async function apiFetch<T = unknown>(
-  path: string,
-  init?: RequestInit,
-): Promise<T> {
+export async function apiFetch<T = unknown>(path: string, init?: RequestInit): Promise<T> {
   const auth = await getAuthHeader()
   const res = await fetch(`${BASE_URL}${path}`, {
     ...init,

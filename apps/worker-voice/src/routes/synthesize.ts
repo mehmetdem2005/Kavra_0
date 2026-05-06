@@ -36,7 +36,12 @@ export async function synthesizeRoutes(fastify: FastifyInstance) {
     return {
       voices: [
         { id: 'tr_TR-dfki-medium', language: 'tr', name: 'Türkçe (DFKI Medium)', gender: 'female' },
-        { id: 'tr_TR-fettah-medium', language: 'tr', name: 'Türkçe (Fettah Medium)', gender: 'male' },
+        {
+          id: 'tr_TR-fettah-medium',
+          language: 'tr',
+          name: 'Türkçe (Fettah Medium)',
+          gender: 'male',
+        },
         { id: 'en_US-lessac-medium', language: 'en', name: 'English US (Lessac)', gender: 'male' },
         { id: 'en_GB-alan-medium', language: 'en', name: 'English UK (Alan)', gender: 'male' },
         { id: 'de_DE-thorsten-medium', language: 'de', name: 'Deutsch (Thorsten)', gender: 'male' },

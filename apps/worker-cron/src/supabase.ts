@@ -10,13 +10,15 @@ if (!url || !serviceKey) {
 export const supabase = createServiceClient(url, serviceKey)
 
 /** Expo Push API'ye batch gönderim */
-export async function sendExpoPushBatch(messages: Array<{
-  to: string
-  title: string
-  body: string
-  data?: Record<string, unknown>
-  sound?: string
-}>): Promise<{ sent: number; errors: number }> {
+export async function sendExpoPushBatch(
+  messages: Array<{
+    to: string
+    title: string
+    body: string
+    data?: Record<string, unknown>
+    sound?: string
+  }>,
+): Promise<{ sent: number; errors: number }> {
   if (messages.length === 0) return { sent: 0, errors: 0 }
 
   // Expo limit: 100 push/request

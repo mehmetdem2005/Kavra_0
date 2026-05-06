@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { View, Text, Modal, Pressable, ActivityIndicator, Alert } from 'react-native'
+import { ActivityIndicator, Alert, Modal, Pressable, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { HandwritingCanvas } from './HandwritingCanvas'
-import { Icon } from '../ui/Icon'
 import { apiFetch } from '../../lib/api'
+import { Icon } from '../ui/Icon'
+import { HandwritingCanvas } from './HandwritingCanvas'
 
 interface Props {
   visible: boolean
@@ -40,7 +40,12 @@ export function HandwritingModal({ visible, onClose, onRecognized, mode = 'mixed
   }
 
   return (
-    <Modal animationType="slide" presentationStyle="pageSheet" visible={visible} onRequestClose={onClose}>
+    <Modal
+      animationType="slide"
+      presentationStyle="pageSheet"
+      visible={visible}
+      onRequestClose={onClose}
+    >
       <SafeAreaView className="flex-1 bg-cream-50">
         <View className="flex-row items-center justify-between px-4 py-3 border-b border-slate-100">
           <Pressable onPress={onClose} hitSlop={8}>
@@ -52,11 +57,11 @@ export function HandwritingModal({ visible, onClose, onRecognized, mode = 'mixed
 
         {/* Mode tabs */}
         <View className="flex-row gap-2 px-4 py-3">
-          {([
-            { value: 'text', label: 'Metin', icon: 'type' as const },
-            { value: 'math', label: 'Matematik', icon: 'calculator' as const },
-            { value: 'mixed', label: 'Karışık', icon: 'edit' as const },
-          ]).map((m) => (
+          {[
+            { value: 'text' as const, label: 'Metin', icon: 'type' as const },
+            { value: 'math' as const, label: 'Matematik', icon: 'calculator' as const },
+            { value: 'mixed' as const, label: 'Karışık', icon: 'edit' as const },
+          ].map((m) => (
             <Pressable
               key={m.value}
               onPress={() => setCurrentMode(m.value)}
@@ -64,8 +69,14 @@ export function HandwritingModal({ visible, onClose, onRecognized, mode = 'mixed
                 currentMode === m.value ? 'bg-ink-900' : 'bg-white border border-slate-200'
               }`}
             >
-              <Icon name={m.icon} size={11} color={currentMode === m.value ? '#F59E0B' : '#475569'} />
-              <Text className={`text-[11px] font-bold ${currentMode === m.value ? 'text-cream-50' : 'text-slate-600'}`}>
+              <Icon
+                name={m.icon}
+                size={11}
+                color={currentMode === m.value ? '#F59E0B' : '#475569'}
+              />
+              <Text
+                className={`text-[11px] font-bold ${currentMode === m.value ? 'text-cream-50' : 'text-slate-600'}`}
+              >
                 {m.label}
               </Text>
             </Pressable>

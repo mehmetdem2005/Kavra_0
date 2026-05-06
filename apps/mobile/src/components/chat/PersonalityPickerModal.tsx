@@ -1,5 +1,5 @@
-import { View, Text, Modal, Pressable, ScrollView, ActivityIndicator } from 'react-native'
-import { usePersonalities, type Personality } from '../../hooks/useSubjects'
+import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native'
+import { type Personality, usePersonalities } from '../../hooks/useSubjects'
 
 interface Props {
   visible: boolean
@@ -23,9 +23,7 @@ export function PersonalityPickerModal({ visible, onClose, selectedId, onSelect 
                 <Text className="text-slate-500 text-base">Kapat</Text>
               </Pressable>
             </View>
-            <Text className="text-slate-500 text-sm mb-4">
-              Kavra'nın konuşma stilini seç.
-            </Text>
+            <Text className="text-slate-500 text-sm mb-4">Kavra'nın konuşma stilini seç.</Text>
           </View>
 
           <ScrollView className="px-4 pb-6">
@@ -38,7 +36,10 @@ export function PersonalityPickerModal({ visible, onClose, selectedId, onSelect 
                   return (
                     <Pressable
                       key={p.id}
-                      onPress={() => { onSelect(p); onClose() }}
+                      onPress={() => {
+                        onSelect(p)
+                        onClose()
+                      }}
                       className={[
                         'rounded-xl p-4 border flex-row items-center gap-3',
                         selected ? 'border-brand-950 bg-brand-50' : 'border-slate-100 bg-white',

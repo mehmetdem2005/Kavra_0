@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Modal, Switch, Alert, Share } from 'react-native'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import * as Clipboard from 'expo-clipboard'
+import { useState } from 'react'
+import { Alert, Modal, Pressable, ScrollView, Share, Switch, Text, View } from 'react-native'
 import { apiFetch } from '../../lib/api'
 import { Icon } from '../ui/Icon'
-import * as Clipboard from 'expo-clipboard'
 
 const CATEGORIES = [
   { value: 'biology', emoji: '🧬', label: 'Biyoloji' },
@@ -39,33 +39,28 @@ export function ShareNotebookModal({ visible, onClose, notebook }: Props) {
   const [allowClone, setAllowClone] = useState(notebook.allow_clone)
 
   const shareMut = useMutation({
-    mutationFn: () => apiFetch<{ shareUrl: string | null; notebook: any }>(
-      `/api/notebooks/${notebook.id}/share`,
-      {
+    mutationFn: () =>
+      apiFetch<{ shareUrl: string | null; notebook: any }>(`/api/notebooks/${notebook.id}/share`, {
         method: 'POST',
         body: JSON.stringify({ isPublic, category, allowClone }),
-      },
-    ),
+      }),
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ['notebook', notebook.id] })
       if (res.shareUrl) {
-        Alert.alert(
-          '✓ Paylaşıldı',
-          `Defter herkese açık.\n\n${res.shareUrl}`,
-          [
-            {
-              text: 'Linki Kopyala',
-              onPress: async () => {
-                await Clipboard.setStringAsync(res.shareUrl!)
-              },
+        Alert.alert('✓ Paylaşıldı', `Defter herkese açık.\n\n${res.shareUrl}`, [
+          {
+            text: 'Linki Kopyala',
+            onPress: async () => {
+              await Clipboard.setStringAsync(res.shareUrl!)
             },
-            {
-              text: 'Paylaş',
-              onPress: () => Share.share({ message: `${notebook.title}\n${res.shareUrl}`, url: res.shareUrl! }),
-            },
-            { text: 'Tamam', style: 'cancel', onPress: onClose },
-          ],
-        )
+          },
+          {
+            text: 'Paylaş',
+            onPress: () =>
+              Share.share({ message: `${notebook.title}\n${res.shareUrl}`, url: res.shareUrl! }),
+          },
+          { text: 'Tamam', style: 'cancel', onPress: onClose },
+        ])
       } else {
         onClose()
       }
@@ -82,8 +77,8 @@ export function ShareNotebookModal({ visible, onClose, notebook }: Props) {
           <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}>
             <Text className="font-serif text-2xl text-ink-900">Paylaş</Text>
             <Text className="text-sm text-slate-600 mt-1 mb-5">
-              Bu defteri herkese açık yaparsan kavra.app/n/... linkinden erişilir.
-              Kaynak içerikleri gizli kalır — sadece başlıklar ve metadata görünür.
+              Bu defteri herkese açık yaparsan kavra.app/n/... linkinden erişilir. Kaynak içerikleri
+              gizli kalır — sadece başlıklar ve metadata görünür.
             </Text>
 
             {/* Public toggle */}
@@ -130,11 +125,15 @@ export function ShareNotebookModal({ visible, onClose, notebook }: Props) {
                       key={c.value}
                       onPress={() => setCategory(category === c.value ? null : c.value)}
                       className={`px-2.5 py-1.5 rounded-full border flex-row items-center gap-1 ${
-                        category === c.value ? 'bg-amber-500 border-amber-500' : 'bg-white border-slate-200'
+                        category === c.value
+                          ? 'bg-amber-500 border-amber-500'
+                          : 'bg-white border-slate-200'
                       }`}
                     >
                       <Text className="text-xs">{c.emoji}</Text>
-                      <Text className={`text-[11px] font-semibold ${category === c.value ? 'text-ink-900' : 'text-slate-600'}`}>
+                      <Text
+                        className={`text-[11px] font-semibold ${category === c.value ? 'text-ink-900' : 'text-slate-600'}`}
+                      >
                         {c.label}
                       </Text>
                     </Pressable>
@@ -144,7 +143,8 @@ export function ShareNotebookModal({ visible, onClose, notebook }: Props) {
                 <View className="bg-amber-50 border border-amber-200 rounded-2xl p-3 mb-3 flex-row gap-2">
                   <Icon name="info" size={14} color="#F59E0B" />
                   <Text className="flex-1 text-[11px] text-amber-900 leading-5">
-                    Paylaştığında "Paylaşan El" rozetini kazanırsın. 100 görüntüleme = "Viral" rozet.
+                    Paylaştığında "Paylaşan El" rozetini kazanırsın. 100 görüntüleme = "Viral"
+                    rozet.
                   </Text>
                 </View>
               </>

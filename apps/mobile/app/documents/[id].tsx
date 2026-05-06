@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
 import {
+  type ExtractedConcept,
   useDocument,
   useExtractConcepts,
   useGenerateFlashcards,
-  type ExtractedConcept,
 } from '../../src/hooks/useDocuments'
 
 export default function DocumentDetail() {
@@ -88,8 +88,8 @@ export default function DocumentDetail() {
             isReady
               ? 'bg-green-50 border-green-200'
               : isFailed
-              ? 'bg-red-50 border-red-200'
-              : 'bg-amber-50 border-amber-200',
+                ? 'bg-red-50 border-red-200'
+                : 'bg-amber-50 border-amber-200',
           ].join(' ')}
         >
           {isProcessing && (
@@ -150,7 +150,7 @@ export default function DocumentDetail() {
               emoji="💬"
               title="PDF Hakkında Soru Sor"
               subtitle="RAG ile dokümandan cevap (yakında)"
-              onPress={() => Alert.alert('', 'RAG sohbet Faz 4\'te')}
+              onPress={() => Alert.alert('', "RAG sohbet Faz 4'te")}
               disabled
             />
           </View>
@@ -159,15 +159,10 @@ export default function DocumentDetail() {
         {/* Çıkarılan kavramlar */}
         {extractedConcepts && extractedConcepts.length > 0 && (
           <View className="mt-6">
-            <Text className="text-lg font-serif text-brand-950 mb-3">
-              Çıkarılan Kavramlar
-            </Text>
+            <Text className="text-lg font-serif text-brand-950 mb-3">Çıkarılan Kavramlar</Text>
             <View className="gap-2">
               {extractedConcepts.map((c, i) => (
-                <View
-                  key={i}
-                  className="bg-white rounded-xl p-4 border border-slate-100"
-                >
+                <View key={i} className="bg-white rounded-xl p-4 border border-slate-100">
                   <View className="flex-row items-start justify-between">
                     <Text className="font-semibold text-brand-950 flex-1">{c.name}</Text>
                     <View className="bg-brand-50 px-2 py-0.5 rounded">
@@ -188,7 +183,12 @@ export default function DocumentDetail() {
 }
 
 function ActionCard({
-  emoji, title, subtitle, onPress, loading, disabled,
+  emoji,
+  title,
+  subtitle,
+  onPress,
+  loading,
+  disabled,
 }: {
   emoji: string
   title: string
@@ -213,7 +213,11 @@ function ActionCard({
         <Text className="font-semibold text-brand-950">{title}</Text>
         <Text className="text-slate-500 text-sm">{subtitle}</Text>
       </View>
-      {loading ? <ActivityIndicator color="#1E1B4B" /> : <Text className="text-slate-400 text-xl">›</Text>}
+      {loading ? (
+        <ActivityIndicator color="#1E1B4B" />
+      ) : (
+        <Text className="text-slate-400 text-xl">›</Text>
+      )}
     </Pressable>
   )
 }

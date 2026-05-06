@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { groqChatJSON } from '../groq.js'
-import { supabase, verifyUserToken, getActiveGroqKey } from '../supabase.js'
+import { getActiveGroqKey, supabase, verifyUserToken } from '../supabase.js'
 
 const ReflectionUpsertSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -19,8 +19,7 @@ export async function reflectionsRoutes(fastify: FastifyInstance) {
     if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
     const days = Math.min(90, Number(req.query.days ?? 30))
-    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-      .toISOString().slice(0, 10)
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
 
     const { data, error } = await supabase
       .from('reflections')
@@ -41,10 +40,9 @@ export async function reflectionsRoutes(fastify: FastifyInstance) {
     const parsed = ReflectionUpsertSchema.safeParse(req.body)
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.format() })
 
-    const { error } = await supabase.from('reflections').upsert(
-      { user_id: userId, ...parsed.data },
-      { onConflict: 'user_id,date' },
-    )
+    const { error } = await supabase
+      .from('reflections')
+      .upsert({ user_id: userId, ...parsed.data }, { onConflict: 'user_id,date' })
 
     if (error) return reply.code(500).send({ error: error.message })
 
@@ -71,7 +69,8 @@ export async function reflectionsRoutes(fastify: FastifyInstance) {
           const d = new Date()
           const day = d.getDay()
           const diff = d.getDate() - day + (day === 0 ? -6 : 1)
-          d.setDate(diff); d.setHours(0, 0, 0, 0)
+          d.setDate(diff)
+          d.setHours(0, 0, 0, 0)
           return d
         })()
 
@@ -143,11 +142,16 @@ METRİKLER:
 - En verimli gün: ${metrics.best_day ?? '-'}
 
 GÜNLÜK YANSIMALAR:
-${(refs ?? []).map((r: any) =>
-  `${r.date} (mood:${r.mood ?? '-'}, enerji:${r.energy ?? '-'}): ` +
-  `${r.what_learned ? `Öğrendi: "${r.what_learned}". ` : ''}` +
-  `${r.what_struggled ? `Zorlandı: "${r.what_struggled}". ` : ''}`,
-).join('\n') || 'Bu hafta yansıma yazmamış.'}`,
+${
+  (refs ?? [])
+    .map(
+      (r: any) =>
+        `${r.date} (mood:${r.mood ?? '-'}, enerji:${r.energy ?? '-'}): ` +
+        `${r.what_learned ? `Öğrendi: "${r.what_learned}". ` : ''}` +
+        `${r.what_struggled ? `Zorlandı: "${r.what_struggled}". ` : ''}`,
+    )
+    .join('\n') || 'Bu hafta yansıma yazmamış.'
+}`,
       })
 
       // Upsert
@@ -185,20 +189,23 @@ ${(refs ?? []).map((r: any) =>
   })
 
   /** GET /api/reports/weekly?weekStart=2025-... */
-  fastify.get<{ Querystring: { weekStart?: string } }>('/api/reports/weekly', async (req, reply) => {
-    const userId = await verifyUserToken(req.headers.authorization)
-    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.get<{ Querystring: { weekStart?: string } }>(
+    '/api/reports/weekly',
+    async (req, reply) => {
+      const userId = await verifyUserToken(req.headers.authorization)
+      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-    let q = supabase
-      .from('weekly_reports')
-      .select('*')
-      .eq('user_id', userId)
-      .order('week_start', { ascending: false })
-      .limit(12)
+      let q = supabase
+        .from('weekly_reports')
+        .select('*')
+        .eq('user_id', userId)
+        .order('week_start', { ascending: false })
+        .limit(12)
 
-    if (req.query.weekStart) q = q.eq('week_start', req.query.weekStart)
+      if (req.query.weekStart) q = q.eq('week_start', req.query.weekStart)
 
-    const { data } = await q
-    return { reports: data ?? [] }
-  })
+      const { data } = await q
+      return { reports: data ?? [] }
+    },
+  )
 }

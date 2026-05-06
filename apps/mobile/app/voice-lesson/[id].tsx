@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
-import { View, Text, Pressable, Animated, Easing } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useMessages, useSendMessage } from '../../src/hooks/useLessons'
-import { useVoiceInput } from '../../src/hooks/useVoiceInput'
-import { useTTS } from '../../src/hooks/useTTS'
 import * as Haptics from 'expo-haptics'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useEffect, useRef, useState } from 'react'
+import { Animated, Easing, Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useMessages, useSendMessage } from '../../src/hooks/useLessons'
+import { useTTS } from '../../src/hooks/useTTS'
+import { useVoiceInput } from '../../src/hooks/useVoiceInput'
 
 type Phase = 'idle' | 'recording' | 'transcribing' | 'thinking' | 'speaking'
 
@@ -125,9 +125,7 @@ export default function VoiceLesson() {
           </Text>
         )}
 
-        {error && (
-          <Text className="text-red-300 text-sm mt-4 text-center">⚠️ {error}</Text>
-        )}
+        {error && <Text className="text-red-300 text-sm mt-4 text-center">⚠️ {error}</Text>}
       </View>
 
       {/* Alt — büyük mikrofon butonu */}
@@ -142,14 +140,20 @@ export default function VoiceLesson() {
             phase === 'recording'
               ? 'bg-red-500'
               : phase === 'speaking'
-              ? 'bg-accent-500'
-              : phase === 'idle'
-              ? 'bg-white'
-              : 'bg-white/30',
+                ? 'bg-accent-500'
+                : phase === 'idle'
+                  ? 'bg-white'
+                  : 'bg-white/30',
           ].join(' ')}
         >
           <Text style={{ fontSize: 40 }}>
-            {phase === 'speaking' ? '⏸' : phase === 'recording' ? '🎤' : phase === 'idle' ? '🎤' : '⋯'}
+            {phase === 'speaking'
+              ? '⏸'
+              : phase === 'recording'
+                ? '🎤'
+                : phase === 'idle'
+                  ? '🎤'
+                  : '⋯'}
           </Text>
         </Pressable>
       </View>
@@ -169,8 +173,18 @@ function PulseOrb({ phase }: { phase: Phase }) {
       anim = Animated.loop(
         Animated.parallel([
           Animated.sequence([
-            Animated.timing(pulse, { toValue: 1.3, duration: speed, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-            Animated.timing(pulse, { toValue: 1, duration: speed, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+            Animated.timing(pulse, {
+              toValue: 1.3,
+              duration: speed,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+            Animated.timing(pulse, {
+              toValue: 1,
+              duration: speed,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
           ]),
           Animated.sequence([
             Animated.timing(opacity, { toValue: 0.7, duration: speed, useNativeDriver: true }),
@@ -180,32 +194,48 @@ function PulseOrb({ phase }: { phase: Phase }) {
       )
       anim.start()
     }
-    return () => { anim?.stop(); pulse.setValue(1); opacity.setValue(0.4) }
+    return () => {
+      anim?.stop()
+      pulse.setValue(1)
+      opacity.setValue(0.4)
+    }
   }, [phase, pulse, opacity])
 
   const color =
-    phase === 'recording' ? '#EF4444'
-    : phase === 'speaking' ? '#F59E0B'
-    : phase === 'thinking' ? '#818CF8'
-    : '#FFFFFF'
+    phase === 'recording'
+      ? '#EF4444'
+      : phase === 'speaking'
+        ? '#F59E0B'
+        : phase === 'thinking'
+          ? '#818CF8'
+          : '#FFFFFF'
 
   return (
     <View className="items-center justify-center">
       <Animated.View
         style={{
-          width: 220, height: 220, borderRadius: 110,
-          backgroundColor: color, opacity,
+          width: 220,
+          height: 220,
+          borderRadius: 110,
+          backgroundColor: color,
+          opacity,
           transform: [{ scale: pulse }],
         }}
       />
-      <View className="absolute w-32 h-32 rounded-full items-center justify-center"
-            style={{ backgroundColor: color }}>
+      <View
+        className="absolute w-32 h-32 rounded-full items-center justify-center"
+        style={{ backgroundColor: color }}
+      >
         <Text style={{ fontSize: 64 }}>
-          {phase === 'recording' ? '🎤'
-            : phase === 'speaking' ? '💬'
-            : phase === 'thinking' ? '🧠'
-            : phase === 'transcribing' ? '✍️'
-            : '🎙️'}
+          {phase === 'recording'
+            ? '🎤'
+            : phase === 'speaking'
+              ? '💬'
+              : phase === 'thinking'
+                ? '🧠'
+                : phase === 'transcribing'
+                  ? '✍️'
+                  : '🎙️'}
         </Text>
       </View>
     </View>

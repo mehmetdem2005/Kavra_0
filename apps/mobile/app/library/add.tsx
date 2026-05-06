@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
 import * as DocumentPicker from 'expo-document-picker'
-import { useUploadBook, useCreateBook } from '../../src/hooks/useBooks'
-import { Input } from '../../src/components/ui/Input'
+import { Stack, useRouter } from 'expo-router'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
 import { Icon } from '../../src/components/ui/Icon'
+import { Input } from '../../src/components/ui/Input'
+import { useCreateBook, useUploadBook } from '../../src/hooks/useBooks'
 
 const LANGUAGES = [
   { code: 'en', flag: '🇬🇧', name: 'İngilizce' },
@@ -25,7 +25,10 @@ export default function LibraryAdd() {
   const createBook = useCreateBook()
 
   const [file, setFile] = useState<{
-    uri: string; name: string; size: number; format: 'epub' | 'pdf' | 'txt'
+    uri: string
+    name: string
+    size: number
+    format: 'epub' | 'pdf' | 'txt'
   } | null>(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -41,8 +44,7 @@ export default function LibraryAdd() {
         const a = res.assets[0]
         const ext = a.name.toLowerCase().split('.').pop() ?? ''
         const format: 'epub' | 'pdf' | 'txt' =
-          ext === 'epub' ? 'epub' :
-          ext === 'pdf' ? 'pdf' : 'txt'
+          ext === 'epub' ? 'epub' : ext === 'pdf' ? 'pdf' : 'txt'
 
         setFile({
           uri: a.uri,
@@ -87,10 +89,14 @@ export default function LibraryAdd() {
       ])
     } catch (e: any) {
       if (e.message?.includes('free_limit')) {
-        Alert.alert('Aylık limit doldu', 'Free üyeler ayda 5 kitap yükleyebilir. Pro\'ya geç sınırsız aç.', [
-          { text: 'Tamam', style: 'cancel' },
-          { text: 'Pro\'ya Geç', onPress: () => router.replace('/upgrade') },
-        ])
+        Alert.alert(
+          'Aylık limit doldu',
+          "Free üyeler ayda 5 kitap yükleyebilir. Pro'ya geç sınırsız aç.",
+          [
+            { text: 'Tamam', style: 'cancel' },
+            { text: "Pro'ya Geç", onPress: () => router.replace('/upgrade') },
+          ],
+        )
       } else {
         Alert.alert('Hata', e.message)
       }
@@ -132,7 +138,9 @@ export default function LibraryAdd() {
               </Text>
               <View className="flex-row items-center gap-2 mt-1">
                 <View className="bg-ink-900 rounded px-2 py-0.5">
-                  <Text className="text-cream-50 text-[9px] font-bold">{file.format.toUpperCase()}</Text>
+                  <Text className="text-cream-50 text-[9px] font-bold">
+                    {file.format.toUpperCase()}
+                  </Text>
                 </View>
                 <Text className="text-xs text-slate-500">
                   {(file.size / 1024 / 1024).toFixed(1)} MB
@@ -144,16 +152,24 @@ export default function LibraryAdd() {
             <>
               <Icon name="upload" size={32} color="#94A3B8" />
               <Text className="font-semibold text-ink-900 mt-2">Kitap seç</Text>
-              <Text className="text-xs text-slate-500 mt-1 text-center">
-                EPUB · PDF · TXT
-              </Text>
+              <Text className="text-xs text-slate-500 mt-1 text-center">EPUB · PDF · TXT</Text>
             </>
           )}
         </Pressable>
 
-        <Input label="BAŞLIK" value={title} onChangeText={setTitle} placeholder="Crime and Punishment" />
+        <Input
+          label="BAŞLIK"
+          value={title}
+          onChangeText={setTitle}
+          placeholder="Crime and Punishment"
+        />
         <View className="mt-3">
-          <Input label="YAZAR (OPS.)" value={author} onChangeText={setAuthor} placeholder="Fyodor Dostoevsky" />
+          <Input
+            label="YAZAR (OPS.)"
+            value={author}
+            onChangeText={setAuthor}
+            placeholder="Fyodor Dostoevsky"
+          />
         </View>
 
         <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mt-5 mb-2">
@@ -169,7 +185,9 @@ export default function LibraryAdd() {
               }`}
             >
               <Text style={{ fontSize: 16 }}>{l.flag}</Text>
-              <Text className={`text-xs font-semibold ${language === l.code ? 'text-cream-50' : 'text-slate-700'}`}>
+              <Text
+                className={`text-xs font-semibold ${language === l.code ? 'text-cream-50' : 'text-slate-700'}`}
+              >
                 {l.name}
               </Text>
             </Pressable>

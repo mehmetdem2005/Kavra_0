@@ -1,9 +1,9 @@
+import { Link, Stack, useRouter } from 'expo-router'
 import { useState } from 'react'
-import { View, Text, ScrollView, Alert } from 'react-native'
+import { Alert, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Stack, Link, useRouter } from 'expo-router'
-import { Input } from '../../src/components/ui/Input'
 import { Button } from '../../src/components/ui/Button'
+import { Input } from '../../src/components/ui/Input'
 import { supabase } from '../../src/lib/supabase'
 
 export default function SignUp() {
@@ -51,9 +51,13 @@ export default function SignUp() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream-50">
-      <Stack.Screen options={{ title: 'Hesap Oluştur', headerStyle: { backgroundColor: '#FBF8F0' } }} />
+      <Stack.Screen
+        options={{ title: 'Hesap Oluştur', headerStyle: { backgroundColor: '#FBF8F0' } }}
+      />
       <ScrollView contentContainerStyle={{ padding: 24, paddingTop: 8 }}>
-        <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">Yeni Hesap</Text>
+        <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">
+          Yeni Hesap
+        </Text>
         <Text className="font-serif text-3xl text-ink-900 leading-tight mb-3">
           Kavra'ya <Text className="text-amber-500 italic">hoşgeldin</Text>
         </Text>
@@ -62,9 +66,28 @@ export default function SignUp() {
         </Text>
 
         <View className="gap-3">
-          <Input label="İSMİN" value={fullName} onChangeText={setFullName} placeholder="Eda Yılmaz" autoCapitalize="words" />
-          <Input label="E-POSTA" value={email} onChangeText={setEmail} placeholder="eda@example.com" keyboardType="email-address" autoCapitalize="none" />
-          <Input label="ŞİFRE" value={password} onChangeText={setPassword} placeholder="En az 8 karakter" secureTextEntry />
+          <Input
+            label="İSMİN"
+            value={fullName}
+            onChangeText={setFullName}
+            placeholder="Eda Yılmaz"
+            autoCapitalize="words"
+          />
+          <Input
+            label="E-POSTA"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="eda@example.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <Input
+            label="ŞİFRE"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="En az 8 karakter"
+            secureTextEntry
+          />
 
           <View className="mt-4">
             <Button title="Hesap Oluştur" onPress={handleSubmit} loading={loading} fullWidth />

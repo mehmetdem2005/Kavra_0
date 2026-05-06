@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { transcribeAudio, GroqVoiceError } from '../groq-stt.js'
-import { supabase, verifyUserToken, getActiveGroqKey } from '../supabase.js'
+import { GroqVoiceError, transcribeAudio } from '../groq-stt.js'
+import { getActiveGroqKey, supabase, verifyUserToken } from '../supabase.js'
 
 const TranscribeSchema = z.object({
   audioStoragePath: z.string().min(1),

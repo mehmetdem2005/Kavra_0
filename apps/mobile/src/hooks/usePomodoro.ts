@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
 import * as Haptics from 'expo-haptics'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type PomodoroPhase = 'idle' | 'focus' | 'short_break' | 'long_break'
 
@@ -39,10 +39,14 @@ export function usePomodoro(opts: PomodoroOptions = {}) {
   const phaseDuration = useCallback(
     (p: PomodoroPhase): number => {
       switch (p) {
-        case 'focus': return focusMinutes * 60
-        case 'short_break': return shortBreakMinutes * 60
-        case 'long_break': return longBreakMinutes * 60
-        default: return 0
+        case 'focus':
+          return focusMinutes * 60
+        case 'short_break':
+          return shortBreakMinutes * 60
+        case 'long_break':
+          return longBreakMinutes * 60
+        default:
+          return 0
       }
     },
     [focusMinutes, shortBreakMinutes, longBreakMinutes],

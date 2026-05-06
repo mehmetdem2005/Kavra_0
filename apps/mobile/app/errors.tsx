@@ -1,12 +1,8 @@
-import { useState } from 'react'
-import {
-  View, Text, ScrollView, Pressable, ActivityIndicator, Alert,
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useRouter } from 'expo-router'
-import {
-  useErrors, useFiveWhys, useResolveError, type ErrorRow,
-} from '../src/hooks/useErrors'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { type ErrorRow, useErrors, useFiveWhys, useResolveError } from '../src/hooks/useErrors'
 
 export default function Errors() {
   const router = useRouter()
@@ -26,8 +22,7 @@ export default function Errors() {
         <View className="bg-brand-50 border border-brand-200 rounded-2xl p-4 mb-4">
           <Text className="text-brand-900 font-semibold mb-1">🔍 Hatalardan Öğren</Text>
           <Text className="text-brand-800 text-sm leading-5">
-            Yanlış cevapların burada toplanır. "5 Neden" ile kök sebebi bul,
-            kalıcı düzelt.
+            Yanlış cevapların burada toplanır. "5 Neden" ile kök sebebi bul, kalıcı düzelt.
           </Text>
         </View>
 

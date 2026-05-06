@@ -19,14 +19,14 @@
  */
 
 export interface SM2State {
-  easeFactor: number    // E-Factor (1.3 - ?)
-  intervalDays: number  // Sonraki tekrar arası
-  repetitions: number   // Üst üste başarılı tekrar
+  easeFactor: number // E-Factor (1.3 - ?)
+  intervalDays: number // Sonraki tekrar arası
+  repetitions: number // Üst üste başarılı tekrar
 }
 
 export interface SM2Result extends SM2State {
   nextReviewAt: Date
-  isLapse: boolean      // quality < 3 ise true
+  isLapse: boolean // quality < 3 ise true
 }
 
 const MIN_EASE = 1.3
@@ -39,11 +39,7 @@ const SECOND_INTERVAL = 6
  * @param quality 0-5 kullanıcı değerlendirmesi
  * @param now Şimdi (test için injectable)
  */
-export function applySM2(
-  state: SM2State,
-  quality: number,
-  now: Date = new Date(),
-): SM2Result {
+export function applySM2(state: SM2State, quality: number, now: Date = new Date()): SM2Result {
   // Quality clamp
   const q = Math.max(0, Math.min(5, Math.round(quality)))
   const isLapse = q < 3

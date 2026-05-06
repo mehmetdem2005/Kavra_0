@@ -1,11 +1,12 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Image, ActivityIndicator } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import { useBooks, type Book } from '../../src/hooks/useBooks'
+import { useState } from 'react'
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Icon } from '../../src/components/ui/Icon'
+import { type Book, useBooks } from '../../src/hooks/useBooks'
 
-const PROUST_QUOTE = '"Bir kitap, bir kitaptan ibaret değildir, tıpkı bir insanın yalnızca insan olmadığı gibi. Kitap, eşsiz bir bireydi, kendinden başka var olma sebebi olmayan."'
+const PROUST_QUOTE =
+  '"Bir kitap, bir kitaptan ibaret değildir, tıpkı bir insanın yalnızca insan olmadığı gibi. Kitap, eşsiz bir bireydi, kendinden başka var olma sebebi olmayan."'
 
 export default function BooksLibrary() {
   const router = useRouter()
@@ -47,7 +48,9 @@ export default function BooksLibrary() {
               onPress={() => setTab(t.v)}
               className={`px-4 py-2 rounded-full ${tab === t.v ? 'bg-ink-900' : 'bg-white border border-slate-200'}`}
             >
-              <Text className={`text-xs font-bold ${tab === t.v ? 'text-cream-50' : 'text-slate-700'}`}>
+              <Text
+                className={`text-xs font-bold ${tab === t.v ? 'text-cream-50' : 'text-slate-700'}`}
+              >
                 {t.l.toUpperCase()}
               </Text>
             </Pressable>
@@ -91,7 +94,12 @@ export default function BooksLibrary() {
           <Pressable
             onPress={() => router.push('/library/add')}
             className="w-14 h-14 bg-ink-900 rounded-full items-center justify-center shadow-lg"
-            style={{ shadowColor: '#1E1B4B', shadowOpacity: 0.3, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } }}
+            style={{
+              shadowColor: '#1E1B4B',
+              shadowOpacity: 0.3,
+              shadowRadius: 16,
+              shadowOffset: { width: 0, height: 8 },
+            }}
           >
             <Icon name="plus" size={24} color="#F59E0B" />
           </Pressable>
@@ -107,7 +115,14 @@ function BookCard({ book, onPress }: { book: Book; onPress: () => void }) {
   const progressPct = Math.round((book.current_position ?? 0) * 100)
 
   const langFlag: Record<string, string> = {
-    en: '🇬🇧', tr: '🇹🇷', de: '🇩🇪', fr: '🇫🇷', es: '🇪🇸', it: '🇮🇹', ja: '🇯🇵', ar: '🇸🇦',
+    en: '🇬🇧',
+    tr: '🇹🇷',
+    de: '🇩🇪',
+    fr: '🇫🇷',
+    es: '🇪🇸',
+    it: '🇮🇹',
+    ja: '🇯🇵',
+    ar: '🇸🇦',
   }
 
   return (
@@ -116,13 +131,27 @@ function BookCard({ book, onPress }: { book: Book; onPress: () => void }) {
       className="bg-white border border-slate-100 rounded-3xl p-4 flex-row gap-4"
     >
       {/* Cover */}
-      <View className="w-20 h-28 rounded-2xl overflow-hidden bg-emerald-50 items-center justify-center" style={{ borderWidth: 1, borderColor: '#A7F3D0' }}>
+      <View
+        className="w-20 h-28 rounded-2xl overflow-hidden bg-emerald-50 items-center justify-center"
+        style={{ borderWidth: 1, borderColor: '#A7F3D0' }}
+      >
         {book.cover_url ? (
-          <Image source={{ uri: book.cover_url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+          <Image
+            source={{ uri: book.cover_url }}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover"
+          />
         ) : (
           <View className="items-center px-1">
-            <Text className="text-[8px] text-emerald-700 font-mono">{book.format.toUpperCase()}</Text>
-            <Text className="font-serif text-emerald-900 text-center text-xs mt-1" numberOfLines={3}>{book.title}</Text>
+            <Text className="text-[8px] text-emerald-700 font-mono">
+              {book.format.toUpperCase()}
+            </Text>
+            <Text
+              className="font-serif text-emerald-900 text-center text-xs mt-1"
+              numberOfLines={3}
+            >
+              {book.title}
+            </Text>
           </View>
         )}
       </View>
@@ -132,10 +161,14 @@ function BookCard({ book, onPress }: { book: Book; onPress: () => void }) {
         <View>
           <View className="flex-row items-center gap-1">
             <Text style={{ fontSize: 12 }}>{langFlag[book.language] ?? '📖'}</Text>
-            <Text className="font-serif text-base text-ink-900 flex-1" numberOfLines={2}>{book.title}</Text>
+            <Text className="font-serif text-base text-ink-900 flex-1" numberOfLines={2}>
+              {book.title}
+            </Text>
           </View>
           {book.author && (
-            <Text className="text-xs text-slate-500 mt-0.5" numberOfLines={1}>{book.author}</Text>
+            <Text className="text-xs text-slate-500 mt-0.5" numberOfLines={1}>
+              {book.author}
+            </Text>
           )}
         </View>
 
@@ -154,7 +187,10 @@ function BookCard({ book, onPress }: { book: Book; onPress: () => void }) {
           {book.status === 'reading' && (
             <>
               <View className="h-1 bg-slate-100 rounded-full overflow-hidden">
-                <View className="h-full bg-amber-500 rounded-full" style={{ width: `${progressPct}%` }} />
+                <View
+                  className="h-full bg-amber-500 rounded-full"
+                  style={{ width: `${progressPct}%` }}
+                />
               </View>
               <View className="flex-row justify-between mt-1">
                 <Text className="text-[9px] font-mono text-slate-500">%{progressPct}</Text>
@@ -212,7 +248,10 @@ function EmptyState({ tab, onAdd }: { tab: string; onAdd: () => void }) {
       </View>
       <Text className="font-serif text-xl text-ink-900">{m.title}</Text>
       <Text className="text-sm text-slate-500 text-center mt-2 max-w-[280px]">{m.desc}</Text>
-      <Pressable onPress={onAdd} className="mt-5 bg-ink-900 rounded-full px-6 py-3 flex-row items-center gap-2">
+      <Pressable
+        onPress={onAdd}
+        className="mt-5 bg-ink-900 rounded-full px-6 py-3 flex-row items-center gap-2"
+      >
         <Icon name="plus" size={16} color="#F59E0B" />
         <Text className="text-cream-50 font-semibold text-sm">{m.cta}</Text>
       </Pressable>

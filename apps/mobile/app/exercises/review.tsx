@@ -1,10 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
-import { View, Text, Pressable, ActivityIndicator } from 'react-native'
+import { Stack, useRouter } from 'expo-router'
+import { useEffect, useRef, useState } from 'react'
+import { ActivityIndicator, Pressable, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
-import { useVocabQueue, useRateVocabCard, useVocabPreview, type VocabSRSCard } from '../../src/hooks/useVocabReview'
-import { Icon } from '../../src/components/ui/Icon'
 import { KaraokeTTSPlayer } from '../../src/components/reader/KaraokeTTSPlayer'
+import { Icon } from '../../src/components/ui/Icon'
+import {
+  type VocabSRSCard,
+  useRateVocabCard,
+  useVocabPreview,
+  useVocabQueue,
+} from '../../src/hooks/useVocabReview'
 
 export default function VocabReviewSession() {
   const router = useRouter()
@@ -114,26 +119,24 @@ export default function VocabReviewSession() {
             <View className="flex-row items-center gap-2 mb-4">
               <View className="bg-ink-900 rounded-full px-2.5 py-1">
                 <Text className="text-cream-50 text-[9px] font-bold uppercase">
-                  {card.state === 'new' ? 'YENİ' :
-                   card.state === 'learning' ? 'ÖĞRENİYORUM' :
-                   card.state === 'relearning' ? 'TEKRAR' : 'TEKRAR'}
+                  {card.state === 'new'
+                    ? 'YENİ'
+                    : card.state === 'learning'
+                      ? 'ÖĞRENİYORUM'
+                      : card.state === 'relearning'
+                        ? 'TEKRAR'
+                        : 'TEKRAR'}
                 </Text>
               </View>
-              <Text className="text-[10px] text-slate-500 font-mono">
-                {card.reps} tekrar
-              </Text>
+              <Text className="text-[10px] text-slate-500 font-mono">{card.reps} tekrar</Text>
               {card.lapses > 0 && (
-                <Text className="text-[10px] text-red-500 font-mono">
-                  {card.lapses} unutma
-                </Text>
+                <Text className="text-[10px] text-red-500 font-mono">{card.lapses} unutma</Text>
               )}
             </View>
 
             {/* Word */}
             <Text className="font-serif text-5xl text-ink-900">{v.word}</Text>
-            {v.ipa && (
-              <Text className="text-base text-slate-500 font-mono mt-2">[{v.ipa}]</Text>
-            )}
+            {v.ipa && <Text className="text-base text-slate-500 font-mono mt-2">[{v.ipa}]</Text>}
 
             {/* TTS */}
             <View className="mt-4 self-start">
@@ -172,7 +175,8 @@ export default function VocabReviewSession() {
                   {v.definitions.slice(0, 1).map((d, i) => (
                     <Text key={i} className="text-xs text-slate-600 leading-5">
                       <Text className="font-bold uppercase text-[10px]">{d.partOfSpeech}</Text>
-                      {' · '}{d.definition}
+                      {' · '}
+                      {d.definition}
                     </Text>
                   ))}
                 </View>
@@ -220,9 +224,7 @@ export default function VocabReviewSession() {
             ✓ {stats.good}/{stats.done}
           </Text>
           {stats.again > 0 && (
-            <Text className="text-[10px] text-red-500 font-mono">
-              ❌ {stats.again}
-            </Text>
+            <Text className="text-[10px] text-red-500 font-mono">❌ {stats.again}</Text>
           )}
         </View>
       </View>

@@ -21,12 +21,10 @@ export async function uploadAudio(localUri: string, userId: string): Promise<str
     bytes[i] = binary.charCodeAt(i)
   }
 
-  const { error } = await supabase.storage
-    .from('audio-input')
-    .upload(storagePath, bytes.buffer, {
-      contentType: 'audio/m4a',
-      upsert: false,
-    })
+  const { error } = await supabase.storage.from('audio-input').upload(storagePath, bytes.buffer, {
+    contentType: 'audio/m4a',
+    upsert: false,
+  })
 
   if (error) throw error
 

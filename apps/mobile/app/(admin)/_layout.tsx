@@ -1,8 +1,8 @@
-import { Stack, Redirect } from 'expo-router'
-import { View, Text, ActivityIndicator } from 'react-native'
+import { Redirect, Stack } from 'expo-router'
+import { ActivityIndicator, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useMyRole } from '../../src/hooks/useAdmin'
 import { Icon } from '../../src/components/ui/Icon'
+import { useMyRole } from '../../src/hooks/useAdmin'
 
 export default function AdminLayout() {
   const { data: role, isLoading } = useMyRole()
@@ -43,7 +43,10 @@ export default function AdminLayout() {
       <Stack.Screen name="users" options={{ title: 'Kullanıcılar' }} />
       <Stack.Screen name="users/[id]" options={{ title: 'Kullanıcı Detay' }} />
       <Stack.Screen name="library" options={{ title: 'Kütüphane' }} />
-      <Stack.Screen name="library/upload" options={{ title: 'Yeni Kitap', presentation: 'modal' }} />
+      <Stack.Screen
+        name="library/upload"
+        options={{ title: 'Yeni Kitap', presentation: 'modal' }}
+      />
       <Stack.Screen name="audit" options={{ title: 'İşlem Geçmişi' }} />
     </Stack>
   )

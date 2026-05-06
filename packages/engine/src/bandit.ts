@@ -1,5 +1,5 @@
-import type { ArmState, TechniqueMeta } from './types.js'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { ArmState, TechniqueMeta } from './types.js'
 
 /**
  * Thompson Sampling multi-armed bandit.

@@ -1,5 +1,5 @@
-import { View, Text, Modal, Pressable, ScrollView, ActivityIndicator } from 'react-native'
-import { useChatModels, type LLMModel } from '../../hooks/useModels'
+import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native'
+import { type LLMModel, useChatModels } from '../../hooks/useModels'
 
 interface Props {
   visible: boolean
@@ -61,24 +61,35 @@ export function ModelPickerModal({ visible, onClose, selectedModelId, onSelect }
                         return (
                           <Pressable
                             key={m.id}
-                            onPress={() => { onSelect(m); onClose() }}
+                            onPress={() => {
+                              onSelect(m)
+                              onClose()
+                            }}
                             className={[
                               'rounded-xl p-3 border',
-                              selected ? 'border-brand-950 bg-brand-50' : 'border-slate-100 bg-white',
+                              selected
+                                ? 'border-brand-950 bg-brand-50'
+                                : 'border-slate-100 bg-white',
                             ].join(' ')}
                           >
                             <View className="flex-row items-center justify-between">
                               <View className="flex-1">
-                                <Text className="font-semibold text-brand-950">{m.display_name}</Text>
+                                <Text className="font-semibold text-brand-950">
+                                  {m.display_name}
+                                </Text>
                                 <Text className="text-xs text-slate-500 mt-0.5">
                                   {m.model_id}
-                                  {m.context_window ? ` · ${Math.round(m.context_window / 1000)}K` : ''}
+                                  {m.context_window
+                                    ? ` · ${Math.round(m.context_window / 1000)}K`
+                                    : ''}
                                 </Text>
                               </View>
                               {selected && <Text className="text-brand-950 text-xl">✓</Text>}
                               {m.is_recommended && !selected && (
                                 <View className="bg-accent-500/15 px-2 py-0.5 rounded">
-                                  <Text className="text-accent-700 text-xs font-semibold">Önerilen</Text>
+                                  <Text className="text-accent-700 text-xs font-semibold">
+                                    Önerilen
+                                  </Text>
                                 </View>
                               )}
                             </View>

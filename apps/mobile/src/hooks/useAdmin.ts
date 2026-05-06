@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '../lib/api'
 import { supabase } from '../lib/supabase'
 
@@ -71,7 +71,9 @@ export function useAdminDashboard() {
 
 // ===== USERS =====
 
-export function useAdminUsers(opts: { search?: string; role?: string; limit?: number; offset?: number } = {}) {
+export function useAdminUsers(
+  opts: { search?: string; role?: string; limit?: number; offset?: number } = {},
+) {
   return useQuery({
     queryKey: ['admin', 'users', opts],
     queryFn: () => {

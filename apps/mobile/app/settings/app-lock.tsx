@@ -1,9 +1,7 @@
-import { View, Text, ScrollView, Pressable, Switch, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack } from 'expo-router'
-import {
-  useAppLockStore, useBiometricCapabilities,
-} from '../../src/hooks/useAppLock'
+import { Alert, Pressable, ScrollView, Switch, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useAppLockStore, useBiometricCapabilities } from '../../src/hooks/useAppLock'
 
 const TIMEOUT_OPTIONS = [
   { label: 'Anında', value: 0 },
@@ -43,8 +41,8 @@ export default function AppLockSettings() {
         <View className="bg-brand-50 border border-brand-200 rounded-2xl p-4 mb-4">
           <Text className="text-brand-900 font-semibold mb-1">🔒 Gizlilik</Text>
           <Text className="text-brand-800 text-sm leading-5">
-            Kavra'yı her açışında biyometrik doğrulama isteyebilirsin.
-            Yansımaların ve hata portföyün kişisel olduğu için iyi bir koruma.
+            Kavra'yı her açışında biyometrik doğrulama isteyebilirsin. Yansımaların ve hata
+            portföyün kişisel olduğu için iyi bir koruma.
           </Text>
         </View>
 

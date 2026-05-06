@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import type { EngineMeta } from '../../hooks/useLessons'
 
 const CONTEXT_LABELS: Record<string, { emoji: string; tr: string }> = {

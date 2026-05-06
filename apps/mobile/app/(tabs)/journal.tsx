@@ -1,14 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useRouter } from 'expo-router'
+import { useEffect, useState } from 'react'
 import {
-  View, Text, ScrollView, Pressable, TextInput, Alert, ActivityIndicator,
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
 import { Button } from '../../src/components/ui/Button'
-import {
-  useTodayReflection, useUpsertReflection, useReflections,
-} from '../../src/hooks/useReflections'
 import { useStreak } from '../../src/hooks/useMotivation'
+import {
+  useReflections,
+  useTodayReflection,
+  useUpsertReflection,
+} from '../../src/hooks/useReflections'
 
 const MOOD_LABELS = ['', 'Zor', 'Eh', 'İyi', 'Çok iyi', 'Harika']
 const MOOD_EMOJIS = ['', '😞', '😐', '🙂', '😊', '🤩']
@@ -86,12 +94,17 @@ export default function JournalTab() {
 
         {/* Mood + Energy */}
         <View className="bg-white rounded-2xl p-4 border border-slate-100 mb-3">
-          <Text className="text-xs font-semibold text-slate-400 uppercase mb-3">Bugün nasıldın?</Text>
+          <Text className="text-xs font-semibold text-slate-400 uppercase mb-3">
+            Bugün nasıldın?
+          </Text>
           <View className="flex-row justify-between gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
               <Pressable
                 key={n}
-                onPress={() => { setMood(n); setDraft(true) }}
+                onPress={() => {
+                  setMood(n)
+                  setDraft(true)
+                }}
                 className={[
                   'flex-1 p-2 rounded-xl items-center',
                   mood === n ? 'bg-brand-50 border border-brand-300' : '',
@@ -105,12 +118,17 @@ export default function JournalTab() {
         </View>
 
         <View className="bg-white rounded-2xl p-4 border border-slate-100 mb-3">
-          <Text className="text-xs font-semibold text-slate-400 uppercase mb-3">Enerji seviyesi</Text>
+          <Text className="text-xs font-semibold text-slate-400 uppercase mb-3">
+            Enerji seviyesi
+          </Text>
           <View className="flex-row justify-between gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
               <Pressable
                 key={n}
-                onPress={() => { setEnergy(n); setDraft(true) }}
+                onPress={() => {
+                  setEnergy(n)
+                  setDraft(true)
+                }}
                 className={[
                   'flex-1 p-2 rounded-xl items-center',
                   energy === n ? 'bg-brand-50 border border-brand-300' : '',
@@ -127,30 +145,33 @@ export default function JournalTab() {
           icon="🧠"
           label="Bugün ne öğrendim?"
           value={whatLearned}
-          onChange={(v) => { setWhatLearned(v); setDraft(true) }}
+          onChange={(v) => {
+            setWhatLearned(v)
+            setDraft(true)
+          }}
         />
         <ReflectionField
           icon="🪨"
           label="Neyle zorlandım?"
           value={whatStruggled}
-          onChange={(v) => { setWhatStruggled(v); setDraft(true) }}
+          onChange={(v) => {
+            setWhatStruggled(v)
+            setDraft(true)
+          }}
         />
         <ReflectionField
           icon="🎯"
           label="Yarın neye odaklanacağım?"
           value={tomorrowFocus}
-          onChange={(v) => { setTomorrowFocus(v); setDraft(true) }}
+          onChange={(v) => {
+            setTomorrowFocus(v)
+            setDraft(true)
+          }}
         />
 
         {draft && (
           <View className="my-4">
-            <Button
-              title="Kaydet"
-              onPress={save}
-              loading={upsert.isPending}
-              fullWidth
-              size="lg"
-            />
+            <Button title="Kaydet" onPress={save} loading={upsert.isPending} fullWidth size="lg" />
           </View>
         )}
 
@@ -170,28 +191,31 @@ export default function JournalTab() {
         {/* Son yansımalar */}
         {recent && recent.length > 1 && (
           <View className="mt-6 mb-8">
-            <Text className="text-xs font-semibold text-slate-400 uppercase mb-3">
-              Son 7 gün
-            </Text>
+            <Text className="text-xs font-semibold text-slate-400 uppercase mb-3">Son 7 gün</Text>
             <View className="gap-2">
-              {recent.filter((r) => r.date !== today).map((r) => (
-                <View key={r.id} className="bg-white rounded-xl p-3 border border-slate-100">
-                  <View className="flex-row items-center justify-between">
-                    <Text className="text-xs text-slate-500">
-                      {new Date(r.date).toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric' })}
-                    </Text>
-                    <View className="flex-row gap-1">
-                      {r.mood && <Text>{MOOD_EMOJIS[r.mood]}</Text>}
-                      {r.energy && <Text>{ENERGY_EMOJIS[r.energy]}</Text>}
+              {recent
+                .filter((r) => r.date !== today)
+                .map((r) => (
+                  <View key={r.id} className="bg-white rounded-xl p-3 border border-slate-100">
+                    <View className="flex-row items-center justify-between">
+                      <Text className="text-xs text-slate-500">
+                        {new Date(r.date).toLocaleDateString('tr-TR', {
+                          weekday: 'short',
+                          day: 'numeric',
+                        })}
+                      </Text>
+                      <View className="flex-row gap-1">
+                        {r.mood && <Text>{MOOD_EMOJIS[r.mood]}</Text>}
+                        {r.energy && <Text>{ENERGY_EMOJIS[r.energy]}</Text>}
+                      </View>
                     </View>
+                    {r.what_learned && (
+                      <Text className="text-brand-950 text-sm mt-1" numberOfLines={2}>
+                        {r.what_learned}
+                      </Text>
+                    )}
                   </View>
-                  {r.what_learned && (
-                    <Text className="text-brand-950 text-sm mt-1" numberOfLines={2}>
-                      {r.what_learned}
-                    </Text>
-                  )}
-                </View>
-              ))}
+                ))}
             </View>
           </View>
         )}
@@ -201,7 +225,10 @@ export default function JournalTab() {
 }
 
 function ReflectionField({
-  icon, label, value, onChange,
+  icon,
+  label,
+  value,
+  onChange,
 }: { icon: string; label: string; value: string; onChange: (v: string) => void }) {
   return (
     <View className="bg-white rounded-2xl p-4 border border-slate-100 mb-3">

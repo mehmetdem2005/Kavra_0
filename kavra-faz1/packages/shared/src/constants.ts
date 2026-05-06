@@ -39,9 +39,9 @@ export const LIMITS = {
     highQualityTTS: false,
   },
   pro: {
-    pdfUploadsPerMonth: Infinity,
+    pdfUploadsPerMonth: Number.POSITIVE_INFINITY,
     maxStorageMB: 5000,
-    personalitiesAvailable: Infinity,
+    personalitiesAvailable: Number.POSITIVE_INFINITY,
     conceptMap3D: true,
     voiceCloning: true,
     highQualityTTS: true,
@@ -65,14 +65,34 @@ export const SUPPORTED_UI_LANGUAGES = ['tr', 'en'] as const
 export type UILanguage = (typeof SUPPORTED_UI_LANGUAGES)[number]
 
 export const SUPPORTED_CONTENT_LANGUAGES = [
-  'tr', 'en', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'nl', 'pl',
-  'ar', 'fa', 'hi', 'zh', 'ja', 'ko',
+  'tr',
+  'en',
+  'de',
+  'es',
+  'fr',
+  'it',
+  'pt',
+  'ru',
+  'nl',
+  'pl',
+  'ar',
+  'fa',
+  'hi',
+  'zh',
+  'ja',
+  'ko',
 ] as const
 export type ContentLanguage = (typeof SUPPORTED_CONTENT_LANGUAGES)[number]
 
 export const GROQ_BASE_URL = 'https://api.groq.com/openai/v1'
 export const GROQ_MODEL_CATEGORIES = [
-  'fast', 'versatile', 'vision', 'reasoning', 'compound', 'safety', 'stt',
+  'fast',
+  'versatile',
+  'vision',
+  'reasoning',
+  'compound',
+  'safety',
+  'stt',
 ] as const
 
 export const SM2_DEFAULTS = {

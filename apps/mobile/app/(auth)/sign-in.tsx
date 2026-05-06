@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, ActivityIndicator, Image } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import * as AppleAuth from 'expo-apple-authentication'
 import { Link, useRouter } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
-import * as AppleAuth from 'expo-apple-authentication'
-import { Input } from '../../src/components/ui/Input'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Image, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
 import { Icon } from '../../src/components/ui/Icon'
+import { Input } from '../../src/components/ui/Input'
 import { supabase } from '../../src/lib/supabase'
 
 /**
@@ -62,7 +62,10 @@ export default function SignIn() {
       if (e.message?.includes('Invalid')) {
         Alert.alert('Hatalı bilgiler', 'E-posta veya şifre yanlış. Şifremi unuttum?', [
           { text: 'Tekrar dene', style: 'cancel' },
-          { text: 'Şifremi unuttum', onPress: () => router.push({ pathname: '/(auth)/reset-password', params: { email } }) },
+          {
+            text: 'Şifremi unuttum',
+            onPress: () => router.push({ pathname: '/(auth)/reset-password', params: { email } }),
+          },
         ])
       } else {
         Alert.alert('Hata', e.message)
@@ -156,9 +159,12 @@ export default function SignIn() {
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, paddingTop: 48 }}>
         {/* Brand */}
         <View className="mb-12">
-          <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">Hoşgeldin</Text>
+          <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-2">
+            Hoşgeldin
+          </Text>
           <Text className="font-serif text-4xl text-ink-900 leading-tight">
-            Bugün <Text className="text-amber-500 italic">ne</Text>{'\n'}kavramak istersin?
+            Bugün <Text className="text-amber-500 italic">ne</Text>
+            {'\n'}kavramak istersin?
           </Text>
         </View>
 
@@ -174,7 +180,9 @@ export default function SignIn() {
               onPress={() => setAuthMethod(m.key as any)}
               className={`flex-1 py-2 rounded-lg ${authMethod === m.key ? 'bg-white' : ''}`}
             >
-              <Text className={`text-center text-xs font-semibold ${authMethod === m.key ? 'text-ink-900' : 'text-slate-500'}`}>
+              <Text
+                className={`text-center text-xs font-semibold ${authMethod === m.key ? 'text-ink-900' : 'text-slate-500'}`}
+              >
                 {m.label}
               </Text>
             </Pressable>
@@ -207,16 +215,38 @@ export default function SignIn() {
 
         {authMethod === 'password' && (
           <View className="gap-3">
-            <Input label="E-POSTA" value={email} onChangeText={setEmail} placeholder="eda@example.com" keyboardType="email-address" autoCapitalize="none" />
-            <Input label="ŞİFRE" value={password} onChangeText={setPassword} placeholder="•••••••••" secureTextEntry />
-            <Button title="Giriş Yap" onPress={handlePassword} loading={loading === 'password'} fullWidth />
+            <Input
+              label="E-POSTA"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="eda@example.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <Input
+              label="ŞİFRE"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="•••••••••"
+              secureTextEntry
+            />
+            <Button
+              title="Giriş Yap"
+              onPress={handlePassword}
+              loading={loading === 'password'}
+              fullWidth
+            />
 
             <View className="flex-row justify-between mt-1">
               <Link href="/(auth)/sign-up" asChild>
-                <Pressable><Text className="text-xs text-ink-900 underline">Hesabım yok</Text></Pressable>
+                <Pressable>
+                  <Text className="text-xs text-ink-900 underline">Hesabım yok</Text>
+                </Pressable>
               </Link>
               <Link href="/(auth)/reset-password" asChild>
-                <Pressable><Text className="text-xs text-ink-900 underline">Şifremi unuttum</Text></Pressable>
+                <Pressable>
+                  <Text className="text-xs text-ink-900 underline">Şifremi unuttum</Text>
+                </Pressable>
               </Link>
             </View>
           </View>
@@ -231,7 +261,13 @@ export default function SignIn() {
               placeholder="+90 5XX XXX XX XX"
               keyboardType="phone-pad"
             />
-            <Button title="SMS ile Doğrulama Kodu Gönder" onPress={handlePhone} loading={loading === 'phone'} icon="message-circle" fullWidth />
+            <Button
+              title="SMS ile Doğrulama Kodu Gönder"
+              onPress={handlePhone}
+              loading={loading === 'phone'}
+              icon="message-circle"
+              fullWidth
+            />
             <Text className="text-xs text-slate-500 text-center">
               Numarana 6 haneli kod gönderilir. Şifre gerekmez.
             </Text>
@@ -252,9 +288,16 @@ export default function SignIn() {
             disabled={!!loading}
             className="bg-white border border-slate-200 rounded-xl p-3 flex-row items-center justify-center gap-3"
           >
-            {loading === 'google' ? <ActivityIndicator color="#1E1B4B" /> : (
+            {loading === 'google' ? (
+              <ActivityIndicator color="#1E1B4B" />
+            ) : (
               <>
-                <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg' }} style={{ width: 18, height: 18 }} />
+                <Image
+                  source={{
+                    uri: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg',
+                  }}
+                  style={{ width: 18, height: 18 }}
+                />
                 <Text className="text-ink-900 font-medium text-sm">Google ile devam et</Text>
               </>
             )}
@@ -266,7 +309,9 @@ export default function SignIn() {
               disabled={!!loading}
               className="bg-black rounded-xl p-3 flex-row items-center justify-center gap-3"
             >
-              {loading === 'apple' ? <ActivityIndicator color="white" /> : (
+              {loading === 'apple' ? (
+                <ActivityIndicator color="white" />
+              ) : (
                 <>
                   <Icon name="apple" size={18} color="white" />
                   <Text className="text-white font-medium text-sm">Apple ile devam et</Text>
@@ -280,10 +325,14 @@ export default function SignIn() {
             disabled={!!loading}
             className="bg-[#1877F2] rounded-xl p-3 flex-row items-center justify-center gap-3"
           >
-            {loading === 'facebook' ? <ActivityIndicator color="white" /> : (
+            {loading === 'facebook' ? (
+              <ActivityIndicator color="white" />
+            ) : (
               <>
                 <Icon name="facebook" size={18} color="white" />
-                <Text className="text-white font-medium text-sm">Facebook / Instagram ile devam et</Text>
+                <Text className="text-white font-medium text-sm">
+                  Facebook / Instagram ile devam et
+                </Text>
               </>
             )}
           </Pressable>

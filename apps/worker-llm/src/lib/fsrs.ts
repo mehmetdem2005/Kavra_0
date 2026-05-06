@@ -12,13 +12,13 @@
  * de kullanılabilir; Kavra'nın gereksinimi için bu yeterli.
  */
 
-export type Rating = 1 | 2 | 3 | 4  // Again, Hard, Good, Easy
+export type Rating = 1 | 2 | 3 | 4 // Again, Hard, Good, Easy
 export type State = 'new' | 'learning' | 'review' | 'relearning'
 
 export interface FSRSCard {
-  difficulty: number      // 0-10
-  stability: number       // gün
-  retrievability: number  // 0-1
+  difficulty: number // 0-10
+  stability: number // gün
+  retrievability: number // 0-1
   state: State
   step: number
   due: Date
@@ -28,17 +28,17 @@ export interface FSRSCard {
 }
 
 export interface FSRSParams {
-  w: number[]                    // 17 ağırlık
-  requestRetention: number       // 0.7 - 0.99 (default 0.9)
-  maximumInterval: number        // gün (default 36500)
+  w: number[] // 17 ağırlık
+  requestRetention: number // 0.7 - 0.99 (default 0.9)
+  maximumInterval: number // gün (default 36500)
   enableShortTerm: boolean
 }
 
 export const DEFAULT_PARAMS: FSRSParams = {
   // ts-fsrs v5 default w
   w: [
-    0.4072, 1.1829, 3.1262, 15.4722, 7.2102, 0.5316, 1.0651, 0.0234,
-    1.616, 0.1544, 1.0824, 1.9813, 0.0953, 0.2975, 2.2042, 0.2407, 2.9466,
+    0.4072, 1.1829, 3.1262, 15.4722, 7.2102, 0.5316, 1.0651, 0.0234, 1.616, 0.1544, 1.0824, 1.9813,
+    0.0953, 0.2975, 2.2042, 0.2407, 2.9466,
   ],
   requestRetention: 0.9,
   maximumInterval: 36500,
@@ -78,30 +78,45 @@ function nextInterval(stability: number, params: FSRSParams): number {
 }
 
 function initStability(rating: Rating, w: number[]): number {
-  return Math.max(0.1, w[rating - 1])
+  return Math.max(0.1, w[rating - 1]!)
 }
 
 function initDifficulty(rating: Rating, w: number[]): number {
-  return Math.min(10, Math.max(1, w[4] - Math.exp(w[5] * (rating - 1)) + 1))
+  return Math.min(10, Math.max(1, w[4]! - Math.exp(w[5]! * (rating - 1)) + 1))
 }
 
 function nextDifficulty(d: number, rating: Rating, w: number[]): number {
-  const deltaD = -w[6] * (rating - 3)
+  const deltaD = -w[6]! * (rating - 3)
   const newD = d + deltaD * ((10 - d) / 9)
-  return Math.min(10, Math.max(1, w[4] + (newD - w[4]) * 0.5))
+  return Math.min(10, Math.max(1, w[4]! + (newD - w[4]!) * 0.5))
 }
 
-function nextStabilitySuccess(d: number, s: number, r: number, rating: Rating, w: number[]): number {
-  const hardPenalty = rating === 2 ? w[15] : 1
-  const easyBonus = rating === 4 ? w[16] : 1
-  return s * (1 + Math.exp(w[8]) * (11 - d) * Math.pow(s, -w[9]) * (Math.exp((1 - r) * w[10]) - 1) * hardPenalty * easyBonus)
+function nextStabilitySuccess(
+  d: number,
+  s: number,
+  r: number,
+  rating: Rating,
+  w: number[],
+): number {
+  const hardPenalty = rating === 2 ? w[15]! : 1
+  const easyBonus = rating === 4 ? w[16]! : 1
+  return (
+    s *
+    (1 +
+      Math.exp(w[8]!) *
+        (11 - d) *
+        Math.pow(s, -w[9]!) *
+        (Math.exp((1 - r) * w[10]!) - 1) *
+        hardPenalty *
+        easyBonus)
+  )
 }
 
 function nextStabilityFail(d: number, s: number, r: number, w: number[]): number {
   return Math.max(
     0.01,
     Math.min(
-      w[11] * Math.pow(d, -w[12]) * (Math.pow(s + 1, w[13]) - 1) * Math.exp((1 - r) * w[14]),
+      w[11]! * Math.pow(d, -w[12]!) * (Math.pow(s + 1, w[13]!) - 1) * Math.exp((1 - r) * w[14]!),
       s,
     ),
   )

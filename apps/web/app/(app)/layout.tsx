@@ -1,13 +1,24 @@
 'use client'
+import {
+  Award,
+  Bell,
+  Building2,
+  ChevronsLeft,
+  ChevronsRight,
+  Compass,
+  Library,
+  LogOut,
+  Plus,
+  Search,
+  Settings,
+  Trophy,
+  Users,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import {
-  Library, Compass, Trophy, Award, Users, Settings, LogOut, Plus, ChevronsLeft, ChevronsRight,
-  Search, Bell, Building2,
-} from 'lucide-react'
-import { getSupabaseBrowserClient } from '../../lib/supabase/client'
 import { OnlineIndicator } from '../../components/OnlineIndicator'
+import { getSupabaseBrowserClient } from '../../lib/supabase/client'
 
 const NAV = [
   { href: '/library', label: 'Defterlerim', icon: Library },
@@ -28,7 +39,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       setUser(user)
     }
     init()
@@ -37,7 +50,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (persisted === '1') setCollapsed(true)
 
     // Auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       if (!session) router.replace('/login')
     })
@@ -64,7 +79,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       >
         <div className="p-4 flex items-center justify-between">
           {!collapsed && (
-            <Link href="/library" className="font-serif text-2xl text-ink-900">Kavra</Link>
+            <Link href="/library" className="font-serif text-2xl text-ink-900">
+              Kavra
+            </Link>
           )}
           <button onClick={toggleCollapse} className="text-slate-400 hover:text-ink-900 ml-auto">
             {collapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}

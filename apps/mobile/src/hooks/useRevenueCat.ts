@@ -1,7 +1,11 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
-import Purchases, { PurchasesOffering, PurchasesPackage, CustomerInfo } from 'react-native-purchases'
-import { useAuth } from './useAuth'
+import Purchases, {
+  type PurchasesOffering,
+  type PurchasesPackage,
+  type CustomerInfo,
+} from 'react-native-purchases'
+import { useAuth } from '../stores/auth'
 
 /**
  * RevenueCat — iOS/Android in-app purchases
@@ -60,7 +64,7 @@ export function useRevenueCat() {
   // Init on auth
   useEffect(() => {
     if (!user) return
-    (async () => {
+    ;(async () => {
       await initializeRevenueCat(user.id)
       await refresh()
     })()

@@ -1,19 +1,17 @@
-import { useState } from 'react'
-import {
-  View, Text, ScrollView, Pressable, ActivityIndicator, Alert, Linking,
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useRouter } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../src/components/ui/Button'
 import { useEntitlement, usePricing } from '../src/hooks/useEntitlement'
 import { apiFetch } from '../src/lib/api'
 
 const FEATURES = [
   { emoji: '🎙️', title: 'Voice Cloning', desc: 'Kendi sesini kaydet, AI o sesle anlatsın' },
-  { emoji: '🎨', title: '7 Premium Tema', desc: 'Forest Dawn\'dan Cosmic\'e' },
+  { emoji: '🎨', title: '7 Premium Tema', desc: "Forest Dawn'dan Cosmic'e" },
   { emoji: '🌐', title: '3D Kavram Haritası', desc: 'Konseptlerini 3 boyutta keşfet' },
-  { emoji: '📄', title: 'Sınırsız PDF', desc: 'Free\'de aylık 5, Pro\'da sınır yok' },
+  { emoji: '📄', title: 'Sınırsız PDF', desc: "Free'de aylık 5, Pro'da sınır yok" },
   { emoji: '🎭', title: '7 AI Kişilik', desc: 'Her ders için farklı tarz' },
   { emoji: '🔊', title: 'Kaliteli TTS', desc: 'Cihaz değil, sunucu seslendirme' },
   { emoji: '📊', title: 'Detaylı Analitik', desc: 'Aylık & yıllık raporlar' },
@@ -48,7 +46,9 @@ export default function Upgrade() {
             <Pressable
               onPress={async () => {
                 try {
-                  const { url } = await apiFetch<{ url: string }>('/api/stripe/portal', { method: 'POST' })
+                  const { url } = await apiFetch<{ url: string }>('/api/stripe/portal', {
+                    method: 'POST',
+                  })
                   await WebBrowser.openBrowserAsync(url)
                 } catch (e: any) {
                   Alert.alert('Hata', e.message)
@@ -82,7 +82,7 @@ export default function Upgrade() {
 
       const result = await WebBrowser.openAuthSessionAsync(url, 'kavra://')
       if (result.type === 'success' && result.url.includes('upgrade-success')) {
-        Alert.alert('🎉', 'Teşekkür ederim! Pro\'ya hoş geldin.', [
+        Alert.alert('🎉', "Teşekkür ederim! Pro'ya hoş geldin.", [
           { text: 'Süper', onPress: () => router.back() },
         ])
       }
@@ -107,9 +107,7 @@ export default function Upgrade() {
         <View className="bg-brand-950 rounded-3xl p-6 mb-4">
           <Text style={{ fontSize: 48 }}>👑</Text>
           <Text className="text-white text-3xl font-serif mt-2">Kavra Pro</Text>
-          <Text className="text-white/80 text-base mt-1">
-            Tüm özellikleri aç, daha derin öğren
-          </Text>
+          <Text className="text-white/80 text-base mt-1">Tüm özellikleri aç, daha derin öğren</Text>
         </View>
 
         {/* Early bird badge */}
@@ -117,7 +115,9 @@ export default function Upgrade() {
           <View className="bg-accent-500/15 border border-accent-500 rounded-2xl p-4 mb-4 flex-row items-center gap-3">
             <Text style={{ fontSize: 28 }}>⚡</Text>
             <View className="flex-1">
-              <Text className="text-accent-700 font-bold">Sadece {earlyBirdLeft} lifetime kaldı</Text>
+              <Text className="text-accent-700 font-bold">
+                Sadece {earlyBirdLeft} lifetime kaldı
+              </Text>
               <Text className="text-amber-800 text-sm">$99 — sonra fiyat 199$ olacak</Text>
             </View>
           </View>
@@ -168,7 +168,10 @@ export default function Upgrade() {
         </Text>
         <View className="gap-3 mb-8">
           {FEATURES.map((f, i) => (
-            <View key={i} className="bg-white rounded-2xl p-4 border border-slate-100 flex-row items-start gap-3">
+            <View
+              key={i}
+              className="bg-white rounded-2xl p-4 border border-slate-100 flex-row items-start gap-3"
+            >
               <Text style={{ fontSize: 28 }}>{f.emoji}</Text>
               <View className="flex-1">
                 <Text className="font-bold text-brand-950">{f.title}</Text>
@@ -181,7 +184,12 @@ export default function Upgrade() {
         {/* Restore */}
         <View className="mb-8 items-center">
           <Pressable
-            onPress={() => Alert.alert('', 'Stripe satın alımları otomatik dönecek. App Store/Play satın alımları için login yap, üyelik aktif olur.')}
+            onPress={() =>
+              Alert.alert(
+                '',
+                'Stripe satın alımları otomatik dönecek. App Store/Play satın alımları için login yap, üyelik aktif olur.',
+              )
+            }
             className="py-2"
           >
             <Text className="text-brand-700 underline">Satın alımı geri yükle</Text>
@@ -193,7 +201,16 @@ export default function Upgrade() {
 }
 
 function PlanCard({
-  tier, title, price, period, features, recommended, badge, loading, disabled, onPress,
+  tier,
+  title,
+  price,
+  period,
+  features,
+  recommended,
+  badge,
+  loading,
+  disabled,
+  onPress,
 }: {
   tier: string
   title: string

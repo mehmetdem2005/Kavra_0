@@ -33,7 +33,9 @@ export function initSentry() {
     dsn: DSN,
     environment: ENV,
     release: `kavra@${Constants.expoConfig?.version}`,
-    dist: String(Constants.expoConfig?.ios?.buildNumber ?? Constants.expoConfig?.android?.versionCode ?? '1'),
+    dist: String(
+      Constants.expoConfig?.ios?.buildNumber ?? Constants.expoConfig?.android?.versionCode ?? '1',
+    ),
 
     // Sample rates
     tracesSampleRate: ENV === 'production' ? 0.2 : 1.0,

@@ -1,22 +1,20 @@
 import 'dotenv/config'
-import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import helmet from '@fastify/helmet'
 import rateLimit from '@fastify/rate-limit'
-import { transcribeRoutes } from './routes/transcribe.js'
-import { synthesizeRoutes } from './routes/synthesize.js'
-import { synthesizeV2Routes } from './routes/synthesize-v2.js'
-import { voiceCloneRoutes } from './routes/voice-clones.js'
+import Fastify from 'fastify'
 import { checkPiper } from './piper.js'
+import { synthesizeV2Routes } from './routes/synthesize-v2.js'
+import { synthesizeRoutes } from './routes/synthesize.js'
+import { transcribeRoutes } from './routes/transcribe.js'
+import { voiceCloneRoutes } from './routes/voice-clones.js'
 
 const isDev = process.env.NODE_ENV !== 'production'
 
 const app = Fastify({
   logger: {
     level: process.env.LOG_LEVEL ?? 'info',
-    transport: isDev
-      ? { target: 'pino-pretty', options: { colorize: true } }
-      : undefined,
+    transport: isDev ? { target: 'pino-pretty', options: { colorize: true } } : undefined,
   },
 })
 

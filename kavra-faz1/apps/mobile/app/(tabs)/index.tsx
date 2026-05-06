@@ -1,10 +1,10 @@
-import { View, Text, ScrollView, Pressable, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { useAuth } from '../../src/stores/auth'
-import { useCreateLesson, useRecentLessons } from '../../src/hooks/useLessons'
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useApiKeys } from '../../src/hooks/useApiKeys'
+import { useCreateLesson, useRecentLessons } from '../../src/hooks/useLessons'
+import { useAuth } from '../../src/stores/auth'
 
 function greeting(t: (k: string) => string) {
   const hour = new Date().getHours()
@@ -75,9 +75,7 @@ export default function Dashboard() {
             <Text className="text-white text-4xl font-bold">0</Text>
             <Text className="text-white/80 mb-1">gün</Text>
           </View>
-          <Text className="text-accent-300 text-xs mt-2">
-            🔥 Bugün çalışarak seri başlat
-          </Text>
+          <Text className="text-accent-300 text-xs mt-2">🔥 Bugün çalışarak seri başlat</Text>
         </View>
 
         {lessons && lessons.length > 0 && (
@@ -113,14 +111,34 @@ export default function Dashboard() {
         </Text>
 
         <View className="gap-3 pb-8">
-          <QuickAction emoji="💬" title="Yeni sohbet" subtitle="AI ile konuş"
-            onPress={handleNewChat} loading={createLesson.isPending} />
-          <QuickAction emoji="📄" title="PDF yükle" subtitle="Faz 3'te aktif"
-            onPress={() => Alert.alert('', 'Bu özellik Faz 3\'te eklenecek')} disabled />
-          <QuickAction emoji="🎤" title="Sesli ders" subtitle="Faz 2'de aktif"
-            onPress={() => Alert.alert('', 'Bu özellik Faz 2\'de eklenecek')} disabled />
-          <QuickAction emoji="📸" title="Fotoğrafla" subtitle="Faz 3'te aktif"
-            onPress={() => Alert.alert('', 'Bu özellik Faz 3\'te eklenecek')} disabled />
+          <QuickAction
+            emoji="💬"
+            title="Yeni sohbet"
+            subtitle="AI ile konuş"
+            onPress={handleNewChat}
+            loading={createLesson.isPending}
+          />
+          <QuickAction
+            emoji="📄"
+            title="PDF yükle"
+            subtitle="Faz 3'te aktif"
+            onPress={() => Alert.alert('', "Bu özellik Faz 3'te eklenecek")}
+            disabled
+          />
+          <QuickAction
+            emoji="🎤"
+            title="Sesli ders"
+            subtitle="Faz 2'de aktif"
+            onPress={() => Alert.alert('', "Bu özellik Faz 2'de eklenecek")}
+            disabled
+          />
+          <QuickAction
+            emoji="📸"
+            title="Fotoğrafla"
+            subtitle="Faz 3'te aktif"
+            onPress={() => Alert.alert('', "Bu özellik Faz 3'te eklenecek")}
+            disabled
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -128,7 +146,12 @@ export default function Dashboard() {
 }
 
 function QuickAction({
-  emoji, title, subtitle, onPress, loading, disabled,
+  emoji,
+  title,
+  subtitle,
+  onPress,
+  loading,
+  disabled,
 }: {
   emoji: string
   title: string

@@ -1,6 +1,6 @@
 import { useRef } from 'react'
-import { Pressable, View, Text, Animated, Easing } from 'react-native'
 import { useEffect } from 'react'
+import { Animated, Easing, Pressable, Text, View } from 'react-native'
 
 interface Props {
   isRecording: boolean
@@ -13,7 +13,12 @@ interface Props {
 }
 
 export function MicButton({
-  isRecording, isTranscribing, duration, onStart, onStop, disabled,
+  isRecording,
+  isTranscribing,
+  duration,
+  onStart,
+  onStop,
+  disabled,
 }: Props) {
   const pulse = useRef(new Animated.Value(1)).current
 
@@ -21,8 +26,18 @@ export function MicButton({
     if (isRecording) {
       const anim = Animated.loop(
         Animated.sequence([
-          Animated.timing(pulse, { toValue: 1.25, duration: 600, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-          Animated.timing(pulse, { toValue: 1, duration: 600, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+          Animated.timing(pulse, {
+            toValue: 1.25,
+            duration: 600,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulse, {
+            toValue: 1,
+            duration: 600,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
         ]),
       )
       anim.start()
@@ -42,8 +57,12 @@ export function MicButton({
 
   return (
     <Pressable
-      onPressIn={() => { if (!disabled) onStart() }}
-      onPressOut={() => { if (isRecording) onStop() }}
+      onPressIn={() => {
+        if (!disabled) onStart()
+      }}
+      onPressOut={() => {
+        if (isRecording) onStop()
+      }}
       disabled={disabled}
       className="w-14 h-14 items-center justify-center"
     >
@@ -63,9 +82,7 @@ export function MicButton({
       </View>
       {isRecording && (
         <View className="absolute -top-8 bg-red-500 px-2 py-0.5 rounded-full">
-          <Text className="text-white text-xs font-mono">
-            {duration.toFixed(1)}s
-          </Text>
+          <Text className="text-white text-xs font-mono">{duration.toFixed(1)}s</Text>
         </View>
       )}
     </Pressable>

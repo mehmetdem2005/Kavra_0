@@ -42,8 +42,7 @@ export function useAddApiKey() {
 export function useDeleteApiKey() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (id: string) =>
-      await apiFetch(`/api/keys/${id}`, { method: 'DELETE' }),
+    mutationFn: async (id: string) => await apiFetch(`/api/keys/${id}`, { method: 'DELETE' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['api-keys'] }),
   })
 }
@@ -60,8 +59,7 @@ export function useTestApiKey() {
 export function useSetDefaultApiKey() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (id: string) =>
-      await apiFetch(`/api/keys/${id}/default`, { method: 'POST' }),
+    mutationFn: async (id: string) => await apiFetch(`/api/keys/${id}/default`, { method: 'POST' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['api-keys'] }),
   })
 }

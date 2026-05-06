@@ -1,12 +1,12 @@
+import { BEHAVIORS } from './behaviors.js'
 import type {
-  TechniqueMeta,
   BehaviorCode,
   CompiledPrompt,
+  ConceptSnapshot,
   LearningContext,
   RAGChunk,
-  ConceptSnapshot,
+  TechniqueMeta,
 } from './types.js'
-import { BEHAVIORS } from './behaviors.js'
 
 const BASE_IDENTITY = `Sen Kavra'sın — 150 pedagojik teknikle donanmış Türkçe konuşan kişisel öğrenme AI'ısın.
 Hedefin kullanıcıya sadece bilgi aktarmak değil, o bilgiyi gerçekten KAVRAMAsını sağlamaktır.
@@ -52,7 +52,7 @@ export class PromptCompiler {
     personalityTemperature?: number
     ragContext?: string
     concept?: ConceptSnapshot
-    recentMistakes?: string[]  // Error portfolio'dan
+    recentMistakes?: string[] // Error portfolio'dan
   }): CompiledPrompt {
     const parts: string[] = [BASE_IDENTITY]
 

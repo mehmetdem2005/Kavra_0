@@ -1,9 +1,9 @@
 'use client'
-import { useState, useRef, useCallback } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiFetch } from '../../lib/api'
-import { Plus, FileText, Globe2, Mic, Youtube, Trash2, Upload, X } from 'lucide-react'
+import { FileText, Globe2, Mic, Plus, Trash2, Upload, X, Youtube } from 'lucide-react'
+import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { apiFetch } from '../../lib/api'
 import { getSupabaseBrowserClient } from '../../lib/supabase/client'
 
 interface Source {
@@ -40,7 +40,9 @@ export function SourcesPanel({ notebookId, sources, activeSourceId, onSelectSour
   const uploadMut = useMutation({
     mutationFn: async (file: File) => {
       const supabase = getSupabaseBrowserClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (!user) throw new Error('Önce giriş yap')
 
       // Direct Supabase Storage upload
@@ -69,24 +71,32 @@ export function SourcesPanel({ notebookId, sources, activeSourceId, onSelectSour
     onError: (e: any) => toast.error(e.message),
   })
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setDragActive(false)
-    const files = Array.from(e.dataTransfer.files)
-    files.forEach((f) => uploadMut.mutate(f))
-  }, [uploadMut])
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      setDragActive(false)
+      const files = Array.from(e.dataTransfer.files)
+      files.forEach((f) => uploadMut.mutate(f))
+    },
+    [uploadMut],
+  )
 
   const deleteMut = useMutation({
-    mutationFn: (sourceId: string) =>
-      apiFetch(`/api/sources/${sourceId}`, { method: 'DELETE' }),
+    mutationFn: (sourceId: string) => apiFetch(`/api/sources/${sourceId}`, { method: 'DELETE' }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['notebook-sources', notebookId] }),
   })
 
   return (
     <div
       className={`h-full flex flex-col ${dragActive ? 'bg-amber-50' : 'bg-white'}`}
-      onDragEnter={(e) => { e.preventDefault(); setDragActive(true) }}
-      onDragLeave={(e) => { e.preventDefault(); setDragActive(false) }}
+      onDragEnter={(e) => {
+        e.preventDefault()
+        setDragActive(true)
+      }}
+      onDragLeave={(e) => {
+        e.preventDefault()
+        setDragActive(false)
+      }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
@@ -161,14 +171,18 @@ export function SourcesPanel({ notebookId, sources, activeSourceId, onSelectSour
                 key={s.id}
                 onClick={() => onSelectSource(isActive ? null : s.id)}
                 className={`w-full text-left rounded-xl p-2.5 flex items-center gap-2.5 transition-colors ${
-                  isActive ? 'bg-amber-50 border border-amber-300' : 'bg-cream-50 border border-transparent hover:border-slate-200'
+                  isActive
+                    ? 'bg-amber-50 border border-amber-300'
+                    : 'bg-cream-50 border border-transparent hover:border-slate-200'
                 }`}
               >
                 <Icon size={16} className="text-slate-500 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-semibold text-ink-900 truncate">{s.title}</div>
                   <div className="text-[10px] text-slate-500 mt-0.5">
-                    {s.status === 'ready' ? `${(s.char_count / 1000).toFixed(1)}k karakter` : statusLabel(s.status)}
+                    {s.status === 'ready'
+                      ? `${(s.char_count / 1000).toFixed(1)}k karakter`
+                      : statusLabel(s.status)}
                   </div>
                 </div>
                 {s.status === 'processing' && (
@@ -194,10 +208,14 @@ export function SourcesPanel({ notebookId, sources, activeSourceId, onSelectSour
 
 function statusLabel(s: string): string {
   switch (s) {
-    case 'pending': return 'Sırada...'
-    case 'processing': return 'İşleniyor...'
-    case 'failed': return 'Hata'
-    default: return s
+    case 'pending':
+      return 'Sırada...'
+    case 'processing':
+      return 'İşleniyor...'
+    case 'failed':
+      return 'Hata'
+    default:
+      return s
   }
 }
 
@@ -205,10 +223,11 @@ function UrlInput({ notebookId, onClose }: { notebookId: string; onClose: () => 
   const [url, setUrl] = useState('')
   const qc = useQueryClient()
   const mut = useMutation({
-    mutationFn: () => apiFetch('/api/sources', {
-      method: 'POST',
-      body: JSON.stringify({ notebookId, sourceType: 'url', externalUrl: url }),
-    }),
+    mutationFn: () =>
+      apiFetch('/api/sources', {
+        method: 'POST',
+        body: JSON.stringify({ notebookId, sourceType: 'url', externalUrl: url }),
+      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['notebook-sources', notebookId] })
       onClose()
@@ -240,10 +259,16 @@ function YoutubeInput({ notebookId, onClose }: { notebookId: string; onClose: ()
   const [url, setUrl] = useState('')
   const qc = useQueryClient()
   const mut = useMutation({
-    mutationFn: () => apiFetch('/api/sources', {
-      method: 'POST',
-      body: JSON.stringify({ notebookId, sourceType: 'youtube', externalUrl: url, title: 'YouTube Video' }),
-    }),
+    mutationFn: () =>
+      apiFetch('/api/sources', {
+        method: 'POST',
+        body: JSON.stringify({
+          notebookId,
+          sourceType: 'youtube',
+          externalUrl: url,
+          title: 'YouTube Video',
+        }),
+      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['notebook-sources', notebookId] })
       onClose()

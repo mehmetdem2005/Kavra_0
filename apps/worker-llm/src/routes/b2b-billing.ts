@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
+import { AUDIT_EVENTS, audit } from '../lib/audit.js'
 import { supabase, verifyUserToken } from '../supabase.js'
-import { audit, AUDIT_EVENTS } from '../lib/audit.js'
 
 /**
  * B2B Billing — Stripe Checkout (B2B subscription)
@@ -56,122 +56,115 @@ async function checkOrgOwner(userId: string, orgId: string): Promise<boolean> {
 }
 
 export async function b2bBillingRoutes(fastify: FastifyInstance) {
-
   /** POST /api/orgs/:id/checkout */
-  fastify.post<{ Params: { id: string } }>(
-    '/api/orgs/:id/checkout',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.post<{ Params: { id: string } }>('/api/orgs/:id/checkout', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      if (!await checkOrgOwner(userId, req.params.id)) {
-        return reply.code(403).send({ error: 'must_be_owner' })
-      }
+    if (!(await checkOrgOwner(userId, req.params.id))) {
+      return reply.code(403).send({ error: 'must_be_owner' })
+    }
 
-      const parsed = CheckoutSchema.safeParse(req.body)
-      if (!parsed.success) return reply.code(400).send({ error: parsed.error.format() })
+    const parsed = CheckoutSchema.safeParse(req.body)
+    if (!parsed.success) return reply.code(400).send({ error: parsed.error.format() })
 
-      // Min seat kontrol
-      const minSeats = parsed.data.plan === 'team' ? 5 : 20
-      if (parsed.data.seatCount < minSeats) {
-        return reply.code(400).send({
-          error: 'min_seats',
-          message: `${parsed.data.plan} planı en az ${minSeats} seat gerektirir`,
-        })
-      }
-
-      const priceId = PRICE_IDS[`${parsed.data.plan}_${parsed.data.billingCycle}`]
-      if (!priceId || !STRIPE_SECRET_KEY) {
-        return reply.code(500).send({ error: 'stripe_not_configured' })
-      }
-
-      const { data: org } = await supabase
-        .from('organizations')
-        .select('billing_email, stripe_customer_id, slug, name')
-        .eq('id', req.params.id)
-        .single()
-
-      if (!org) return reply.code(404).send({ error: 'org_not_found' })
-
-      // Stripe Checkout Session oluştur
-      const params = new URLSearchParams({
-        mode: 'subscription',
-        success_url: `${APP_URL}/orgs/${org.slug}/billing?success=1`,
-        cancel_url: `${APP_URL}/orgs/${org.slug}/billing?cancelled=1`,
-        'line_items[0][price]': priceId,
-        'line_items[0][quantity]': String(parsed.data.seatCount),
-        'metadata[org_id]': req.params.id,
-        'metadata[plan]': parsed.data.plan,
-        'metadata[seat_count]': String(parsed.data.seatCount),
-        client_reference_id: req.params.id,
+    // Min seat kontrol
+    const minSeats = parsed.data.plan === 'team' ? 5 : 20
+    if (parsed.data.seatCount < minSeats) {
+      return reply.code(400).send({
+        error: 'min_seats',
+        message: `${parsed.data.plan} planı en az ${minSeats} seat gerektirir`,
       })
+    }
 
-      if (org.stripe_customer_id) {
-        params.append('customer', org.stripe_customer_id)
-      } else {
-        params.append('customer_email', org.billing_email ?? '')
-      }
+    const priceId = PRICE_IDS[`${parsed.data.plan}_${parsed.data.billingCycle}`]
+    if (!priceId || !STRIPE_SECRET_KEY) {
+      return reply.code(500).send({ error: 'stripe_not_configured' })
+    }
 
-      const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params.toString(),
-      })
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('billing_email, stripe_customer_id, slug, name')
+      .eq('id', req.params.id)
+      .single()
 
-      if (!res.ok) {
-        const err = await res.text()
-        return reply.code(500).send({ error: 'stripe_failed', details: err })
-      }
+    if (!org) return reply.code(404).send({ error: 'org_not_found' })
 
-      const session: any = await res.json()
-      return { checkoutUrl: session.url, sessionId: session.id }
-    },
-  )
+    // Stripe Checkout Session oluştur
+    const params = new URLSearchParams({
+      mode: 'subscription',
+      success_url: `${APP_URL}/orgs/${org.slug}/billing?success=1`,
+      cancel_url: `${APP_URL}/orgs/${org.slug}/billing?cancelled=1`,
+      'line_items[0][price]': priceId,
+      'line_items[0][quantity]': String(parsed.data.seatCount),
+      'metadata[org_id]': req.params.id,
+      'metadata[plan]': parsed.data.plan,
+      'metadata[seat_count]': String(parsed.data.seatCount),
+      client_reference_id: req.params.id,
+    })
+
+    if (org.stripe_customer_id) {
+      params.append('customer', org.stripe_customer_id)
+    } else {
+      params.append('customer_email', org.billing_email ?? '')
+    }
+
+    const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    })
+
+    if (!res.ok) {
+      const err = await res.text()
+      return reply.code(500).send({ error: 'stripe_failed', details: err })
+    }
+
+    const session: any = await res.json()
+    return { checkoutUrl: session.url, sessionId: session.id }
+  })
 
   /** POST /api/orgs/:id/portal — Stripe Customer Portal (abonelik yönetim) */
-  fastify.post<{ Params: { id: string } }>(
-    '/api/orgs/:id/portal',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.post<{ Params: { id: string } }>('/api/orgs/:id/portal', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      if (!await checkOrgOwner(userId, req.params.id)) {
-        return reply.code(403).send({ error: 'must_be_owner' })
-      }
+    if (!(await checkOrgOwner(userId, req.params.id))) {
+      return reply.code(403).send({ error: 'must_be_owner' })
+    }
 
-      const { data: org } = await supabase
-        .from('organizations')
-        .select('stripe_customer_id, slug')
-        .eq('id', req.params.id)
-        .single()
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('stripe_customer_id, slug')
+      .eq('id', req.params.id)
+      .single()
 
-      if (!org?.stripe_customer_id) {
-        return reply.code(400).send({ error: 'no_subscription' })
-      }
+    if (!org?.stripe_customer_id) {
+      return reply.code(400).send({ error: 'no_subscription' })
+    }
 
-      if (!STRIPE_SECRET_KEY) return reply.code(500).send({ error: 'stripe_not_configured' })
+    if (!STRIPE_SECRET_KEY) return reply.code(500).send({ error: 'stripe_not_configured' })
 
-      const params = new URLSearchParams({
-        customer: org.stripe_customer_id,
-        return_url: `${APP_URL}/orgs/${org.slug}/billing`,
-      })
+    const params = new URLSearchParams({
+      customer: org.stripe_customer_id,
+      return_url: `${APP_URL}/orgs/${org.slug}/billing`,
+    })
 
-      const res = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params.toString(),
-      })
+    const res = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    })
 
-      const session: any = await res.json()
-      return { portalUrl: session.url }
-    },
-  )
+    const session: any = await res.json()
+    return { portalUrl: session.url }
+  })
 
   /** POST /api/orgs/:id/contact-sales (enterprise) */
   fastify.post<{ Params: { id: string }; Body: { message: string; seatEstimate?: number } }>(
@@ -226,9 +219,10 @@ export async function b2bBillingRoutes(fastify: FastifyInstance) {
         return reply.code(403).send({ error: 'forbidden' })
       }
 
+      const queryParams = req.query as Record<string, string | undefined>
       const parsed = AuditQuerySchema.safeParse({
-        ...req.query,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+        ...queryParams,
+        limit: queryParams.limit ? Number.parseInt(queryParams.limit) : undefined,
       })
       if (!parsed.success) return reply.code(400).send({ error: parsed.error.format() })
 
@@ -288,16 +282,20 @@ export async function b2bBillingRoutes(fastify: FastifyInstance) {
 
       // CSV format
       const header = 'Timestamp,Event,Category,User,Email,Target,IP,Metadata\n'
-      const rows = (data ?? []).map((l: any) => [
-        l.created_at,
-        l.event_type,
-        l.event_category,
-        l.profiles?.full_name ?? '',
-        l.profiles?.email ?? '',
-        l.target_type ?? '',
-        l.ip_address ?? '',
-        JSON.stringify(l.metadata).replace(/"/g, '""'),
-      ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
+      const rows = (data ?? []).map((l: any) =>
+        [
+          l.created_at,
+          l.event_type,
+          l.event_category,
+          l.profiles?.full_name ?? '',
+          l.profiles?.email ?? '',
+          l.target_type ?? '',
+          l.ip_address ?? '',
+          JSON.stringify(l.metadata).replace(/"/g, '""'),
+        ]
+          .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+          .join(','),
+      )
 
       const csv = header + rows.join('\n')
 

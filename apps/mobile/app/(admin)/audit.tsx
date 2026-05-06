@@ -1,6 +1,6 @@
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native'
-import { useAuditLogs } from '../../src/hooks/useAdmin'
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
 import { Icon } from '../../src/components/ui/Icon'
+import { useAuditLogs } from '../../src/hooks/useAdmin'
 
 const ACTION_META: Record<string, { icon: string; color: string; label: string }> = {
   user_role_changed: { icon: 'shield', color: '#7C3AED', label: 'Rol değişti' },
@@ -32,11 +32,18 @@ export default function AdminAudit() {
       )}
 
       {(data?.logs ?? []).map((log) => {
-        const meta = ACTION_META[log.action] ?? { icon: 'info', color: '#64748B', label: log.action }
+        const meta = ACTION_META[log.action] ?? {
+          icon: 'info',
+          color: '#64748B',
+          label: log.action,
+        }
         const adminName = log.profiles?.full_name || log.profiles?.email?.split('@')[0] || 'Admin'
 
         return (
-          <View key={log.id} className="bg-white border border-slate-100 rounded-xl p-3 mb-2 flex-row gap-3">
+          <View
+            key={log.id}
+            className="bg-white border border-slate-100 rounded-xl p-3 mb-2 flex-row gap-3"
+          >
             <View
               className="w-9 h-9 rounded-lg items-center justify-center"
               style={{ backgroundColor: `${meta.color}15` }}
@@ -50,7 +57,9 @@ export default function AdminAudit() {
               </Text>
               {Object.keys(log.metadata).length > 0 && (
                 <Text className="text-[11px] text-slate-500 mt-0.5" numberOfLines={2}>
-                  {Object.entries(log.metadata).map(([k, v]) => `${k}: ${v}`).join(' · ')}
+                  {Object.entries(log.metadata)
+                    .map(([k, v]) => `${k}: ${v}`)
+                    .join(' · ')}
                 </Text>
               )}
               <Text className="text-[10px] text-slate-400 mt-0.5">

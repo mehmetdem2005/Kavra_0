@@ -36,7 +36,9 @@ export default function AchievementsPage() {
         <div className="h-2 bg-white rounded-full mt-3 overflow-hidden max-w-md">
           <div
             className="h-full bg-amber-500 transition-all"
-            style={{ width: `${((data?.unlockedCount ?? 0) / Math.max(1, data?.totalCount ?? 1)) * 100}%` }}
+            style={{
+              width: `${((data?.unlockedCount ?? 0) / Math.max(1, data?.totalCount ?? 1)) * 100}%`,
+            }}
           />
         </div>
       </header>
@@ -47,7 +49,8 @@ export default function AchievementsPage() {
         return (
           <section key={cat} className="mb-8">
             <h2 className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mb-3">
-              {CATEGORY_LABELS[cat]} ({items.filter((a: any) => a.isUnlocked).length}/{items.length})
+              {CATEGORY_LABELS[cat]} ({items.filter((a: any) => a.isUnlocked).length}/{items.length}
+              )
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
               {items.map((a: any) => (

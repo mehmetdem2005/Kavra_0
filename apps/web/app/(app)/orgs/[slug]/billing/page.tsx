@@ -1,10 +1,10 @@
 'use client'
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { apiFetch } from '../../../../../lib/api'
-import { toast } from 'sonner'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { Check } from 'lucide-react'
+import { useParams } from 'next/navigation'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { apiFetch } from '../../../../../lib/api'
 
 const PLANS = [
   {
@@ -21,7 +21,13 @@ const PLANS = [
     price: 7,
     minSeats: 20,
     target: 'Okullar, dershane',
-    features: ['Team özellikleri', 'SSO (Google + MS)', 'Audit log', 'Öncelikli destek', 'SLA 99.5%'],
+    features: [
+      'Team özellikleri',
+      'SSO (Google + MS)',
+      'Audit log',
+      'Öncelikli destek',
+      'SLA 99.5%',
+    ],
     popular: true,
   },
   {
@@ -30,7 +36,14 @@ const PLANS = [
     price: null,
     minSeats: 50,
     target: 'Üniversiteler, kamu',
-    features: ['Business özellikleri', 'SCIM 2.0', 'SAML 2.0', 'Dedicated CSM', 'On-premise opsiyonu', 'Özel kontrat'],
+    features: [
+      'Business özellikleri',
+      'SCIM 2.0',
+      'SAML 2.0',
+      'Dedicated CSM',
+      'On-premise opsiyonu',
+      'Özel kontrat',
+    ],
   },
 ]
 
@@ -60,7 +73,8 @@ export default function BillingPage() {
   })
 
   const portalMut = useMutation({
-    mutationFn: () => apiFetch<{ portalUrl: string }>(`/api/orgs/${orgId}/portal`, { method: 'POST' }),
+    mutationFn: () =>
+      apiFetch<{ portalUrl: string }>(`/api/orgs/${orgId}/portal`, { method: 'POST' }),
     onSuccess: (res) => {
       window.location.href = res.portalUrl
     },
@@ -112,7 +126,9 @@ export default function BillingPage() {
         <button
           onClick={() => setBillingCycle('monthly')}
           className={`px-4 py-2 rounded-full text-xs font-bold ${
-            billingCycle === 'monthly' ? 'bg-ink-900 text-cream-50' : 'bg-white border border-slate-200 text-slate-600'
+            billingCycle === 'monthly'
+              ? 'bg-ink-900 text-cream-50'
+              : 'bg-white border border-slate-200 text-slate-600'
           }`}
         >
           Aylık
@@ -120,11 +136,15 @@ export default function BillingPage() {
         <button
           onClick={() => setBillingCycle('yearly')}
           className={`px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 ${
-            billingCycle === 'yearly' ? 'bg-ink-900 text-cream-50' : 'bg-white border border-slate-200 text-slate-600'
+            billingCycle === 'yearly'
+              ? 'bg-ink-900 text-cream-50'
+              : 'bg-white border border-slate-200 text-slate-600'
           }`}
         >
           Yıllık
-          <span className="text-[9px] bg-amber-500 text-ink-900 px-1.5 py-0.5 rounded-full">2 AY ÜCRETSİZ</span>
+          <span className="text-[9px] bg-amber-500 text-ink-900 px-1.5 py-0.5 rounded-full">
+            2 AY ÜCRETSİZ
+          </span>
         </button>
       </div>
 
@@ -140,11 +160,14 @@ export default function BillingPage() {
           max="500"
           step="5"
           value={seatCount}
-          onChange={(e) => setSeatCount(parseInt(e.target.value))}
+          onChange={(e) => setSeatCount(Number.parseInt(e.target.value))}
           className="w-full"
         />
         <div className="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
-          <span>5</span><span>100</span><span>250</span><span>500+</span>
+          <span>5</span>
+          <span>100</span>
+          <span>250</span>
+          <span>500+</span>
         </div>
       </div>
 
@@ -176,7 +199,8 @@ export default function BillingPage() {
                       ${displayPrice?.toLocaleString()}
                     </p>
                     <p className="text-[10px] text-slate-500">
-                      ${plan.price}/koltuk · {billingCycle === 'monthly' ? 'aylık' : 'yıllık'} · min {plan.minSeats}
+                      ${plan.price}/koltuk · {billingCycle === 'monthly' ? 'aylık' : 'yıllık'} · min{' '}
+                      {plan.minSeats}
                     </p>
                   </>
                 ) : (
@@ -195,7 +219,9 @@ export default function BillingPage() {
 
               {plan.id === 'enterprise' ? (
                 <button
-                  onClick={() => contactSalesMut.mutate({ message: 'Enterprise ilgi', seatEstimate: seatCount })}
+                  onClick={() =>
+                    contactSalesMut.mutate({ message: 'Enterprise ilgi', seatEstimate: seatCount })
+                  }
                   className="w-full bg-ink-900 text-cream-50 rounded-full py-2.5 text-xs font-bold"
                 >
                   Satışla Görüş

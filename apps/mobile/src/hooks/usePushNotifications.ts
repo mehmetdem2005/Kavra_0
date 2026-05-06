@@ -1,10 +1,10 @@
+import Constants from 'expo-constants'
+import * as Device from 'expo-device'
+import * as Notifications from 'expo-notifications'
 import { useEffect, useState } from 'react'
 import { Platform } from 'react-native'
-import * as Notifications from 'expo-notifications'
-import * as Device from 'expo-device'
-import Constants from 'expo-constants'
 import { apiFetch } from '../lib/api'
-import { useAuth } from './useAuth'
+import { useAuth } from '../stores/auth'
 
 /**
  * Push Notifications + Device Registration
@@ -75,8 +75,7 @@ async function registerForPushNotifications(): Promise<string | null> {
     })
   }
 
-  const projectId = Constants.expoConfig?.extra?.eas?.projectId
-                  ?? Constants.easConfig?.projectId
+  const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId
   if (!projectId) {
     console.warn('Expo project ID bulunamadı, push token alınamaz')
     return null
@@ -94,7 +93,8 @@ async function registerForPushNotifications(): Promise<string | null> {
 function getDeviceInfo() {
   return {
     deviceId: Device.osBuildId ?? Device.modelId ?? `${Platform.OS}-${Date.now()}`,
-    deviceName: Device.deviceName ?? `${Device.brand} ${Device.modelName}`.trim() ?? 'Bilinmeyen Cihaz',
+    deviceName:
+      Device.deviceName ?? `${Device.brand} ${Device.modelName}`.trim() ?? 'Bilinmeyen Cihaz',
     platform: Platform.OS as 'ios' | 'android' | 'web',
     appVersion: Constants.expoConfig?.version,
     osVersion: Device.osVersion ?? undefined,
@@ -110,7 +110,6 @@ export function usePushNotifications() {
     if (!user) return
 
     let cancelled = false
-
     ;(async () => {
       const token = await registerForPushNotifications()
       if (cancelled) return
@@ -133,7 +132,9 @@ export function usePushNotifications() {
       }
     })()
 
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [user?.id])
 
   // Notification tap listener

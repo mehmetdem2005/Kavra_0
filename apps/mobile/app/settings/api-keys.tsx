@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, Modal, TextInput } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack, useRouter } from 'expo-router'
+import { useState } from 'react'
+import { Alert, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
 import { Input } from '../../src/components/ui/Input'
 
@@ -31,33 +31,25 @@ export default function ApiKeys() {
         <View className="bg-brand-50 border border-brand-200 rounded-2xl p-4 mb-4">
           <Text className="text-brand-900 font-semibold mb-1">🔐 Anahtarın sende</Text>
           <Text className="text-brand-800 text-sm leading-5">
-            Groq API anahtarını kendi hesabından aldın, Kavra onu şifreli saklar.
-            Ücretsiz tier cömerttir — çoğu kullanıcı hiç para ödemez.
+            Groq API anahtarını kendi hesabından aldın, Kavra onu şifreli saklar. Ücretsiz tier
+            cömerttir — çoğu kullanıcı hiç para ödemez.
           </Text>
           <Pressable
             onPress={() => Alert.alert('', 'console.groq.com/keys adresinden ücretsiz anahtar al')}
             className="mt-2"
           >
-            <Text className="text-brand-600 font-semibold text-sm">
-              Nasıl alırım? →
-            </Text>
+            <Text className="text-brand-600 font-semibold text-sm">Nasıl alırım? →</Text>
           </Pressable>
         </View>
 
         {keys.length === 0 ? (
           <View className="bg-white rounded-2xl p-6 items-center border border-slate-100">
             <Text style={{ fontSize: 48 }}>🗝️</Text>
-            <Text className="text-lg font-semibold text-brand-950 mt-3">
-              Henüz anahtar yok
-            </Text>
+            <Text className="text-lg font-semibold text-brand-950 mt-3">Henüz anahtar yok</Text>
             <Text className="text-slate-500 text-center mt-1 mb-4">
               Kavra'yı kullanmaya başlamak için bir Groq anahtarı ekle.
             </Text>
-            <Button
-              title="+ Yeni Anahtar Ekle"
-              onPress={() => setShowAddModal(true)}
-              fullWidth
-            />
+            <Button title="+ Yeni Anahtar Ekle" onPress={() => setShowAddModal(true)} fullWidth />
           </View>
         ) : (
           <View>
@@ -97,18 +89,11 @@ function AddKeyModal({ visible, onClose }: { visible: boolean; onClose: () => vo
   }
 
   return (
-    <Modal
-      animationType="slide"
-      transparent
-      visible={visible}
-      onRequestClose={onClose}
-    >
+    <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
       <View className="flex-1 justify-end bg-black/50">
         <View className="bg-white rounded-t-3xl p-6 pt-4">
           <View className="w-12 h-1 bg-slate-200 rounded-full self-center mb-6" />
-          <Text className="text-2xl font-serif text-brand-950 mb-1">
-            Yeni Groq Anahtarı
-          </Text>
+          <Text className="text-2xl font-serif text-brand-950 mb-1">Yeni Groq Anahtarı</Text>
           <Text className="text-slate-500 mb-6">
             Anahtarın şifreli saklanır, sadece sen erişebilirsin.
           </Text>

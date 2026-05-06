@@ -1,20 +1,20 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type {
-  EngineDecision,
-  CompiledPrompt,
-  UserSnapshot,
-  ConceptSnapshot,
-  TechniqueMeta,
-  LessonOutcome,
-} from './types.js'
-import { ContextDetector } from './context-detector.js'
-import { CandidateSelector } from './candidate-selector.js'
-import { TechniqueFilter } from './filter.js'
 import { ThompsonSamplingBandit } from './bandit.js'
 import { BehaviorOrchestrator } from './behaviors.js'
-import { RAGEngine } from './rag.js'
+import { CandidateSelector } from './candidate-selector.js'
+import { ContextDetector } from './context-detector.js'
+import { TechniqueFilter } from './filter.js'
 import { PromptCompiler } from './prompt-compiler.js'
+import { RAGEngine } from './rag.js'
 import { enrichTechnique } from './technique-library.js'
+import type {
+  CompiledPrompt,
+  ConceptSnapshot,
+  EngineDecision,
+  LessonOutcome,
+  TechniqueMeta,
+  UserSnapshot,
+} from './types.js'
 
 /**
  * Teaching Engine — Kavra'nın kalbi.
@@ -42,7 +42,7 @@ export class TeachingEngine {
   constructor(
     private supabase: SupabaseClient<any>,
     private options: {
-      openaiKey?: string  // RAG için gerekli
+      openaiKey?: string // RAG için gerekli
     } = {},
   ) {
     this.contextDetector = new ContextDetector(supabase)
@@ -63,7 +63,7 @@ export class TeachingEngine {
     messageContent: string
     sessionMessageCount: number
     isSessionEnding?: boolean
-    groqApiKey?: string  // Intent classification için
+    groqApiKey?: string // Intent classification için
     personalityId?: string
   }): Promise<{ prompt: CompiledPrompt; decision: EngineDecision }> {
     const startTime = Date.now()
@@ -205,11 +205,7 @@ export class TeachingEngine {
    */
   async recordOutcome(outcome: LessonOutcome): Promise<void> {
     if (outcome.userRating) {
-      await this.bandit.updateFromRating(
-        outcome.userId,
-        outcome.techniqueId,
-        outcome.userRating,
-      )
+      await this.bandit.updateFromRating(outcome.userId, outcome.techniqueId, outcome.userRating)
     } else if (outcome.completed && outcome.messageCount >= 3) {
       await this.bandit.updateFromImplicit(outcome.userId, outcome.techniqueId, 'completed')
     } else if (!outcome.completed) {

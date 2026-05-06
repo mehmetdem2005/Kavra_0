@@ -1,10 +1,16 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { supabase, verifyUserToken } from '../supabase.js'
 import {
-  scheduleCard, retrievability, previewIntervals,
-  newCard, type FSRSCard, type Rating, type State, DEFAULT_PARAMS,
+  DEFAULT_PARAMS,
+  type FSRSCard,
+  type Rating,
+  type State,
+  newCard,
+  previewIntervals,
+  retrievability,
+  scheduleCard,
 } from '../lib/fsrs.js'
+import { supabase, verifyUserToken } from '../supabase.js'
 
 /**
  * Vocabulary Review Routes — FSRS-5 bazlı kelime tekrarı
@@ -52,7 +58,6 @@ function dbToFSRS(row: DBVocabSRS): FSRSCard {
 }
 
 export async function vocabReviewRoutes(fastify: FastifyInstance) {
-
   /**
    * GET /api/vocab-review/due — bugün/şu an tekrar edilecekler
    */
@@ -62,7 +67,7 @@ export async function vocabReviewRoutes(fastify: FastifyInstance) {
       const userId = await verifyUserToken(req.headers.authorization)
       if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      const limit = Math.min(parseInt(req.query.limit ?? '50'), 200)
+      const limit = Math.min(Number.parseInt(req.query.limit ?? '50'), 200)
 
       let q = supabase
         .from('vocabulary_srs')
@@ -100,8 +105,8 @@ export async function vocabReviewRoutes(fastify: FastifyInstance) {
       const userId = await verifyUserToken(req.headers.authorization)
       if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      const limit = Math.min(parseInt(req.query.limit ?? '20'), 100)
-      const newRatio = Math.min(Math.max(parseFloat(req.query.newRatio ?? '0.2'), 0), 1)
+      const limit = Math.min(Number.parseInt(req.query.limit ?? '20'), 100)
+      const newRatio = Math.min(Math.max(Number.parseFloat(req.query.newRatio ?? '0.2'), 0), 1)
       const newCount = Math.floor(limit * newRatio)
       const dueCount = limit - newCount
 
@@ -151,7 +156,7 @@ export async function vocabReviewRoutes(fastify: FastifyInstance) {
       const all = [...(dueCards ?? []), ...newCards]
       for (let i = all.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
-        ;[all[i], all[j]] = [all[j], all[i]]
+        ;[all[i], all[j]] = [all[j]!, all[i]!]
       }
 
       return { cards: all, dueCount: dueCards?.length ?? 0, newCount: newCards.length }
@@ -189,13 +194,15 @@ export async function vocabReviewRoutes(fastify: FastifyInstance) {
         .eq('user_id', userId)
         .maybeSingle()
 
-      const params = paramsRow ? {
-        ...DEFAULT_PARAMS,
-        w: paramsRow.parameters,
-        requestRetention: paramsRow.request_retention,
-        maximumInterval: paramsRow.maximum_interval,
-        enableShortTerm: paramsRow.enable_short_term,
-      } : DEFAULT_PARAMS
+      const params = paramsRow
+        ? {
+            ...DEFAULT_PARAMS,
+            w: paramsRow.parameters,
+            requestRetention: paramsRow.request_retention,
+            maximumInterval: paramsRow.maximum_interval,
+            enableShortTerm: paramsRow.enable_short_term,
+          }
+        : DEFAULT_PARAMS
 
       const cardObj = dbToFSRS(card as DBVocabSRS)
       const r = retrievability(cardObj)
@@ -295,13 +302,24 @@ export async function vocabReviewRoutes(fastify: FastifyInstance) {
     const userId = await verifyUserToken(req.headers.authorization)
     if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-    const [{ count: totalCards }, { count: dueCards }, { count: masteredCount }] = await Promise.all([
-      supabase.from('vocabulary_srs').select('*', { count: 'exact', head: true }).eq('user_id', userId),
-      supabase.from('vocabulary_srs').select('*', { count: 'exact', head: true })
-        .eq('user_id', userId).lte('due_at', new Date().toISOString()).neq('state', 'new'),
-      supabase.from('user_vocabulary').select('*', { count: 'exact', head: true })
-        .eq('user_id', userId).eq('status', 'mastered'),
-    ])
+    const [{ count: totalCards }, { count: dueCards }, { count: masteredCount }] =
+      await Promise.all([
+        supabase
+          .from('vocabulary_srs')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', userId),
+        supabase
+          .from('vocabulary_srs')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', userId)
+          .lte('due_at', new Date().toISOString())
+          .neq('state', 'new'),
+        supabase
+          .from('user_vocabulary')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', userId)
+          .eq('status', 'mastered'),
+      ])
 
     // Last 30 days reviews heatmap
     const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString()

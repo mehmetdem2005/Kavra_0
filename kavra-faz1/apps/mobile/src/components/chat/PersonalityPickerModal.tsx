@@ -1,5 +1,5 @@
-import { View, Text, Modal, Pressable, ScrollView, ActivityIndicator } from 'react-native'
-import { usePersonalities, type Personality } from '../../hooks/useSubjects'
+import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native'
+import { type Personality, usePersonalities } from '../../hooks/useSubjects'
 
 interface Props {
   visible: boolean
@@ -40,21 +40,20 @@ export function PersonalityPickerModal({ visible, onClose, selectedId, onSelect 
                   return (
                     <Pressable
                       key={p.id}
-                      onPress={() => { onSelect(p); onClose() }}
+                      onPress={() => {
+                        onSelect(p)
+                        onClose()
+                      }}
                       className={[
                         'rounded-xl p-4 border flex-row items-center gap-3',
-                        selected
-                          ? 'border-brand-950 bg-brand-50'
-                          : 'border-slate-100 bg-white',
+                        selected ? 'border-brand-950 bg-brand-50' : 'border-slate-100 bg-white',
                       ].join(' ')}
                     >
                       <View className="w-12 h-12 rounded-full bg-slate-100 items-center justify-center">
                         <Text style={{ fontSize: 24 }}>{p.emoji ?? '🤖'}</Text>
                       </View>
                       <View className="flex-1">
-                        <Text className="font-semibold text-brand-950 text-base">
-                          {p.name}
-                        </Text>
+                        <Text className="font-semibold text-brand-950 text-base">{p.name}</Text>
                         <Text className="text-slate-500 text-xs mt-0.5" numberOfLines={2}>
                           {p.system_prompt_fragment}
                         </Text>

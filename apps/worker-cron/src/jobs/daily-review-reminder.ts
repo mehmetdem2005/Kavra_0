@@ -1,5 +1,5 @@
 import type { Logger } from 'pino'
-import { supabase, sendExpoPushBatch } from '../supabase.js'
+import { sendExpoPushBatch, supabase } from '../supabase.js'
 
 interface JobContext {
   logger: Logger
@@ -85,9 +85,7 @@ export async function runDailyReviewReminder({ logger }: JobContext): Promise<vo
             to: t.token,
             sound: 'default',
             title: '🔁 Tekrar zamanı',
-            body: dueCount === 1
-              ? '1 kart seni bekliyor'
-              : `${dueCount} kart seni bekliyor`,
+            body: dueCount === 1 ? '1 kart seni bekliyor' : `${dueCount} kart seni bekliyor`,
             data: { type: 'review_reminder', dueCount, userId: pref.user_id },
           })
         }

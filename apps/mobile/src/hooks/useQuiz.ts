@@ -36,10 +36,10 @@ export function useGenerateQuiz() {
       difficulty?: 'easy' | 'medium' | 'hard' | 'mixed'
       types?: Array<'multiple_choice' | 'true_false' | 'open_ended'>
     }) => {
-      return await apiFetch<{ quizId: string; questionCount: number }>(
-        '/api/quiz/generate',
-        { method: 'POST', body: JSON.stringify(input) },
-      )
+      return await apiFetch<{ quizId: string; questionCount: number }>('/api/quiz/generate', {
+        method: 'POST',
+        body: JSON.stringify(input),
+      })
     },
   })
 }

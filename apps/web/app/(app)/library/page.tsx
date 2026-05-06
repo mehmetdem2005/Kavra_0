@@ -1,8 +1,8 @@
 'use client'
-import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
+import { BookOpen, Bookmark, Eye, Globe2, Lock, Plus } from 'lucide-react'
+import Link from 'next/link'
 import { apiFetch } from '../../../lib/api'
-import { Plus, BookOpen, Globe2, Lock, Eye, Bookmark } from 'lucide-react'
 
 interface Notebook {
   id: string
@@ -48,7 +48,10 @@ export default function LibraryPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-3xl p-5 border border-slate-100 animate-pulse h-44" />
+            <div
+              key={i}
+              className="bg-white rounded-3xl p-5 border border-slate-100 animate-pulse h-44"
+            />
           ))}
         </div>
       ) : notebooks.length === 0 ? (
@@ -72,7 +75,9 @@ export default function LibraryPage() {
                 )}
               </div>
 
-              <h3 className="font-serif text-lg text-ink-900 leading-tight line-clamp-2">{n.title}</h3>
+              <h3 className="font-serif text-lg text-ink-900 leading-tight line-clamp-2">
+                {n.title}
+              </h3>
               {n.description && (
                 <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">{n.description}</p>
               )}
@@ -82,8 +87,12 @@ export default function LibraryPage() {
                 {n.total_words > 0 && <span>{(n.total_words / 1000).toFixed(0)}k kelime</span>}
                 {n.is_public && (
                   <>
-                    <span className="flex items-center gap-1"><Eye size={10} /> {n.view_count}</span>
-                    <span className="flex items-center gap-1"><Bookmark size={10} /> {n.save_count}</span>
+                    <span className="flex items-center gap-1">
+                      <Eye size={10} /> {n.view_count}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Bookmark size={10} /> {n.save_count}
+                    </span>
                   </>
                 )}
               </div>
@@ -101,7 +110,8 @@ function EmptyState() {
       <BookOpen size={48} className="text-slate-300 mx-auto mb-3" />
       <h2 className="font-serif text-xl text-ink-900">İlk defterini oluştur</h2>
       <p className="text-sm text-slate-500 mt-1.5 mb-5 max-w-md mx-auto">
-        PDF, video, web sayfası, ses kaydı — hepsini bir deftere koy. AI öğrensin, sen sor, podcast'e dönüştür.
+        PDF, video, web sayfası, ses kaydı — hepsini bir deftere koy. AI öğrensin, sen sor,
+        podcast'e dönüştür.
       </p>
       <Link
         href="/notebooks/new"

@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
-import { View, Text, Pressable, Linking } from 'react-native'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
+import { Linking, Pressable, Text, View } from 'react-native'
 import { apiFetch } from '../../lib/api'
 import { Icon, type IconName } from '../ui/Icon'
 
@@ -14,11 +14,38 @@ interface Announcement {
   level: 'info' | 'feature' | 'maintenance' | 'critical'
 }
 
-const LEVEL_STYLES: Record<string, { bg: string; border: string; text: string; icon: IconName; iconColor: string }> = {
-  info: { bg: 'bg-cyan-50', border: 'border-cyan-200', text: 'text-cyan-900', icon: 'info', iconColor: '#0891B2' },
-  feature: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-900', icon: 'sparkles', iconColor: '#F59E0B' },
-  maintenance: { bg: 'bg-slate-50', border: 'border-slate-200', text: 'text-slate-900', icon: 'settings', iconColor: '#64748B' },
-  critical: { bg: 'bg-red-50', border: 'border-red-300', text: 'text-red-900', icon: 'alert-triangle', iconColor: '#DC2626' },
+const LEVEL_STYLES: Record<
+  string,
+  { bg: string; border: string; text: string; icon: IconName; iconColor: string }
+> = {
+  info: {
+    bg: 'bg-cyan-50',
+    border: 'border-cyan-200',
+    text: 'text-cyan-900',
+    icon: 'info',
+    iconColor: '#0891B2',
+  },
+  feature: {
+    bg: 'bg-amber-50',
+    border: 'border-amber-200',
+    text: 'text-amber-900',
+    icon: 'sparkles',
+    iconColor: '#F59E0B',
+  },
+  maintenance: {
+    bg: 'bg-slate-50',
+    border: 'border-slate-200',
+    text: 'text-slate-900',
+    icon: 'settings',
+    iconColor: '#64748B',
+  },
+  critical: {
+    bg: 'bg-red-50',
+    border: 'border-red-300',
+    text: 'text-red-900',
+    icon: 'alert-triangle',
+    iconColor: '#DC2626',
+  },
 }
 
 export function AnnouncementBanner() {
@@ -28,7 +55,7 @@ export function AnnouncementBanner() {
   const { data } = useQuery({
     queryKey: ['announcements'],
     queryFn: () => apiFetch<{ announcements: Announcement[] }>('/api/announcements'),
-    staleTime: 10 * 60 * 1000,        // 10 dk
+    staleTime: 10 * 60 * 1000, // 10 dk
   })
 
   const dismissMut = useMutation({
@@ -62,14 +89,10 @@ export function AnnouncementBanner() {
         <Icon name={style.icon} size={18} color={style.iconColor} />
         <View className="flex-1">
           <Text className={`font-semibold text-sm ${style.text}`}>{announcement.title}</Text>
-          <Text className={`text-xs ${style.text} opacity-80 mt-0.5`}>
-            {announcement.message}
-          </Text>
+          <Text className={`text-xs ${style.text} opacity-80 mt-0.5`}>{announcement.message}</Text>
           {announcement.cta_label && announcement.cta_url && (
             <Pressable onPress={handleClick} className="mt-2">
-              <Text className={`text-xs font-bold ${style.text}`}>
-                {announcement.cta_label} →
-              </Text>
+              <Text className={`text-xs font-bold ${style.text}`}>{announcement.cta_label} →</Text>
             </Pressable>
           )}
         </View>

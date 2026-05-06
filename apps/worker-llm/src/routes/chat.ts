@@ -1,9 +1,9 @@
-import type { FastifyInstance } from 'fastify'
-import { SendMessageSchema } from '@kavra/shared/schemas'
 import { TeachingEngine } from '@kavra/engine'
-import { groqChat, GroqError } from '../groq.js'
-import { getActiveGroqKey } from './api-keys.js'
+import { SendMessageSchema } from '@kavra/shared/schemas'
+import type { FastifyInstance } from 'fastify'
+import { GroqError, groqChat } from '../groq.js'
 import { supabase, verifyUserToken } from '../supabase.js'
+import { getActiveGroqKey } from './api-keys.js'
 
 const DEFAULT_MODEL = 'llama-3.3-70b-versatile'
 const MAX_HISTORY_MESSAGES = 40
@@ -21,7 +21,7 @@ export async function chatRoutes(fastify: FastifyInstance) {
     if (!apiKey) {
       return reply.code(400).send({
         error: 'no_active_key',
-        message: 'Önce Ayarlar > API Anahtarları\'ndan Groq anahtarını ekle',
+        message: "Önce Ayarlar > API Anahtarları'ndan Groq anahtarını ekle",
       })
     }
 
@@ -223,7 +223,7 @@ export async function chatRoutes(fastify: FastifyInstance) {
       reply.raw.end()
     } catch (err: any) {
       const message =
-        err instanceof GroqError ? `Groq: ${err.message}` : err?.message ?? 'Beklenmeyen hata'
+        err instanceof GroqError ? `Groq: ${err.message}` : (err?.message ?? 'Beklenmeyen hata')
 
       reply.raw.write(`data: ${JSON.stringify({ error: message })}\n\n`)
       reply.raw.end()

@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { View, Text, ActivityIndicator, Pressable, Alert, Share } from 'react-native'
+import { useMemo, useState } from 'react'
+import { ActivityIndicator, Alert, Pressable, Share, Text, View } from 'react-native'
 import WebView from 'react-native-webview'
 import { Icon } from '../ui/Icon'
 
@@ -121,7 +121,10 @@ export function MermaidView({ code, height = 320, theme = 'default', onError }: 
   }
 
   return (
-    <View style={{ height, position: 'relative' }} className="bg-cream-50 rounded-2xl overflow-hidden">
+    <View
+      style={{ height, position: 'relative' }}
+      className="bg-cream-50 rounded-2xl overflow-hidden"
+    >
       <WebView
         source={{ html }}
         onMessage={handleMessage}

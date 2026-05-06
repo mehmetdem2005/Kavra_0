@@ -1,10 +1,10 @@
+import { Stack, useRouter } from 'expo-router'
 import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert } from 'react-native'
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Stack } from 'expo-router'
-import { useCreateNotebook } from '../../src/hooks/useNotebooks'
-import { Input } from '../../src/components/ui/Input'
 import { Button } from '../../src/components/ui/Button'
+import { Input } from '../../src/components/ui/Input'
+import { useCreateNotebook } from '../../src/hooks/useNotebooks'
 
 const EMOJIS = ['📓', '📚', '🧠', '🔬', '💡', '🎯', '🌍', '⚗️', '📐', '🎨', '💻', '📜', '🌱', '⚙️']
 const COLORS = [
@@ -50,9 +50,9 @@ export default function NewNotebook() {
       router.replace(`/notebook/${res.notebook.id}`)
     } catch (e: any) {
       if (e.message?.includes('free_limit')) {
-        Alert.alert('Limit', 'Free üyeler 3 aktif defter tutabilir. Pro\'ya geçince sınırsız.', [
+        Alert.alert('Limit', "Free üyeler 3 aktif defter tutabilir. Pro'ya geçince sınırsız.", [
           { text: 'Tamam', style: 'cancel' },
-          { text: 'Pro\'ya Geç', onPress: () => router.replace('/upgrade') },
+          { text: "Pro'ya Geç", onPress: () => router.replace('/upgrade') },
         ])
       } else {
         Alert.alert('Hata', e.message)
@@ -89,10 +89,21 @@ export default function NewNotebook() {
           </View>
         </View>
 
-        <Input label="DEFTER BAŞLIĞI" value={title} onChangeText={setTitle} placeholder="Hücre Biyolojisi" autoFocus />
+        <Input
+          label="DEFTER BAŞLIĞI"
+          value={title}
+          onChangeText={setTitle}
+          placeholder="Hücre Biyolojisi"
+          autoFocus
+        />
 
         <View className="mt-3">
-          <Input label="AÇIKLAMA (OPS.)" value={description} onChangeText={setDescription} placeholder="Final sınavı için" />
+          <Input
+            label="AÇIKLAMA (OPS.)"
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Final sınavı için"
+          />
         </View>
 
         <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mt-5 mb-2">
@@ -140,7 +151,9 @@ export default function NewNotebook() {
                 language === l.code ? 'bg-ink-900 border-ink-900' : 'bg-white border-slate-200'
               }`}
             >
-              <Text className={`text-xs font-semibold ${language === l.code ? 'text-cream-50' : 'text-slate-700'}`}>
+              <Text
+                className={`text-xs font-semibold ${language === l.code ? 'text-cream-50' : 'text-slate-700'}`}
+              >
                 {l.label}
               </Text>
             </Pressable>

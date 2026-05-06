@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '../lib/supabase'
 import { apiFetch } from '../lib/api'
+import { supabase } from '../lib/supabase'
 
 export interface Concept {
   id: string
@@ -42,17 +42,12 @@ export function useConcepts(subjectId: string | null) {
           .select('*')
           .eq('subject_id', subjectId!)
           .order('created_at', { ascending: true }),
-        supabase
-          .from('progress')
-          .select('*')
-          .eq('user_id', userData.user.id),
+        supabase.from('progress').select('*').eq('user_id', userData.user.id),
       ])
 
       if (conceptsResp.error) throw conceptsResp.error
 
-      const progressMap = new Map(
-        (progressResp.data ?? []).map((p: any) => [p.concept_id, p]),
-      )
+      const progressMap = new Map((progressResp.data ?? []).map((p: any) => [p.concept_id, p]))
 
       return (conceptsResp.data ?? []).map((c: any) => ({
         ...c,
@@ -67,11 +62,7 @@ export function useConcept(id: string | null) {
     queryKey: ['concept', id],
     enabled: !!id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('concepts')
-        .select('*')
-        .eq('id', id!)
-        .single()
+      const { data, error } = await supabase.from('concepts').select('*').eq('id', id!).single()
       if (error) throw error
       return data as Concept
     },

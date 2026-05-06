@@ -32,7 +32,7 @@ async function main() {
       continue
     }
 
-    const { error } = await supabase.from('techniques').upsert(
+    const { error } = await (supabase.from('techniques') as any).upsert(
       {
         module_id: moduleId,
         code: tech.code,

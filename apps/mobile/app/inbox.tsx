@@ -1,7 +1,7 @@
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Stack, useRouter } from 'expo-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { supabase } from '../src/lib/supabase'
 
 interface InboxItem {
@@ -51,8 +51,8 @@ export default function Inbox() {
         <View className="bg-brand-50 border border-brand-200 rounded-2xl p-4 mb-4">
           <Text className="text-brand-900 font-semibold mb-1">📥 Paylaşılan İçerikler</Text>
           <Text className="text-brand-800 text-sm leading-5">
-            WhatsApp, tarayıcı ya da başka uygulamalardan Kavra'ya
-            paylaşılan metin, link veya dosyalar burada.
+            WhatsApp, tarayıcı ya da başka uygulamalardan Kavra'ya paylaşılan metin, link veya
+            dosyalar burada.
           </Text>
         </View>
 
@@ -84,7 +84,7 @@ export default function Inbox() {
                 </Text>
                 <View className="flex-row gap-2 mt-3">
                   <Pressable
-                    onPress={() => Alert.alert('', 'RAG entegrasyonu Faz 4\'te')}
+                    onPress={() => Alert.alert('', "RAG entegrasyonu Faz 4'te")}
                     className="flex-1 bg-brand-950 py-2 rounded-lg items-center"
                   >
                     <Text className="text-white text-sm font-semibold">Konuya Ekle</Text>

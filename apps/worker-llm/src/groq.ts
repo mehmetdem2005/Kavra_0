@@ -15,7 +15,10 @@ export interface GroqChatRequest {
 }
 
 export class GroqError extends Error {
-  constructor(message: string, public status: number) {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
     super(message)
     this.name = 'GroqError'
   }
@@ -69,6 +72,48 @@ export async function groqTestKey(apiKey: string): Promise<boolean> {
     return true
   } catch {
     return false
+  }
+}
+
+export interface GroqChatJSONRequest {
+  apiKey: string
+  jsonMode?: boolean
+  temperature?: number
+  maxTokens?: number
+  model?: string
+  systemPrompt: string
+  userPrompt: string
+}
+
+/** JSON modunda Groq chat — mesajı parse edip generic döner. */
+export async function groqChatJSON<T>(req: GroqChatJSONRequest): Promise<T> {
+  const res = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${req.apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: req.model ?? 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: req.systemPrompt },
+        { role: 'user', content: req.userPrompt },
+      ],
+      stream: false,
+      temperature: req.temperature ?? 0.5,
+      max_tokens: req.maxTokens ?? 2048,
+      ...(req.jsonMode ? { response_format: { type: 'json_object' } } : {}),
+    }),
+  })
+  if (!res.ok) {
+    throw new GroqError(await res.text(), res.status)
+  }
+  const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> }
+  const content = json.choices?.[0]?.message?.content ?? ''
+  try {
+    return JSON.parse(content) as T
+  } catch (e) {
+    throw new GroqError(`Invalid JSON response: ${content.slice(0, 200)}`, 502)
   }
 }
 

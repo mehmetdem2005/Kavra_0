@@ -1,7 +1,7 @@
-import { View, Text, ScrollView, Pressable, Alert } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useAuth } from '../../src/stores/auth'
 
 export default function Profile() {
@@ -34,21 +34,49 @@ export default function Profile() {
 
         <View className="px-5 gap-2">
           <Section title="Kişiselleştirme">
-            <Row emoji="🔑" title={t('profile.apiKeys')} onPress={() => router.push('/settings/api-keys')} />
-            <Row emoji="🎭" title={t('profile.personalities')} onPress={() => Alert.alert('', 'Yakında')} />
+            <Row
+              emoji="🔑"
+              title={t('profile.apiKeys')}
+              onPress={() => router.push('/settings/api-keys')}
+            />
+            <Row
+              emoji="🎭"
+              title={t('profile.personalities')}
+              onPress={() => Alert.alert('', 'Yakında')}
+            />
             <Row emoji="🎙️" title={t('profile.voice')} onPress={() => Alert.alert('', 'Yakında')} />
           </Section>
 
           <Section title="Uygulama">
-            <Row emoji="🎨" title={t('profile.appearance')} onPress={() => Alert.alert('', 'Yakında')} />
-            <Row emoji="🌍" title={t('profile.language')} onPress={() => Alert.alert('', 'Yakında')} />
-            <Row emoji="⚙️" title={t('profile.preferences')} onPress={() => Alert.alert('', 'Yakında')} />
+            <Row
+              emoji="🎨"
+              title={t('profile.appearance')}
+              onPress={() => Alert.alert('', 'Yakında')}
+            />
+            <Row
+              emoji="🌍"
+              title={t('profile.language')}
+              onPress={() => Alert.alert('', 'Yakında')}
+            />
+            <Row
+              emoji="⚙️"
+              title={t('profile.preferences')}
+              onPress={() => Alert.alert('', 'Yakında')}
+            />
           </Section>
 
           <Section title="Hesap">
-            <Row emoji="💎" title={t('profile.subscription')} onPress={() => Alert.alert('', 'Yakında')} />
+            <Row
+              emoji="💎"
+              title={t('profile.subscription')}
+              onPress={() => Alert.alert('', 'Yakında')}
+            />
             <Row emoji="📦" title={t('profile.data')} onPress={() => Alert.alert('', 'Yakında')} />
-            <Row emoji="ℹ️" title={t('profile.about')} onPress={() => Alert.alert('', 'Kavra v0.1.0')} />
+            <Row
+              emoji="ℹ️"
+              title={t('profile.about')}
+              onPress={() => Alert.alert('', 'Kavra v0.1.0')}
+            />
           </Section>
 
           <Pressable
@@ -66,9 +94,7 @@ export default function Profile() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View>
-      <Text className="text-xs font-semibold text-slate-400 uppercase mt-4 mb-2 px-1">
-        {title}
-      </Text>
+      <Text className="text-xs font-semibold text-slate-400 uppercase mt-4 mb-2 px-1">{title}</Text>
       <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         {children}
       </View>

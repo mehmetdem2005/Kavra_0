@@ -1,19 +1,21 @@
-import { useState, useRef } from 'react'
-import {
-  View, Text, ScrollView, Pressable, Modal, Alert, ActivityIndicator,
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Stack } from 'expo-router'
 import { Audio } from 'expo-av'
+import { Stack } from 'expo-router'
+import { useRef, useState } from 'react'
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { ProGuard } from '../../src/components/pro/ProGuard'
 import { Button } from '../../src/components/ui/Button'
 import { Input } from '../../src/components/ui/Input'
-import { ProGuard } from '../../src/components/pro/ProGuard'
 import {
-  useVoiceClones, useCreateVoiceClone, useSetDefaultVoiceClone, useDeleteVoiceClone,
   type VoiceClone,
+  useCreateVoiceClone,
+  useDeleteVoiceClone,
+  useSetDefaultVoiceClone,
+  useVoiceClones,
 } from '../../src/hooks/useVoiceClones'
 
-const REFERENCE_TEXT_TR = 'Merhaba, ben Kavra için ses örneği veriyorum. Bu cümleyi olabildiğince doğal ve net bir tonda okuyorum. Sesim duru, tempolu ve kendi olağan tonumda. Birkaç farklı duraklamayla cümleyi tamamlıyorum.'
+const REFERENCE_TEXT_TR =
+  'Merhaba, ben Kavra için ses örneği veriyorum. Bu cümleyi olabildiğince doğal ve net bir tonda okuyorum. Sesim duru, tempolu ve kendi olağan tonumda. Birkaç farklı duraklamayla cümleyi tamamlıyorum.'
 
 export default function VoiceClonesSettings() {
   return (
@@ -62,10 +64,7 @@ function VoiceClonesContent() {
       ) : (
         <View className="gap-2 mt-6">
           {clones.map((c) => (
-            <View
-              key={c.id}
-              className="bg-white rounded-2xl p-4 border border-slate-100"
-            >
+            <View key={c.id} className="bg-white rounded-2xl p-4 border border-slate-100">
               <View className="flex-row items-center gap-3">
                 <Text style={{ fontSize: 24 }}>🎙️</Text>
                 <View className="flex-1">
@@ -97,7 +96,11 @@ function VoiceClonesContent() {
                     onPress={() =>
                       Alert.alert('Sil', `"${c.name}" silinecek. Emin misin?`, [
                         { text: 'İptal', style: 'cancel' },
-                        { text: 'Sil', style: 'destructive', onPress: () => deleteClone.mutate(c.id) },
+                        {
+                          text: 'Sil',
+                          style: 'destructive',
+                          onPress: () => deleteClone.mutate(c.id),
+                        },
                       ])
                     }
                     className="px-2 py-1"
@@ -202,7 +205,10 @@ function RecordCloneModal({ visible, onClose }: { visible: boolean; onClose: () 
       },
       {
         onSuccess: () => {
-          setName(''); setDescription(''); setRecordingUri(null); setDuration(0)
+          setName('')
+          setDescription('')
+          setRecordingUri(null)
+          setDuration(0)
           onClose()
         },
         onError: (e: any) => Alert.alert('Hata', e.message),
@@ -254,24 +260,44 @@ function RecordCloneModal({ visible, onClose }: { visible: boolean; onClose: () 
               </View>
             )}
             <Text className="text-slate-500 text-sm mt-2">
-              {recording ? '⏺ Kaydediliyor...' : recordingUri ? `${duration}sn kaydedildi` : 'Mikrofona dokun'}
+              {recording
+                ? '⏺ Kaydediliyor...'
+                : recordingUri
+                  ? `${duration}sn kaydedildi`
+                  : 'Mikrofona dokun'}
             </Text>
             <Text className="text-2xl font-mono text-brand-950 mt-1">
-              {String(Math.floor(duration / 60)).padStart(2, '0')}:{String(duration % 60).padStart(2, '0')}
+              {String(Math.floor(duration / 60)).padStart(2, '0')}:
+              {String(duration % 60).padStart(2, '0')}
             </Text>
           </View>
 
           {/* İsim/açıklama */}
           {recordingUri && (
             <>
-              <Input label="İsim" value={name} onChangeText={setName} placeholder="Benim sesim, Babamın sesi..." />
-              <Input label="Açıklama (ops.)" value={description} onChangeText={setDescription} placeholder="Notlar" />
+              <Input
+                label="İsim"
+                value={name}
+                onChangeText={setName}
+                placeholder="Benim sesim, Babamın sesi..."
+              />
+              <Input
+                label="Açıklama (ops.)"
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Notlar"
+              />
             </>
           )}
 
           <View className="flex-row gap-3 mt-2">
             <View className="flex-1">
-              <Button title="İptal" variant="secondary" onPress={onClose} disabled={create.isPending} />
+              <Button
+                title="İptal"
+                variant="secondary"
+                onPress={onClose}
+                disabled={create.isPending}
+              />
             </View>
             <View className="flex-1">
               <Button

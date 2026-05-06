@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Link } from 'expo-router'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
 import { Input } from '../../src/components/ui/Input'
 import { useAuth } from '../../src/stores/auth'
@@ -48,12 +48,8 @@ export default function SignUp() {
             </View>
           </View>
 
-          <Text className="text-3xl font-serif text-brand-950 mb-1">
-            {t('auth.signup.title')}
-          </Text>
-          <Text className="text-base text-slate-600 mb-8">
-            {t('auth.signup.subtitle')}
-          </Text>
+          <Text className="text-3xl font-serif text-brand-950 mb-1">{t('auth.signup.title')}</Text>
+          <Text className="text-base text-slate-600 mb-8">{t('auth.signup.subtitle')}</Text>
 
           <Input
             label={t('auth.signup.fullName')}

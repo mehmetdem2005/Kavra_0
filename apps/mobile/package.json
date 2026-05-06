@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@epubjs-react-native/core": "^1.4.7",
-    "@epubjs-react-native/expo-file-system": "^1.4.7",
+    "@epubjs-react-native/expo-file-system": "^1.1.4",
     "@kavra/db": "workspace:*",
     "@kavra/engine": "workspace:*",
     "@kavra/shared": "workspace:*",
@@ -45,7 +45,6 @@
     "react-native-purchases": "8.7.0",
     "expo-tracking-transparency": "~5.0.0",
     "@sentry/react-native": "~6.10.0",
-    "expo-clipboard": "~7.0.0",
     "expo-router": "~4.0.0",
     "expo-secure-store": "~14.0.0",
     "expo-speech": "~13.0.0",

@@ -10,8 +10,8 @@ export default function PrivacyPage() {
       <p className="text-sm text-slate-500">Son güncelleme: 1 Mayıs 2026</p>
 
       <p>
-        Kavra ("biz", "uygulama") senin verilerinin <strong>senin olduğunu</strong> savunur. Bu metin
-        kısa ve sade — nasıl çalıştığımızı anlamayasın diye değil, anlayabilesin diye yazıldı.
+        Kavra ("biz", "uygulama") senin verilerinin <strong>senin olduğunu</strong> savunur. Bu
+        metin kısa ve sade — nasıl çalıştığımızı anlamayasın diye değil, anlayabilesin diye yazıldı.
       </p>
 
       <h2>Topladığımız veriler</h2>
@@ -59,12 +59,12 @@ export default function PrivacyPage() {
         <li>
           <strong>AI işlemcileri</strong>: Soruların ve içeriklerin OpenAI, Anthropic, Google
           Gemini, Groq, ElevenLabs gibi AI servislerine gönderilir. Bu servislerin sözleşmesinde
-          "kullanıcı verisi modeli eğitmek için kullanılmaz" maddesi var (zero data retention)
-          ve biz bunu garanti ediyoruz.
+          "kullanıcı verisi modeli eğitmek için kullanılmaz" maddesi var (zero data retention) ve
+          biz bunu garanti ediyoruz.
         </li>
         <li>
-          <strong>Saklama</strong>: Veriler Supabase (Frankfurt, AB sunucusu) ve Cloudflare
-          R2'da şifreli saklanır.
+          <strong>Saklama</strong>: Veriler Supabase (Frankfurt, AB sunucusu) ve Cloudflare R2'da
+          şifreli saklanır.
         </li>
         <li>
           <strong>Analitik</strong>: Sadece anonim, toplu (örn: "kaç kullanıcı bu hafta podcast
@@ -83,30 +83,32 @@ export default function PrivacyPage() {
           her şey JSON olarak email'ine gelir (GDPR Art. 20).
         </li>
         <li>
-          <strong>Silebilirsin</strong> — Ayarlar → Hesap → Hesabı Sil. 14 gün içinde geri alabilirsin.
-          14 gün sonra <em>tamamen</em> silinir, geri dönüşü yok (GDPR Art. 17).
+          <strong>Silebilirsin</strong> — Ayarlar → Hesap → Hesabı Sil. 14 gün içinde geri
+          alabilirsin. 14 gün sonra <em>tamamen</em> silinir, geri dönüşü yok (GDPR Art. 17).
         </li>
         <li>
-          <strong>Düzeltebilirsin</strong> — Email veya ad soyad değişikliği için ayarlardan
-          (GDPR Art. 16).
+          <strong>Düzeltebilirsin</strong> — Email veya ad soyad değişikliği için ayarlardan (GDPR
+          Art. 16).
         </li>
         <li>
-          <strong>Push'u kapatabilirsin</strong> — Cihaz ayarlarından veya app'ten (Ayarlar → Cihazlar).
+          <strong>Push'u kapatabilirsin</strong> — Cihaz ayarlarından veya app'ten (Ayarlar →
+          Cihazlar).
         </li>
       </ul>
 
       <h2>Çocuklar (under 13)</h2>
       <p>
         Kavra 13 yaş altı kullanıcılar için tasarlanmadı. Eğer 13 yaşından küçükseniz veya bir
-        çocuğun verisi yanlışlıkla toplandıysa lütfen <a href="mailto:privacy@kavra.app">privacy@kavra.app</a>
+        çocuğun verisi yanlışlıkla toplandıysa lütfen{' '}
+        <a href="mailto:privacy@kavra.app">privacy@kavra.app</a>
         adresinden bize ulaşın — derhal sileriz.
       </p>
 
       <h2>Pro abonelik</h2>
       <p>
         iOS'ta Apple, Android'de Google ödeme işlemcisidir. Kart bilgilerini biz görmeyiz. Web'de
-        Stripe kullanılır. RevenueCat (3rd party), abonelik durumunu sync etmek için kullanılır
-        ama kart bilgisi onlarda da yok.
+        Stripe kullanılır. RevenueCat (3rd party), abonelik durumunu sync etmek için kullanılır ama
+        kart bilgisi onlarda da yok.
       </p>
 
       <h2>Değişiklikler</h2>
@@ -116,7 +118,8 @@ export default function PrivacyPage() {
 
       <h2>İletişim</h2>
       <p>
-        Sorular, şikayetler, ya da sadece bir merhaba için: <a href="mailto:privacy@kavra.app">privacy@kavra.app</a>
+        Sorular, şikayetler, ya da sadece bir merhaba için:{' '}
+        <a href="mailto:privacy@kavra.app">privacy@kavra.app</a>
       </p>
 
       <p className="text-sm text-slate-500 mt-8">

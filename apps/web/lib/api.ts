@@ -8,7 +8,9 @@ export async function apiFetch<T = any>(
   init?: RequestInit & { body?: any },
 ): Promise<T> {
   const supabase = getSupabaseBrowserClient()
-  const { data: { session } } = await supabase.auth.getSession()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -23,7 +25,9 @@ export async function apiFetch<T = any>(
   if (!res.ok) {
     const text = await res.text()
     let parsed: any = null
-    try { parsed = JSON.parse(text) } catch {}
+    try {
+      parsed = JSON.parse(text)
+    } catch {}
     const err = new Error(parsed?.message ?? parsed?.error ?? text) as any
     err.status = res.status
     err.body = parsed

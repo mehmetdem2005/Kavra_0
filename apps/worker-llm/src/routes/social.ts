@@ -7,15 +7,20 @@ import { supabase, verifyUserToken } from '../supabase.js'
  */
 
 const UpdateProfileSchema = z.object({
-  username: z.string().regex(/^[a-z0-9_]{3,20}$/).optional(),
+  username: z
+    .string()
+    .regex(/^[a-z0-9_]{3,20}$/)
+    .optional(),
   bio: z.string().max(200).optional(),
   pronouns: z.string().max(20).optional(),
   isPublic: z.boolean().optional(),
-  bannerColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  bannerColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
 })
 
 export async function socialRoutes(fastify: FastifyInstance) {
-
   // ============== PROFILE ===============
 
   /** PATCH /api/me/profile */
@@ -57,62 +62,65 @@ export async function socialRoutes(fastify: FastifyInstance) {
   })
 
   /** GET /api/profiles/:username (public profil) */
-  fastify.get<{ Params: { username: string } }>(
-    '/api/profiles/:username',
-    async (req, reply) => {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id, username, full_name, bio, pronouns, avatar_url, banner_color, is_public, created_at')
-        .eq('username', req.params.username)
-        .single()
+  fastify.get<{ Params: { username: string } }>('/api/profiles/:username', async (req, reply) => {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select(
+        'id, username, full_name, bio, pronouns, avatar_url, banner_color, is_public, created_at',
+      )
+      .eq('username', req.params.username)
+      .single()
 
-      if (!profile || !profile.is_public) {
-        return reply.code(404).send({ error: 'not_found' })
-      }
+    if (!profile || !profile.is_public) {
+      return reply.code(404).send({ error: 'not_found' })
+    }
 
-      // Stats
-      const { data: stats } = await supabase.rpc('user_public_stats', { p_user_id: profile.id })
+    // Stats
+    const { data: stats } = await supabase.rpc('user_public_stats', { p_user_id: profile.id })
 
-      // Public defterleri
-      const { data: notebooks } = await supabase
-        .from('notebooks')
-        .select('id, title, description, public_slug, view_count, save_count, shared_at, source_count, category')
-        .eq('user_id', profile.id)
-        .eq('is_public', true)
-        .order('shared_at', { ascending: false })
-        .limit(20)
+    // Public defterleri
+    const { data: notebooks } = await supabase
+      .from('notebooks')
+      .select(
+        'id, title, description, public_slug, view_count, save_count, shared_at, source_count, category',
+      )
+      .eq('user_id', profile.id)
+      .eq('is_public', true)
+      .order('shared_at', { ascending: false })
+      .limit(20)
 
-      // Achievements (rarity'ye göre)
-      const { data: achievements } = await supabase
-        .from('user_achievements')
-        .select('achievement_id, unlocked_at, achievements(name, emoji, description, rarity, category)')
-        .eq('user_id', profile.id)
-        .eq('is_unlocked', true)
-        .order('unlocked_at', { ascending: false })
+    // Achievements (rarity'ye göre)
+    const { data: achievements } = await supabase
+      .from('user_achievements')
+      .select(
+        'achievement_id, unlocked_at, achievements(name, emoji, description, rarity, category)',
+      )
+      .eq('user_id', profile.id)
+      .eq('is_unlocked', true)
+      .order('unlocked_at', { ascending: false })
 
-      // Follow status (current user)
-      const currentUserId = await verifyUserToken(req.headers.authorization).catch(() => null)
-      let isFollowing = false
-      if (currentUserId && currentUserId !== profile.id) {
-        const { data: f } = await supabase
-          .from('follows')
-          .select('follower_id')
-          .eq('follower_id', currentUserId)
-          .eq('following_id', profile.id)
-          .maybeSingle()
-        isFollowing = !!f
-      }
+    // Follow status (current user)
+    const currentUserId = await verifyUserToken(req.headers.authorization).catch(() => null)
+    let isFollowing = false
+    if (currentUserId && currentUserId !== profile.id) {
+      const { data: f } = await supabase
+        .from('follows')
+        .select('follower_id')
+        .eq('follower_id', currentUserId)
+        .eq('following_id', profile.id)
+        .maybeSingle()
+      isFollowing = !!f
+    }
 
-      return {
-        profile,
-        stats: (stats as any)?.[0] ?? {},
-        notebooks: notebooks ?? [],
-        achievements: achievements ?? [],
-        isFollowing,
-        isSelf: currentUserId === profile.id,
-      }
-    },
-  )
+    return {
+      profile,
+      stats: (stats as any)?.[0] ?? {},
+      notebooks: notebooks ?? [],
+      achievements: achievements ?? [],
+      isFollowing,
+      isSelf: currentUserId === profile.id,
+    }
+  })
 
   // ============== FOLLOW ===============
 
@@ -157,18 +165,22 @@ export async function socialRoutes(fastify: FastifyInstance) {
     '/api/profiles/:userId/connections',
     async (req, reply) => {
       const type = req.query.type ?? 'followers'
-      const limit = Math.min(parseInt(req.query.limit ?? '50'), 200)
+      const limit = Math.min(Number.parseInt(req.query.limit ?? '50'), 200)
 
       let query
       if (type === 'followers') {
         query = supabase
           .from('follows')
-          .select('created_at, profiles!follows_follower_id_fkey(id, username, full_name, avatar_url)')
+          .select(
+            'created_at, profiles!follows_follower_id_fkey(id, username, full_name, avatar_url)',
+          )
           .eq('following_id', req.params.userId)
       } else {
         query = supabase
           .from('follows')
-          .select('created_at, profiles!follows_following_id_fkey(id, username, full_name, avatar_url)')
+          .select(
+            'created_at, profiles!follows_following_id_fkey(id, username, full_name, avatar_url)',
+          )
           .eq('follower_id', req.params.userId)
       }
 
@@ -185,7 +197,7 @@ export async function socialRoutes(fastify: FastifyInstance) {
     async (req, reply) => {
       const userId = await verifyUserToken(req.headers.authorization).catch(() => null)
       const period = req.query.period ?? 'weekly'
-      const limit = Math.min(parseInt(req.query.limit ?? '50'), 100)
+      const limit = Math.min(Number.parseInt(req.query.limit ?? '50'), 100)
 
       // Klan içi liderlik
       if (req.query.clanId) {
@@ -299,12 +311,15 @@ export async function socialRoutes(fastify: FastifyInstance) {
       if ((s.reviews_total ?? 0) >= m.threshold) {
         const { data: ach } = await supabase
           .from('user_achievements')
-          .upsert({
-            user_id: userId,
-            achievement_id: m.id,
-            is_unlocked: true,
-            progress: m.threshold,
-          }, { onConflict: 'user_id,achievement_id', ignoreDuplicates: false })
+          .upsert(
+            {
+              user_id: userId,
+              achievement_id: m.id,
+              is_unlocked: true,
+              progress: m.threshold,
+            },
+            { onConflict: 'user_id,achievement_id', ignoreDuplicates: false },
+          )
           .select()
         if (ach && ach.length > 0) newlyUnlocked.push(m.id)
       }
@@ -319,64 +334,73 @@ export async function socialRoutes(fastify: FastifyInstance) {
     ]
     for (const m of streakMilestones) {
       if ((s.current_streak ?? 0) >= m.threshold) {
-        await supabase.from('user_achievements').upsert({
-          user_id: userId,
-          achievement_id: m.id,
-          is_unlocked: true,
-          progress: m.threshold,
-        }, { onConflict: 'user_id,achievement_id' })
+        await supabase.from('user_achievements').upsert(
+          {
+            user_id: userId,
+            achievement_id: m.id,
+            is_unlocked: true,
+            progress: m.threshold,
+          },
+          { onConflict: 'user_id,achievement_id' },
+        )
       }
     }
 
     // View milestones
     if ((s.total_views ?? 0) >= 100) {
-      await supabase.from('user_achievements').upsert({
-        user_id: userId,
-        achievement_id: 'viral-share',
-        is_unlocked: true,
-        progress: s.total_views,
-      }, { onConflict: 'user_id,achievement_id' })
+      await supabase.from('user_achievements').upsert(
+        {
+          user_id: userId,
+          achievement_id: 'viral-share',
+          is_unlocked: true,
+          progress: s.total_views,
+        },
+        { onConflict: 'user_id,achievement_id' },
+      )
     }
 
     if ((s.total_saves ?? 0) >= 100) {
-      await supabase.from('user_achievements').upsert({
-        user_id: userId,
-        achievement_id: 'saved-by-100',
-        is_unlocked: true,
-        progress: s.total_saves,
-      }, { onConflict: 'user_id,achievement_id' })
+      await supabase.from('user_achievements').upsert(
+        {
+          user_id: userId,
+          achievement_id: 'saved-by-100',
+          is_unlocked: true,
+          progress: s.total_saves,
+        },
+        { onConflict: 'user_id,achievement_id' },
+      )
     }
 
     return { newlyUnlocked, stats: s }
   })
 
   /** POST /api/achievements/event — manuel event (gece kuşu, ilk podcast, vb.) */
-  fastify.post<{ Body: { event: string } }>(
-    '/api/achievements/event',
-    async (req, reply) => {
-      const userId = await verifyUserToken(req.headers.authorization)
-      if (!userId) return reply.code(401).send({ error: 'unauthorized' })
+  fastify.post<{ Body: { event: string } }>('/api/achievements/event', async (req, reply) => {
+    const userId = await verifyUserToken(req.headers.authorization)
+    if (!userId) return reply.code(401).send({ error: 'unauthorized' })
 
-      const eventToAch: Record<string, string> = {
-        'first-notebook': 'first-notebook',
-        'first-podcast': 'first-podcast',
-        'late-night-review': 'night-owl',
-        'early-morning-review': 'early-bird',
-        'pro-upgrade': 'first-pro',
-        'lifetime-purchase': 'lifetime-club',
-      }
+    const eventToAch: Record<string, string> = {
+      'first-notebook': 'first-notebook',
+      'first-podcast': 'first-podcast',
+      'late-night-review': 'night-owl',
+      'early-morning-review': 'early-bird',
+      'pro-upgrade': 'first-pro',
+      'lifetime-purchase': 'lifetime-club',
+    }
 
-      const achId = eventToAch[req.body.event]
-      if (!achId) return reply.code(400).send({ error: 'unknown_event' })
+    const achId = eventToAch[req.body.event]
+    if (!achId) return reply.code(400).send({ error: 'unknown_event' })
 
-      await supabase.from('user_achievements').upsert({
+    await supabase.from('user_achievements').upsert(
+      {
         user_id: userId,
         achievement_id: achId,
         is_unlocked: true,
         progress: 1,
-      }, { onConflict: 'user_id,achievement_id' })
+      },
+      { onConflict: 'user_id,achievement_id' },
+    )
 
-      return { unlocked: achId }
-    },
-  )
+    return { unlocked: achId }
+  })
 }

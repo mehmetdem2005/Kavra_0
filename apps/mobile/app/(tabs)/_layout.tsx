@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Text } from 'react-native'
 
 function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
-  return (
-    <Text style={{ fontSize: 22, opacity: focused ? 1 : 0.5 }}>{emoji}</Text>
-  )
+  return <Text style={{ fontSize: 22, opacity: focused ? 1 : 0.5 }}>{emoji}</Text>
 }
 
 export default function TabsLayout() {

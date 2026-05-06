@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
-import { View, Text, TextInput, Pressable, Alert, Keyboard } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Stack } from 'expo-router'
+import { useEffect, useRef, useState } from 'react'
+import { Alert, Keyboard, Pressable, Text, TextInput, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
 import { apiFetch } from '../../src/lib/api'
 
@@ -126,9 +126,10 @@ export default function VerifyOTP() {
     }
   }
 
-  const masked = params.type === 'email'
-    ? params.identifier?.replace(/^(.{2}).+(@.+)$/, '$1•••$2')
-    : params.identifier?.replace(/(\+?\d{2,3})(.+)(\d{2})$/, '$1•••$3')
+  const masked =
+    params.type === 'email'
+      ? params.identifier?.replace(/^(.{2}).+(@.+)$/, '$1•••$2')
+      : params.identifier?.replace(/(\+?\d{2,3})(.+)(\d{2})$/, '$1•••$3')
 
   return (
     <SafeAreaView className="flex-1 bg-cream-50">
@@ -153,7 +154,9 @@ export default function VerifyOTP() {
           {digits.map((d, i) => (
             <TextInput
               key={i}
-              ref={(r) => { inputs.current[i] = r }}
+              ref={(r) => {
+                inputs.current[i] = r
+              }}
               value={d}
               onChangeText={(v) => updateDigit(i, v)}
               onKeyPress={(e) => {

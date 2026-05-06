@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from '../../../../../lib/api'
 import { Download } from 'lucide-react'
+import { useParams } from 'next/navigation'
+import { useState } from 'react'
+import { apiFetch } from '../../../../../lib/api'
 
 const CATEGORIES = ['', 'auth', 'org', 'user', 'billing', 'class', 'data', 'security']
 
@@ -21,19 +21,23 @@ export default function AuditPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['audit-log', orgId, category],
-    queryFn: () => apiFetch<any>(`/api/orgs/${orgId}/audit${category ? `?category=${category}` : ''}`),
+    queryFn: () =>
+      apiFetch<any>(`/api/orgs/${orgId}/audit${category ? `?category=${category}` : ''}`),
     enabled: !!orgId,
   })
 
   const handleExport = async () => {
     const endDate = new Date().toISOString()
     const startDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orgs/${orgId}/audit/export`, {
-      method: 'POST',
-      body: JSON.stringify({ startDate, endDate }),
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-    })
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orgs/${orgId}/audit/export`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ startDate, endDate }),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      },
+    )
     const blob = await res.blob()
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -66,7 +70,9 @@ export default function AuditPage() {
             key={c}
             onClick={() => setCategory(c)}
             className={`px-3 py-1.5 rounded-full text-[11px] font-bold ${
-              category === c ? 'bg-ink-900 text-cream-50' : 'bg-white border border-slate-200 text-slate-600'
+              category === c
+                ? 'bg-ink-900 text-cream-50'
+                : 'bg-white border border-slate-200 text-slate-600'
             }`}
           >
             {c === '' ? 'Hepsi' : c}
@@ -102,9 +108,7 @@ export default function AuditPage() {
                   <td className="px-4 py-3 text-[11px]">
                     {l.profiles?.full_name ?? l.profiles?.email ?? '-'}
                   </td>
-                  <td className="px-4 py-3 text-[11px] text-slate-600">
-                    {l.target_type ?? '-'}
-                  </td>
+                  <td className="px-4 py-3 text-[11px] text-slate-600">{l.target_type ?? '-'}</td>
                   <td className="px-4 py-3 text-[11px] font-mono text-slate-500">
                     {l.ip_address ?? '-'}
                   </td>

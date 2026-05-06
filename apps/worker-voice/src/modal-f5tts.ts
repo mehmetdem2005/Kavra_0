@@ -21,11 +21,11 @@ export class ModalNotConfiguredError extends Error {
 }
 
 export interface CloneSynthesizeParams {
-  referenceAudioUrl: string  // signed URL to .wav
-  referenceText: string      // F5-TTS için referans transkript
-  targetText: string         // klonlanmış sesle söylenecek metin
-  language?: string          // 'tr', 'en' vb
-  speed?: number             // 0.7 - 1.3
+  referenceAudioUrl: string // signed URL to .wav
+  referenceText: string // F5-TTS için referans transkript
+  targetText: string // klonlanmış sesle söylenecek metin
+  language?: string // 'tr', 'en' vb
+  speed?: number // 0.7 - 1.3
 }
 
 export async function modalClonedTTS(params: CloneSynthesizeParams): Promise<{
@@ -71,9 +71,7 @@ export interface ValidationResult {
   warnings: string[]
 }
 
-export async function validateReferenceAudio(
-  audioBuffer: Buffer,
-): Promise<ValidationResult> {
+export async function validateReferenceAudio(audioBuffer: Buffer): Promise<ValidationResult> {
   const errors: string[] = []
   const warnings: string[] = []
 

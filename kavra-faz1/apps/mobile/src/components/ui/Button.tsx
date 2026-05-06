@@ -1,4 +1,4 @@
-import { Pressable, Text, ActivityIndicator } from 'react-native'
+import { ActivityIndicator, Pressable, Text } from 'react-native'
 import type { PressableProps } from 'react-native'
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'accent'
@@ -44,13 +44,18 @@ export function Button({
       disabled={isDisabled}
       className={[
         'flex-row items-center justify-center rounded-xl',
-        v.bg, v.border ?? '', s.pad, s.height,
+        v.bg,
+        v.border ?? '',
+        s.pad,
+        s.height,
         fullWidth ? 'w-full' : '',
         isDisabled ? 'opacity-50' : '',
       ].join(' ')}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' || variant === 'accent' ? 'white' : '#1E1B4B'} />
+        <ActivityIndicator
+          color={variant === 'primary' || variant === 'accent' ? 'white' : '#1E1B4B'}
+        />
       ) : (
         <Text className={`font-semibold ${v.text} ${s.text}`}>{title}</Text>
       )}

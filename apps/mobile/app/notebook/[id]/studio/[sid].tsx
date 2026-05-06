@@ -1,13 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, Linking } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router'
 import { Audio } from 'expo-av'
-import {
-  useGeneratedContent, useSynthesizePodcast, usePodcastManifest,
-} from '../../../../src/hooks/useNotebooks'
-import { Icon } from '../../../../src/components/ui/Icon'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { useEffect, useRef, useState } from 'react'
+import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { MermaidView } from '../../../../src/components/notebook/MermaidView'
+import { Icon } from '../../../../src/components/ui/Icon'
+import {
+  useGeneratedContent,
+  usePodcastManifest,
+  useSynthesizePodcast,
+} from '../../../../src/hooks/useNotebooks'
 import { apiFetch } from '../../../../src/lib/api'
 
 export default function StudioDetail() {
@@ -16,7 +18,11 @@ export default function StudioDetail() {
   const { data: gen, isLoading } = useGeneratedContent(sid ?? null)
 
   if (isLoading || !gen) {
-    return <View className="flex-1 bg-cream-50 items-center justify-center"><ActivityIndicator color="#1E1B4B" /></View>
+    return (
+      <View className="flex-1 bg-cream-50 items-center justify-center">
+        <ActivityIndicator color="#1E1B4B" />
+      </View>
+    )
   }
 
   return (
@@ -146,14 +152,19 @@ function PodcastPlayer({ generated }: { generated: any }) {
       <View className="px-6 py-8 items-center bg-cream-50">
         <View className="flex-row items-center gap-2 mb-6">
           {['A', 'B'].map((spkr, i) => (
-            <View key={spkr} className={`flex-row items-center gap-1.5 ${
-              seg?.speaker === spkr ? 'opacity-100' : 'opacity-30'
-            }`}>
+            <View
+              key={spkr}
+              className={`flex-row items-center gap-1.5 ${
+                seg?.speaker === spkr ? 'opacity-100' : 'opacity-30'
+              }`}
+            >
               <View
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: spkr === 'A' ? '#F59E0B' : '#7C3AED' }}
               />
-              <Text className="text-xs font-bold text-ink-900">{spkr === 'A' ? 'Ela' : 'Mert'}</Text>
+              <Text className="text-xs font-bold text-ink-900">
+                {spkr === 'A' ? 'Ela' : 'Mert'}
+              </Text>
             </View>
           ))}
         </View>
@@ -175,9 +186,7 @@ function PodcastPlayer({ generated }: { generated: any }) {
         <Text className="font-mono text-[9px] text-slate-500 tracking-widest uppercase mb-2">
           Şimdi konuşan: {seg?.speaker === 'A' ? 'Ela' : 'Mert'}
         </Text>
-        <Text className="font-serif text-base text-ink-900 leading-6 italic">
-          "{seg?.text}"
-        </Text>
+        <Text className="font-serif text-base text-ink-900 leading-6 italic">"{seg?.text}"</Text>
       </View>
 
       {/* Transcript scroll */}
@@ -188,12 +197,17 @@ function PodcastPlayer({ generated }: { generated: any }) {
         {manifest.segments.map((s, i) => (
           <Pressable
             key={i}
-            onPress={() => { setCurrentSegment(i); playSegment(i) }}
+            onPress={() => {
+              setCurrentSegment(i)
+              playSegment(i)
+            }}
             className={`mb-2 p-2 rounded-xl ${currentSegment === i ? 'bg-amber-50 border border-amber-200' : ''}`}
           >
-            <Text className={`text-[11px] font-bold mb-0.5 ${
-              s.speaker === 'A' ? 'text-amber-700' : 'text-purple-700'
-            }`}>
+            <Text
+              className={`text-[11px] font-bold mb-0.5 ${
+                s.speaker === 'A' ? 'text-amber-700' : 'text-purple-700'
+              }`}
+            >
               {s.speaker === 'A' ? 'Ela' : 'Mert'}
             </Text>
             <Text className="text-sm text-ink-900 leading-5">{s.text}</Text>
@@ -211,16 +225,26 @@ function FlashcardsViewer({ raw }: { raw: any }) {
   const [idx, setIdx] = useState(0)
   const [revealed, setRevealed] = useState(false)
 
-  if (cards.length === 0) return <View className="p-6"><Text>Kart yok</Text></View>
+  if (cards.length === 0)
+    return (
+      <View className="p-6">
+        <Text>Kart yok</Text>
+      </View>
+    )
 
   const card = cards[idx]
 
   return (
     <View className="flex-1">
       <View className="px-4 pt-3">
-        <Text className="text-xs text-slate-500 font-mono">{idx + 1} / {cards.length}</Text>
+        <Text className="text-xs text-slate-500 font-mono">
+          {idx + 1} / {cards.length}
+        </Text>
         <View className="h-1 bg-slate-200 rounded-full mt-1.5">
-          <View className="h-full bg-amber-500 rounded-full" style={{ width: `${((idx + 1) / cards.length) * 100}%` }} />
+          <View
+            className="h-full bg-amber-500 rounded-full"
+            style={{ width: `${((idx + 1) / cards.length) * 100}%` }}
+          />
         </View>
       </View>
 
@@ -244,14 +268,24 @@ function FlashcardsViewer({ raw }: { raw: any }) {
       {revealed && (
         <View className="px-5 pb-6 flex-row gap-2">
           <Pressable
-            onPress={() => { if (idx > 0) { setIdx(idx - 1); setRevealed(false) } }}
+            onPress={() => {
+              if (idx > 0) {
+                setIdx(idx - 1)
+                setRevealed(false)
+              }
+            }}
             disabled={idx === 0}
             className="bg-white border border-slate-200 rounded-2xl px-5 py-3"
           >
             <Icon name="chevron-left" size={18} color="#1E1B4B" />
           </Pressable>
           <Pressable
-            onPress={() => { if (idx < cards.length - 1) { setIdx(idx + 1); setRevealed(false) } }}
+            onPress={() => {
+              if (idx < cards.length - 1) {
+                setIdx(idx + 1)
+                setRevealed(false)
+              }
+            }}
             className="flex-1 bg-ink-900 rounded-2xl py-3 items-center"
           >
             <Text className="text-cream-50 font-semibold">Sonraki</Text>
@@ -271,15 +305,24 @@ function QuizViewer({ raw }: { raw: any }) {
   const [showResult, setShowResult] = useState(false)
   const [score, setScore] = useState(0)
 
-  if (questions.length === 0) return <View className="p-6"><Text>Soru yok</Text></View>
+  if (questions.length === 0)
+    return (
+      <View className="p-6">
+        <Text>Soru yok</Text>
+      </View>
+    )
 
   const q = questions[idx]
   const isCorrect = selected === q.correctIndex
 
   return (
     <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60 }}>
-      <Text className="text-xs text-slate-500 font-mono">Soru {idx + 1} / {questions.length}</Text>
-      <Text className="text-xs text-emerald-700 font-mono mt-0.5">Skor: {score} / {questions.length}</Text>
+      <Text className="text-xs text-slate-500 font-mono">
+        Soru {idx + 1} / {questions.length}
+      </Text>
+      <Text className="text-xs text-emerald-700 font-mono mt-0.5">
+        Skor: {score} / {questions.length}
+      </Text>
 
       <Text className="font-serif text-xl text-ink-900 mt-4 leading-7">{q.question}</Text>
 
@@ -298,11 +341,15 @@ function QuizViewer({ raw }: { raw: any }) {
           return (
             <Pressable
               key={i}
-              onPress={() => { if (!showResult) setSelected(i) }}
+              onPress={() => {
+                if (!showResult) setSelected(i)
+              }}
               className={`border rounded-2xl p-4 flex-row items-center gap-3 ${bg}`}
             >
               <View className="w-7 h-7 rounded-full border border-slate-300 items-center justify-center">
-                <Text className="text-xs font-bold text-slate-700">{String.fromCharCode(65 + i)}</Text>
+                <Text className="text-xs font-bold text-slate-700">
+                  {String.fromCharCode(65 + i)}
+                </Text>
               </View>
               <Text className="flex-1 text-sm text-ink-900">{opt}</Text>
               {showResult && isCorrectOpt && <Icon name="check-circle" size={16} color="#10B981" />}
@@ -325,8 +372,12 @@ function QuizViewer({ raw }: { raw: any }) {
 
       {showResult && (
         <>
-          <View className={`mt-5 p-3 rounded-2xl ${isCorrect ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'}`}>
-            <Text className={`text-xs font-bold ${isCorrect ? 'text-emerald-700' : 'text-red-700'} mb-1`}>
+          <View
+            className={`mt-5 p-3 rounded-2xl ${isCorrect ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'}`}
+          >
+            <Text
+              className={`text-xs font-bold ${isCorrect ? 'text-emerald-700' : 'text-red-700'} mb-1`}
+            >
               {isCorrect ? '✓ DOĞRU' : '✗ YANLIŞ'}
             </Text>
             <Text className="text-sm text-ink-900 leading-5">{q.explanation}</Text>
@@ -347,7 +398,9 @@ function QuizViewer({ raw }: { raw: any }) {
           {idx + 1 === questions.length && (
             <View className="mt-4 bg-cream-100 rounded-2xl p-4 items-center">
               <Text className="font-serif text-2xl text-ink-900">Test Bitti!</Text>
-              <Text className="text-sm text-slate-700 mt-1">{score} / {questions.length} doğru</Text>
+              <Text className="text-sm text-slate-700 mt-1">
+                {score} / {questions.length} doğru
+              </Text>
             </View>
           )}
         </>
@@ -363,7 +416,12 @@ function SlidesViewer({ raw, generatedId }: { raw: any; generatedId?: string }) 
   const [idx, setIdx] = useState(0)
   const [exporting, setExporting] = useState(false)
 
-  if (slides.length === 0) return <View className="p-6"><Text>Slayt yok</Text></View>
+  if (slides.length === 0)
+    return (
+      <View className="p-6">
+        <Text>Slayt yok</Text>
+      </View>
+    )
 
   const s = slides[idx]
 
@@ -407,13 +465,19 @@ function SlidesViewer({ raw, generatedId }: { raw: any; generatedId?: string }) 
           )}
           {s.layout === 'quote' && (
             <>
-              <Text className="font-serif text-2xl text-ink-900 italic leading-tight">"{s.quote}"</Text>
-              {s.author && <Text className="text-sm text-slate-600 mt-3 text-right">— {s.author}</Text>}
+              <Text className="font-serif text-2xl text-ink-900 italic leading-tight">
+                "{s.quote}"
+              </Text>
+              {s.author && (
+                <Text className="text-sm text-slate-600 mt-3 text-right">— {s.author}</Text>
+              )}
             </>
           )}
           {s.layout === 'closing' && (
             <View className="items-center">
-              <Text className="font-serif text-4xl text-amber-500 italic">{s.title ?? 'Teşekkürler'}</Text>
+              <Text className="font-serif text-4xl text-amber-500 italic">
+                {s.title ?? 'Teşekkürler'}
+              </Text>
               {s.subtitle && <Text className="text-base text-slate-600 mt-3">{s.subtitle}</Text>}
             </View>
           )}
@@ -421,7 +485,9 @@ function SlidesViewer({ raw, generatedId }: { raw: any; generatedId?: string }) 
 
         {s.speakerNotes && (
           <View className="bg-amber-50 border border-amber-200 rounded-2xl p-3 mt-3">
-            <Text className="font-mono text-[9px] text-amber-700 tracking-widest uppercase mb-1">Konuşma Notu</Text>
+            <Text className="font-mono text-[9px] text-amber-700 tracking-widest uppercase mb-1">
+              Konuşma Notu
+            </Text>
             <Text className="text-xs text-ink-900 leading-5">{s.speakerNotes}</Text>
           </View>
         )}
@@ -436,7 +502,9 @@ function SlidesViewer({ raw, generatedId }: { raw: any; generatedId?: string }) 
           <Icon name="chevron-left" size={16} color="#1E1B4B" />
         </Pressable>
         <View className="flex-1 items-center justify-center">
-          <Text className="text-xs text-slate-500 font-mono">{idx + 1} / {slides.length}</Text>
+          <Text className="text-xs text-slate-500 font-mono">
+            {idx + 1} / {slides.length}
+          </Text>
         </View>
         <Pressable
           onPress={handleExport}
@@ -500,9 +568,7 @@ function InfographicViewer({ raw }: { raw: any }) {
       <Text className="text-sm text-slate-600 mt-2 mb-4">{raw?.description}</Text>
 
       {/* Gerçek mermaid render */}
-      {raw?.mermaid && (
-        <MermaidView code={raw.mermaid} height={400} />
-      )}
+      {raw?.mermaid && <MermaidView code={raw.mermaid} height={400} />}
 
       <Pressable
         onPress={() => setShowSource(!showSource)}
@@ -516,7 +582,9 @@ function InfographicViewer({ raw }: { raw: any }) {
 
       {showSource && (
         <View className="bg-ink-950 rounded-2xl p-4 mt-2">
-          <Text className="font-mono text-xs text-cream-50" selectable>{raw?.mermaid}</Text>
+          <Text className="font-mono text-xs text-cream-50" selectable>
+            {raw?.mermaid}
+          </Text>
         </View>
       )}
     </ScrollView>

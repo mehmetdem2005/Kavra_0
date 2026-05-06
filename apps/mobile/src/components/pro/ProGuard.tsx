@@ -1,12 +1,12 @@
-import { View, Text, Pressable } from 'react-native'
 import { useRouter } from 'expo-router'
+import { Pressable, Text, View } from 'react-native'
 import { useIsPro } from '../../hooks/useEntitlement'
 
 interface Props {
-  feature: string                  // 'Voice Cloning', '3D Map' vb
+  feature: string // 'Voice Cloning', '3D Map' vb
   emoji: string
   description: string
-  children?: React.ReactNode       // Pro ise gösterilecek
+  children?: React.ReactNode // Pro ise gösterilecek
 }
 
 /**

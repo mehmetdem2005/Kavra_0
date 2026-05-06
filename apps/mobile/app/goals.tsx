@@ -1,14 +1,10 @@
-import { useState } from 'react'
-import {
-  View, Text, ScrollView, Pressable, Modal, Alert, ActivityIndicator,
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack } from 'expo-router'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../src/components/ui/Button'
 import { Input } from '../src/components/ui/Input'
-import {
-  useGoals, useCreateGoal, useCompleteGoal, type Goal,
-} from '../src/hooks/useMotivation'
+import { type Goal, useCompleteGoal, useCreateGoal, useGoals } from '../src/hooks/useMotivation'
 
 export default function Goals() {
   const { data: goals, isLoading } = useGoals()
@@ -31,8 +27,8 @@ export default function Goals() {
         <View className="bg-brand-50 border border-brand-200 rounded-2xl p-4 mb-4">
           <Text className="text-brand-900 font-semibold mb-1">🎯 WOOP Yöntemi</Text>
           <Text className="text-brand-800 text-sm leading-5">
-            Wish, Outcome, Obstacle, Plan — Gabriele Oettingen'in
-            zihinsel kontrast tekniği. Sadece istemek değil, engeli de planlamak.
+            Wish, Outcome, Obstacle, Plan — Gabriele Oettingen'in zihinsel kontrast tekniği. Sadece
+            istemek değil, engeli de planlamak.
           </Text>
         </View>
 
@@ -48,7 +44,9 @@ export default function Goals() {
                   Aktif ({active.length})
                 </Text>
                 <View className="gap-3">
-                  {active.map((g) => <GoalCard key={g.id} goal={g} />)}
+                  {active.map((g) => (
+                    <GoalCard key={g.id} goal={g} />
+                  ))}
                 </View>
               </View>
             )}
@@ -60,7 +58,10 @@ export default function Goals() {
                 </Text>
                 <View className="gap-2">
                   {completed.map((g) => (
-                    <View key={g.id} className="bg-white rounded-xl p-3 border border-slate-100 opacity-60">
+                    <View
+                      key={g.id}
+                      className="bg-white rounded-xl p-3 border border-slate-100 opacity-60"
+                    >
                       <Text className="text-brand-950 line-through text-sm" numberOfLines={1}>
                         {g.wish}
                       </Text>
@@ -109,9 +110,15 @@ function GoalCard({ goal }: { goal: Goal }) {
             → {goal.outcome}
           </Text>
           {daysToTarget !== null && daysToTarget >= 0 && (
-            <Text className={`text-xs mt-1 font-medium ${
-              daysToTarget <= 7 ? 'text-red-600' : daysToTarget <= 30 ? 'text-amber-600' : 'text-slate-500'
-            }`}>
+            <Text
+              className={`text-xs mt-1 font-medium ${
+                daysToTarget <= 7
+                  ? 'text-red-600'
+                  : daysToTarget <= 30
+                    ? 'text-amber-600'
+                    : 'text-slate-500'
+              }`}
+            >
               📅 {daysToTarget} gün kaldı
             </Text>
           )}
@@ -153,7 +160,12 @@ function CreateGoalModal({ visible, onClose }: { visible: boolean; onClose: () =
   const [plan, setPlan] = useState('')
   const create = useCreateGoal()
 
-  const reset = () => { setWish(''); setOutcome(''); setObstacle(''); setPlan('') }
+  const reset = () => {
+    setWish('')
+    setOutcome('')
+    setObstacle('')
+    setPlan('')
+  }
 
   const handleSave = () => {
     if (!wish.trim() || !outcome.trim()) {
@@ -168,7 +180,10 @@ function CreateGoalModal({ visible, onClose }: { visible: boolean; onClose: () =
         plan: plan.trim() || undefined,
       },
       {
-        onSuccess: () => { reset(); onClose() },
+        onSuccess: () => {
+          reset()
+          onClose()
+        },
         onError: (e: any) => Alert.alert('Hata', e.message),
       },
     )
@@ -185,19 +200,40 @@ function CreateGoalModal({ visible, onClose }: { visible: boolean; onClose: () =
           </Text>
 
           <ScrollView style={{ maxHeight: 400 }}>
-            <Input label="W — Wish (Dilek)" value={wish} onChangeText={setWish}
-              placeholder="Almanca B1 sınavını geçmek" />
-            <Input label="O — Outcome (Sonuç)" value={outcome} onChangeText={setOutcome}
-              placeholder="Erasmus için Berlin'e gitmek" />
-            <Input label="O — Obstacle (Engel)" value={obstacle} onChangeText={setObstacle}
-              placeholder="Düzenli çalışmamak, ezber sıkıcı" />
-            <Input label="P — Plan (Eğer-O zaman)" value={plan} onChangeText={setPlan}
-              placeholder="Hafta içi 21:00'da olduğumda Anki açacağım" />
+            <Input
+              label="W — Wish (Dilek)"
+              value={wish}
+              onChangeText={setWish}
+              placeholder="Almanca B1 sınavını geçmek"
+            />
+            <Input
+              label="O — Outcome (Sonuç)"
+              value={outcome}
+              onChangeText={setOutcome}
+              placeholder="Erasmus için Berlin'e gitmek"
+            />
+            <Input
+              label="O — Obstacle (Engel)"
+              value={obstacle}
+              onChangeText={setObstacle}
+              placeholder="Düzenli çalışmamak, ezber sıkıcı"
+            />
+            <Input
+              label="P — Plan (Eğer-O zaman)"
+              value={plan}
+              onChangeText={setPlan}
+              placeholder="Hafta içi 21:00'da olduğumda Anki açacağım"
+            />
           </ScrollView>
 
           <View className="flex-row gap-3 mt-4">
             <View className="flex-1">
-              <Button title="İptal" variant="secondary" onPress={onClose} disabled={create.isPending} />
+              <Button
+                title="İptal"
+                variant="secondary"
+                onPress={onClose}
+                disabled={create.isPending}
+              />
             </View>
             <View className="flex-1">
               <Button title="Kaydet" onPress={handleSave} loading={create.isPending} />

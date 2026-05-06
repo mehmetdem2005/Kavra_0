@@ -1,8 +1,8 @@
-import type { FastifyInstance } from 'fastify'
 import { SendMessageSchema } from '@kavra/shared/schemas'
-import { groqChat, GroqError } from '../groq.js'
-import { getActiveGroqKey } from './api-keys.js'
+import type { FastifyInstance } from 'fastify'
+import { GroqError, groqChat } from '../groq.js'
 import { supabase, verifyUserToken } from '../supabase.js'
+import { getActiveGroqKey } from './api-keys.js'
 
 const DEFAULT_MODEL = 'llama-3.3-70b-versatile'
 const MAX_HISTORY_MESSAGES = 40
@@ -31,7 +31,7 @@ export async function chatRoutes(fastify: FastifyInstance) {
     if (!apiKey) {
       return reply.code(400).send({
         error: 'no_active_key',
-        message: 'Önce Ayarlar > API Anahtarları\'ndan Groq anahtarını ekle',
+        message: "Önce Ayarlar > API Anahtarları'ndan Groq anahtarını ekle",
       })
     }
 
@@ -111,7 +111,7 @@ export async function chatRoutes(fastify: FastifyInstance) {
         temperature,
       })
 
-      if (!groqRes.body) throw new Error('Groq\'tan yanıt gövdesi alınamadı')
+      if (!groqRes.body) throw new Error("Groq'tan yanıt gövdesi alınamadı")
 
       const reader = groqRes.body.getReader()
       const decoder = new TextDecoder()
@@ -174,7 +174,7 @@ export async function chatRoutes(fastify: FastifyInstance) {
       const message =
         err instanceof GroqError
           ? `Groq hatası: ${err.message}`
-          : err?.message ?? 'Beklenmeyen hata'
+          : (err?.message ?? 'Beklenmeyen hata')
 
       reply.raw.write(`data: ${JSON.stringify({ error: message })}\n\n`)
       reply.raw.end()

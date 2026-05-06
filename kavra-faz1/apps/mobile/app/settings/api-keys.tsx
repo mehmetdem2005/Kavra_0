@@ -1,16 +1,25 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, Modal, ActivityIndicator, Linking } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { Stack } from 'expo-router'
+import { useState } from 'react'
+import {
+  ActivityIndicator,
+  Alert,
+  Linking,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../src/components/ui/Button'
 import { Input } from '../../src/components/ui/Input'
 import {
-  useApiKeys,
-  useAddApiKey,
-  useDeleteApiKey,
-  useTestApiKey,
-  useSetDefaultApiKey,
   type ApiKeyRow,
+  useAddApiKey,
+  useApiKeys,
+  useDeleteApiKey,
+  useSetDefaultApiKey,
+  useTestApiKey,
 } from '../../src/hooks/useApiKeys'
 
 export default function ApiKeys() {
@@ -58,7 +67,9 @@ export default function ApiKeys() {
         ) : (
           <View>
             <View className="gap-3 mb-4">
-              {keys.map((k) => <KeyRow key={k.id} item={k} />)}
+              {keys.map((k) => (
+                <KeyRow key={k.id} item={k} />
+              ))}
             </View>
             <Button
               title="+ Yeni Anahtar Ekle"
@@ -86,20 +97,23 @@ function KeyRow({ item }: { item: ApiKeyRow }) {
     Alert.alert('Anahtarı sil', `"${item.label}" anahtarını kalıcı olarak silmek istiyor musun?`, [
       { text: 'İptal', style: 'cancel' },
       {
-        text: 'Sil', style: 'destructive',
-        onPress: () => del.mutate(item.id, {
-          onError: (e: any) => Alert.alert('Hata', e.message),
-        }),
+        text: 'Sil',
+        style: 'destructive',
+        onPress: () =>
+          del.mutate(item.id, {
+            onError: (e: any) => Alert.alert('Hata', e.message),
+          }),
       },
     ])
   }
 
   const runTest = () => {
     test.mutate(item.id, {
-      onSuccess: (r) => Alert.alert(
-        r.success ? '✓ Çalışıyor' : '✗ Başarısız',
-        r.success ? 'Anahtar geçerli ve Groq ile iletişim kuruldu.' : 'Anahtar çalışmıyor.',
-      ),
+      onSuccess: (r) =>
+        Alert.alert(
+          r.success ? '✓ Çalışıyor' : '✗ Başarısız',
+          r.success ? 'Anahtar geçerli ve Groq ile iletişim kuruldu.' : 'Anahtar çalışmıyor.',
+        ),
       onError: (e: any) => Alert.alert('Hata', e.message),
     })
   }
@@ -120,7 +134,9 @@ function KeyRow({ item }: { item: ApiKeyRow }) {
             {providerLabel} · gsk_••••{item.key_last4}
           </Text>
           {item.last_test_success !== null && (
-            <Text className={`text-xs mt-1 ${item.last_test_success ? 'text-green-600' : 'text-red-500'}`}>
+            <Text
+              className={`text-xs mt-1 ${item.last_test_success ? 'text-green-600' : 'text-red-500'}`}
+            >
               {item.last_test_success ? '✓ Son test başarılı' : '✗ Son test başarısız'}
             </Text>
           )}
@@ -129,7 +145,10 @@ function KeyRow({ item }: { item: ApiKeyRow }) {
 
       <View className="flex-row gap-2 mt-3">
         {!item.is_default && (
-          <Pressable onPress={() => setDefault.mutate(item.id)} className="px-3 py-1.5 rounded-lg bg-slate-100">
+          <Pressable
+            onPress={() => setDefault.mutate(item.id)}
+            className="px-3 py-1.5 rounded-lg bg-slate-100"
+          >
             <Text className="text-brand-950 text-sm font-medium">Varsayılan Yap</Text>
           </Pressable>
         )}
@@ -161,14 +180,22 @@ function AddKeyModal({ visible, onClose }: { visible: boolean; onClose: () => vo
   const add = useAddApiKey()
 
   const handleSave = async () => {
-    if (!key.trim()) { Alert.alert('', 'API anahtarını yapıştır'); return }
-    if (!key.startsWith('gsk_')) { Alert.alert('', 'Groq anahtarı "gsk_" ile başlamalı'); return }
+    if (!key.trim()) {
+      Alert.alert('', 'API anahtarını yapıştır')
+      return
+    }
+    if (!key.startsWith('gsk_')) {
+      Alert.alert('', 'Groq anahtarı "gsk_" ile başlamalı')
+      return
+    }
 
     add.mutate(
       { label: label.trim(), key: key.trim() },
       {
         onSuccess: () => {
-          setKey(''); setLabel('Kişisel'); onClose()
+          setKey('')
+          setLabel('Kişisel')
+          onClose()
           Alert.alert('✓', 'Anahtar şifreli kaydedildi ve test edildi.')
         },
         onError: (e: any) => {
@@ -206,7 +233,12 @@ function AddKeyModal({ visible, onClose }: { visible: boolean; onClose: () => vo
 
           <View className="flex-row gap-3 mt-2">
             <View className="flex-1">
-              <Button title="İptal" variant="secondary" onPress={onClose} disabled={add.isPending} />
+              <Button
+                title="İptal"
+                variant="secondary"
+                onPress={onClose}
+                disabled={add.isPending}
+              />
             </View>
             <View className="flex-1">
               <Button title="Kaydet" onPress={handleSave} loading={add.isPending} />

@@ -2,12 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif&display=swap");
 
 :root {
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
 }
 
-html { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
-body { background: #FAFAFA; color: #1E1B4B; }
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  background: #fafafa;
+  color: #1e1b4b;
+}

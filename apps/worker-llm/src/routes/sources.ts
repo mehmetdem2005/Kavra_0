@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
+import { chunkYouTubeTranscript, extractVideoId, fetchYouTubeTranscript } from '../lib/youtube.js'
 import { supabase, verifyUserToken } from '../supabase.js'
-import { fetchYouTubeTranscript, extractVideoId, chunkYouTubeTranscript } from '../lib/youtube.js'
 
 /**
  * Source Ingestion Routes — NotebookLM kaynakları
@@ -31,7 +31,7 @@ const CreateSourceSchema = z.object({
   title: z.string().min(1).max(300),
   storagePath: z.string().optional(),
   externalUrl: z.string().url().optional(),
-  rawText: z.string().max(500_000).optional(),     // text source için 500kb max
+  rawText: z.string().max(500_000).optional(), // text source için 500kb max
   metadata: z.record(z.string(), z.any()).optional(),
 })
 
@@ -52,12 +52,15 @@ interface Chunk {
  * Heading-aware chunking. Default: ~700 token, 100 overlap.
  * Türkçe için her token ≈ 3.5 karakter (subtoken yüzünden).
  */
-function chunkText(text: string, opts?: {
-  maxChars?: number
-  overlap?: number
-}): Chunk[] {
-  const maxChars = opts?.maxChars ?? 2500     // ~700 token TR
-  const overlap = opts?.overlap ?? 350         // ~100 token
+function chunkText(
+  text: string,
+  opts?: {
+    maxChars?: number
+    overlap?: number
+  },
+): Chunk[] {
+  const maxChars = opts?.maxChars ?? 2500 // ~700 token TR
+  const overlap = opts?.overlap ?? 350 // ~100 token
 
   if (text.length <= maxChars) {
     return [{ text, index: 0, startChar: 0, endChar: text.length }]
@@ -92,7 +95,7 @@ function chunkText(text: string, opts?: {
 
     // Detect section title
     const sectionMatch = chunkText.match(/^(#{1,3}\s+.+)$/m)
-    if (sectionMatch) currentSection = sectionMatch[1].replace(/^#+\s+/, '')
+    if (sectionMatch?.[1]) currentSection = sectionMatch[1].replace(/^#+\s+/, '')
 
     chunks.push({
       text: chunkText,
@@ -163,7 +166,9 @@ async function extractFromPdf(storagePath: string): Promise<{ text: string; page
   }
 }
 
-async function extractFromAudio(storagePath: string): Promise<{ text: string; durationMs: number }> {
+async function extractFromAudio(
+  storagePath: string,
+): Promise<{ text: string; durationMs: number }> {
   // Groq Whisper Large v3 Turbo
   const groqKey = process.env.GROQ_API_KEY
   if (!groqKey) throw new Error('GROQ_API_KEY not configured')
@@ -194,7 +199,6 @@ async function extractFromAudio(storagePath: string): Promise<{ text: string; du
 // ===== Routes =====
 
 export async function sourcesRoutes(fastify: FastifyInstance) {
-
   /** POST /api/sources/upload-url */
   fastify.post<{ Body: { fileName: string; mimeType?: string } }>(
     '/api/sources/upload-url',
@@ -237,7 +241,10 @@ export async function sourcesRoutes(fastify: FastifyInstance) {
 
     // Free tier: 5 source per notebook
     const { data: ent } = await supabase
-      .from('user_entitlements').select('is_pro').eq('user_id', userId).single()
+      .from('user_entitlements')
+      .select('is_pro')
+      .eq('user_id', userId)
+      .single()
 
     if (!ent?.is_pro) {
       const { count } = await supabase
@@ -377,10 +384,7 @@ export async function processSource(sourceId: string, userId: string): Promise<v
 
   if (!source) return
 
-  await supabase
-    .from('notebook_sources')
-    .update({ status: 'processing' })
-    .eq('id', sourceId)
+  await supabase.from('notebook_sources').update({ status: 'processing' }).eq('id', sourceId)
 
   try {
     let text = ''
@@ -459,7 +463,7 @@ export async function processSource(sourceId: string, userId: string): Promise<v
         .eq('id', sourceId)
 
       await supabase.rpc('recount_notebook_aggregates', { p_notebook_id: source.notebook_id })
-      return                                                  // YouTube path early return — chunking ayrı
+      return // YouTube path early return — chunking ayrı
     } else {
       throw new Error(`Unsupported source type or missing data: ${source.source_type}`)
     }
@@ -487,7 +491,7 @@ export async function processSource(sourceId: string, userId: string): Promise<v
       user_id: userId,
       chunk_index: c.index,
       text: c.text,
-      embedding: allEmbeds[i] as any,    // pgvector accepts array
+      embedding: allEmbeds[i] as any, // pgvector accepts array
       page_number: c.pageNumber,
       section_title: c.sectionTitle,
       start_char: c.startChar,
@@ -518,7 +522,6 @@ export async function processSource(sourceId: string, userId: string): Promise<v
 
     // Recount notebook
     await supabase.rpc('recount_notebook_aggregates', { p_notebook_id: source.notebook_id })
-
   } catch (err: any) {
     await supabase
       .from('notebook_sources')

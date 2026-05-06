@@ -12,11 +12,14 @@ import type { TechniqueMeta } from './types.js'
  * Burası sadece öğrenciye görünür ana öğretim tekniği için.
  */
 
-export const TECHNIQUE_PROMPTS: Record<string, {
-  systemPromptFragment: string
-  estimatedDurationMinutes: number
-  contraindications?: string[]
-}> = {
+export const TECHNIQUE_PROMPTS: Record<
+  string,
+  {
+    systemPromptFragment: string
+    estimatedDurationMinutes: number
+    contraindications?: string[]
+  }
+> = {
   // ============ M1 — HAFIZA ============
   'M1-T01': {
     systemPromptFragment: `AKTİF GERİ ÇAĞIRMA: Konuyu direkt anlatma. Önce öğrenciye bilgiyi hatırlatacak sorular sor ("X hakkında ne biliyorsun?"). Öğrenci cevapladıkça eksikleri nazikçe tamamla. Pasif okuma değil, aktif hatırlama modu.`,

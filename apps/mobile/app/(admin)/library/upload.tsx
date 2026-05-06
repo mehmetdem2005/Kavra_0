@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, Alert, Switch } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
 import * as DocumentPicker from 'expo-document-picker'
-import { useUploadLibraryDocument } from '../../../src/hooks/useAdmin'
-import { Input } from '../../../src/components/ui/Input'
+import { useRouter } from 'expo-router'
+import { useState } from 'react'
+import { Alert, Pressable, ScrollView, Switch, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button } from '../../../src/components/ui/Button'
 import { Icon } from '../../../src/components/ui/Icon'
+import { Input } from '../../../src/components/ui/Input'
+import { useUploadLibraryDocument } from '../../../src/hooks/useAdmin'
 
 const CATEGORIES = [
   { v: 'textbook', l: 'Ders Kitabı', e: '📚' },
@@ -20,11 +20,16 @@ export default function LibraryUpload() {
   const router = useRouter()
   const upload = useUploadLibraryDocument()
 
-  const [file, setFile] = useState<{ uri: string; name: string; size: number; mimeType?: string } | null>(null)
+  const [file, setFile] = useState<{
+    uri: string
+    name: string
+    size: number
+    mimeType?: string
+  } | null>(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [description, setDescription] = useState('')
-  const [category, setCategory] = useState<typeof CATEGORIES[number]['v']>('textbook')
+  const [category, setCategory] = useState<(typeof CATEGORIES)[number]['v']>('textbook')
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState<string[]>([])
   const [isProOnly, setIsProOnly] = useState(false)
@@ -120,12 +125,29 @@ export default function LibraryUpload() {
           )}
         </Pressable>
 
-        <Input label="BAŞLIK" value={title} onChangeText={setTitle} placeholder="Klett A2 Lehrbuch" />
-        <View className="mt-3"><Input label="YAZAR (OPS.)" value={author} onChangeText={setAuthor} placeholder="" /></View>
-        <View className="mt-3"><Input label="AÇIKLAMA (OPS.)" value={description} onChangeText={setDescription} placeholder="Kitabı kısaca tanıt" multiline /></View>
+        <Input
+          label="BAŞLIK"
+          value={title}
+          onChangeText={setTitle}
+          placeholder="Klett A2 Lehrbuch"
+        />
+        <View className="mt-3">
+          <Input label="YAZAR (OPS.)" value={author} onChangeText={setAuthor} placeholder="" />
+        </View>
+        <View className="mt-3">
+          <Input
+            label="AÇIKLAMA (OPS.)"
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Kitabı kısaca tanıt"
+            multiline
+          />
+        </View>
 
         {/* Category */}
-        <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mt-4 mb-2">Kategori</Text>
+        <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mt-4 mb-2">
+          Kategori
+        </Text>
         <View className="flex-row flex-wrap gap-2">
           {CATEGORIES.map((c) => (
             <Pressable
@@ -136,7 +158,9 @@ export default function LibraryUpload() {
               }`}
             >
               <Text style={{ fontSize: 16 }}>{c.e}</Text>
-              <Text className={`text-xs font-semibold ${category === c.v ? 'text-cream-50' : 'text-slate-700'}`}>
+              <Text
+                className={`text-xs font-semibold ${category === c.v ? 'text-cream-50' : 'text-slate-700'}`}
+              >
                 {c.l}
               </Text>
             </Pressable>
@@ -144,7 +168,9 @@ export default function LibraryUpload() {
         </View>
 
         {/* Tags */}
-        <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mt-4 mb-2">Etiketler</Text>
+        <Text className="font-mono text-[10px] text-slate-500 tracking-widest uppercase mt-4 mb-2">
+          Etiketler
+        </Text>
         <View className="flex-row gap-2 mb-2">
           <View className="flex-1">
             <Input

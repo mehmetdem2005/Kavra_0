@@ -1,6 +1,6 @@
+import { applySM2 } from '@kavra/engine'
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { applySM2 } from '@kavra/engine'
 import { supabase, verifyUserToken } from '../supabase.js'
 
 const ReviewSchema = z.object({
@@ -44,7 +44,9 @@ export async function reviewRoutes(fastify: FastifyInstance) {
     // Kart sahipliği + mevcut state
     const { data: card } = await supabase
       .from('flashcards')
-      .select('id, user_id, ease_factor, interval_days, repetitions, total_reviews, lapses, concept_id, subject_id')
+      .select(
+        'id, user_id, ease_factor, interval_days, repetitions, total_reviews, lapses, concept_id, subject_id',
+      )
       .eq('id', flashcardId)
       .eq('user_id', userId)
       .single()
@@ -143,10 +145,7 @@ export async function reviewRoutes(fastify: FastifyInstance) {
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
         .gte('created_at', weekAgo.toISOString()),
-      supabase
-        .from('flashcards')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId),
+      supabase.from('flashcards').select('*', { count: 'exact', head: true }).eq('user_id', userId),
       supabase.rpc('get_due_flashcards', {
         match_user_id: userId,
         match_subject_id: null,

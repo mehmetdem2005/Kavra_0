@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal } from 'react-native'
+import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native'
 import { useLookupWord } from '../../hooks/useDictionary'
 import { Icon } from '../ui/Icon'
 
@@ -27,24 +27,34 @@ interface Props {
  *  - "AI ile bağlam çevirisi" (Pro)
  */
 export function WordPopup({
-  word, sentence, sourceLang, targetLang, bookId, onClose, onSavedToVocab, onLookedUp,
+  word,
+  sentence,
+  sourceLang,
+  targetLang,
+  bookId,
+  onClose,
+  onSavedToVocab,
+  onLookedUp,
 }: Props) {
   const lookup = useLookupWord()
   const [audioPlaying, setAudioPlaying] = useState(false)
 
   useEffect(() => {
     onLookedUp?.()
-    lookup.mutate({
-      word,
-      sourceLang,
-      targetLang,
-      context: sentence,
-      bookId,
-      sentenceText: sentence,
-      saveToVocab: true,
-    }, {
-      onSuccess: () => onSavedToVocab?.(),
-    })
+    lookup.mutate(
+      {
+        word,
+        sourceLang,
+        targetLang,
+        context: sentence,
+        bookId,
+        sentenceText: sentence,
+        saveToVocab: true,
+      },
+      {
+        onSuccess: () => onSavedToVocab?.(),
+      },
+    )
   }, [word])
 
   const playAudio = async () => {
@@ -70,7 +80,11 @@ export function WordPopup({
           {/* Header */}
           <View className="px-6 flex-row items-center justify-between mb-3">
             <View className="flex-row items-center gap-3">
-              <Pressable onPress={playAudio} hitSlop={10} className="w-10 h-10 bg-ink-900 rounded-full items-center justify-center">
+              <Pressable
+                onPress={playAudio}
+                hitSlop={10}
+                className="w-10 h-10 bg-ink-900 rounded-full items-center justify-center"
+              >
                 <Icon name={audioPlaying ? 'volume' : 'volume'} size={18} color="#F59E0B" />
               </Pressable>
               <View className="bg-amber-50 rounded-full px-3 py-1">
@@ -101,7 +115,10 @@ export function WordPopup({
             {lookup.data && lookup.data.translations.length > 0 && (
               <View className="mt-4 flex-row flex-wrap gap-2">
                 {lookup.data.translations.map((t, i) => (
-                  <View key={i} className="bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
+                  <View
+                    key={i}
+                    className="bg-amber-50 border border-amber-200 rounded-full px-3 py-1"
+                  >
                     <Text className="text-amber-900 text-sm">{t}</Text>
                   </View>
                 ))}
@@ -118,12 +135,16 @@ export function WordPopup({
                   <View key={i} className="mb-3">
                     <View className="flex-row items-center gap-2 mb-1">
                       <View className="bg-ink-900 px-2 py-0.5 rounded">
-                        <Text className="text-cream-50 text-[9px] font-bold uppercase">{d.partOfSpeech}</Text>
+                        <Text className="text-cream-50 text-[9px] font-bold uppercase">
+                          {d.partOfSpeech}
+                        </Text>
                       </View>
                     </View>
                     <Text className="text-ink-900 text-sm leading-5">{d.definition}</Text>
                     {d.example && (
-                      <Text className="text-xs text-slate-600 italic mt-1 leading-4">"{d.example}"</Text>
+                      <Text className="text-xs text-slate-600 italic mt-1 leading-4">
+                        "{d.example}"
+                      </Text>
                     )}
                   </View>
                 ))}
@@ -148,9 +169,11 @@ export function WordPopup({
             {/* Source attribution */}
             {lookup.data && (
               <Text className="text-[9px] text-slate-400 mt-4 text-center">
-                {lookup.data.source === 'cache' ? '⚡ Sözlükte var' :
-                 lookup.data.source === 'free-dict' ? 'Free Dictionary' :
-                 'AI sözlüğü'}
+                {lookup.data.source === 'cache'
+                  ? '⚡ Sözlükte var'
+                  : lookup.data.source === 'free-dict'
+                    ? 'Free Dictionary'
+                    : 'AI sözlüğü'}
               </Text>
             )}
 
