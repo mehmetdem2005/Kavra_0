@@ -11,7 +11,7 @@ create extension if not exists "vector";
 -- 1. KULLANICI + TERCİHLER
 -- ============================================================================
 
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text unique not null,
   full_name text,
@@ -25,7 +25,7 @@ create table public.profiles (
   updated_at timestamptz default now()
 );
 
-create table public.user_preferences (
+create table if not exists public.user_preferences (
   user_id uuid primary key references profiles(id) on delete cascade,
   -- Dil
   ui_language text default 'tr',
@@ -63,7 +63,7 @@ create table public.user_preferences (
 -- 2. API KEY YÖNETİMİ (Şifreli)
 -- ============================================================================
 
-create table public.api_keys (
+create table if not exists public.api_keys (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   provider text not null default 'groq' check (provider in ('groq', 'openai', 'anthropic')),
@@ -80,14 +80,14 @@ create table public.api_keys (
   created_at timestamptz default now()
 );
 
-create unique index idx_one_default_per_provider
+create unique index if not exists idx_one_default_per_provider
   on api_keys(user_id, provider) where is_default = true;
 
 -- ============================================================================
 -- 3. LLM MODEL KATALOĞU (Dinamik)
 -- ============================================================================
 
-create table public.llm_models (
+create table if not exists public.llm_models (
   id uuid primary key default gen_random_uuid(),
   provider text not null,
   model_id text not null,
@@ -109,7 +109,7 @@ create table public.llm_models (
 -- 4. TEKNİK MODÜLLERİ + 150 TEKNİK
 -- ============================================================================
 
-create table public.modules (
+create table if not exists public.modules (
   id uuid primary key default gen_random_uuid(),
   code text unique not null,                  -- M1..M7, C1..C10
   kind text not null check (kind in ('technique_module', 'ai_category')),
@@ -121,7 +121,7 @@ create table public.modules (
   is_active boolean default true
 );
 
-create table public.techniques (
+create table if not exists public.techniques (
   id uuid primary key default gen_random_uuid(),
   module_id uuid not null references modules(id),
   code text unique not null,                  -- M1-T01, C3-T02 vs.
@@ -148,7 +148,7 @@ create table public.techniques (
 -- 5. KONULAR + KAVRAMLAR (pgvector)
 -- ============================================================================
 
-create table public.subjects (
+create table if not exists public.subjects (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   name text not null,
@@ -162,7 +162,7 @@ create table public.subjects (
   updated_at timestamptz default now()
 );
 
-create table public.concepts (
+create table if not exists public.concepts (
   id uuid primary key default gen_random_uuid(),
   subject_id uuid not null references subjects(id) on delete cascade,
   name text not null,
@@ -174,10 +174,10 @@ create table public.concepts (
   created_at timestamptz default now()
 );
 
-create index idx_concepts_embedding on concepts
+create index if not exists idx_concepts_embedding on concepts
   using ivfflat (embedding vector_cosine_ops) with (lists = 100);
 
-create table public.concept_relations (
+create table if not exists public.concept_relations (
   id uuid primary key default gen_random_uuid(),
   from_concept_id uuid references concepts(id) on delete cascade,
   to_concept_id uuid references concepts(id) on delete cascade,
@@ -192,7 +192,7 @@ create table public.concept_relations (
 -- 6. DERS OTURUMLARI + MESAJLAR
 -- ============================================================================
 
-create table public.lessons (
+create table if not exists public.lessons (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   subject_id uuid references subjects(id),
@@ -210,7 +210,7 @@ create table public.lessons (
   metadata jsonb default '{}'::jsonb
 );
 
-create table public.messages (
+create table if not exists public.messages (
   id uuid primary key default gen_random_uuid(),
   lesson_id uuid not null references lessons(id) on delete cascade,
   role text not null check (role in ('system', 'user', 'assistant', 'tool')),
@@ -223,13 +223,13 @@ create table public.messages (
   created_at timestamptz default now()
 );
 
-create index idx_messages_lesson on messages(lesson_id, created_at);
+create index if not exists idx_messages_lesson on messages(lesson_id, created_at);
 
 -- ============================================================================
 -- 7. ARALIKLI TEKRAR (SM-2) + LEITNER
 -- ============================================================================
 
-create table public.progress (
+create table if not exists public.progress (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   concept_id uuid not null references concepts(id) on delete cascade,
@@ -245,9 +245,9 @@ create table public.progress (
   unique (user_id, concept_id)
 );
 
-create index idx_progress_due on progress(user_id, next_review_at);
+create index if not exists idx_progress_due on progress(user_id, next_review_at);
 
-create table public.flashcards (
+create table if not exists public.flashcards (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   concept_id uuid references concepts(id),
@@ -263,7 +263,7 @@ create table public.flashcards (
   created_at timestamptz default now()
 );
 
-create table public.generated_flashcards (
+create table if not exists public.generated_flashcards (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   document_id uuid,
@@ -281,7 +281,7 @@ create table public.generated_flashcards (
 -- 8. DEĞERLENDİRME + HATA PORTFÖYÜ + REFLEKSİYON
 -- ============================================================================
 
-create table public.quiz_attempts (
+create table if not exists public.quiz_attempts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   concept_id uuid references concepts(id),
@@ -297,7 +297,7 @@ create table public.quiz_attempts (
   created_at timestamptz default now()
 );
 
-create table public.error_portfolio (
+create table if not exists public.error_portfolio (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   concept_id uuid references concepts(id),
@@ -311,7 +311,7 @@ create table public.error_portfolio (
   created_at timestamptz default now()
 );
 
-create table public.reflections (
+create table if not exists public.reflections (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   date date not null,
@@ -328,7 +328,7 @@ create table public.reflections (
 -- 9. HEDEF + GAMİFİKASYON
 -- ============================================================================
 
-create table public.goals (
+create table if not exists public.goals (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   subject_id uuid references subjects(id),
@@ -344,7 +344,7 @@ create table public.goals (
   created_at timestamptz default now()
 );
 
-create table public.streaks (
+create table if not exists public.streaks (
   user_id uuid primary key references profiles(id) on delete cascade,
   current_streak int default 0,
   longest_streak int default 0,
@@ -352,7 +352,7 @@ create table public.streaks (
   freeze_count int default 0
 );
 
-create table public.achievements (
+create table if not exists public.achievements (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   badge_code text not null,
@@ -365,7 +365,7 @@ create table public.achievements (
 -- 10. DOSYA + SES KAYDI
 -- ============================================================================
 
-create table public.documents (
+create table if not exists public.documents (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   subject_id uuid references subjects(id),
@@ -380,7 +380,7 @@ create table public.documents (
   created_at timestamptz default now()
 );
 
-create table public.document_chunks (
+create table if not exists public.document_chunks (
   id uuid primary key default gen_random_uuid(),
   document_id uuid references documents(id) on delete cascade,
   chunk_index int,
@@ -390,10 +390,10 @@ create table public.document_chunks (
   tokens int
 );
 
-create index idx_chunks_embedding on document_chunks
+create index if not exists idx_chunks_embedding on document_chunks
   using ivfflat (embedding vector_cosine_ops) with (lists = 100);
 
-create table public.images (
+create table if not exists public.images (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   lesson_id uuid references lessons(id),
@@ -402,7 +402,7 @@ create table public.images (
   created_at timestamptz default now()
 );
 
-create table public.audio_recordings (
+create table if not exists public.audio_recordings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   message_id uuid references messages(id),
@@ -418,7 +418,7 @@ create table public.audio_recordings (
 -- 11. KİŞİLİKLER + PLAN + FOCUS + RAPOR
 -- ============================================================================
 
-create table public.personalities (
+create table if not exists public.personalities (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   name text not null,
@@ -431,11 +431,18 @@ create table public.personalities (
 );
 
 -- user_preferences.default_personality_id için FK (geç bağlama)
-alter table user_preferences
-  add constraint fk_default_personality
-  foreign key (default_personality_id) references personalities(id) on delete set null;
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'fk_default_personality'
+  ) then
+    alter table user_preferences
+      add constraint fk_default_personality
+      foreign key (default_personality_id) references personalities(id) on delete set null;
+  end if;
+end $$;
 
-create table public.study_plans (
+create table if not exists public.study_plans (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   subject_id uuid references subjects(id),
@@ -449,7 +456,7 @@ create table public.study_plans (
   created_at timestamptz default now()
 );
 
-create table public.study_sessions (
+create table if not exists public.study_sessions (
   id uuid primary key default gen_random_uuid(),
   plan_id uuid references study_plans(id) on delete cascade,
   scheduled_at timestamptz not null,
@@ -461,7 +468,7 @@ create table public.study_sessions (
   calendar_event_id text
 );
 
-create table public.focus_sessions (
+create table if not exists public.focus_sessions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   subject_id uuid references subjects(id),
@@ -475,7 +482,7 @@ create table public.focus_sessions (
   background_sound text
 );
 
-create table public.weekly_reports (
+create table if not exists public.weekly_reports (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   week_start date not null,
@@ -492,7 +499,7 @@ create table public.weekly_reports (
 -- 12. VOICE CLONE (Premium)
 -- ============================================================================
 
-create table public.voice_clones (
+create table if not exists public.voice_clones (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   name text not null,
@@ -507,7 +514,7 @@ create table public.voice_clones (
 -- 13. INBOX (Paylaşım Menüsünden Gelenler)
 -- ============================================================================
 
-create table public.inbox_items (
+create table if not exists public.inbox_items (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   source text,
@@ -524,7 +531,7 @@ create table public.inbox_items (
 -- 14. EXPORT + KULLANIM LOGLARI
 -- ============================================================================
 
-create table public.exports (
+create table if not exists public.exports (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   type text check (type in ('learning_journal', 'mastery_report', 'flashcards', 'data_dump')),
@@ -536,7 +543,7 @@ create table public.exports (
   created_at timestamptz default now()
 );
 
-create table public.usage_logs (
+create table if not exists public.usage_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   api_key_id uuid references api_keys(id),
@@ -551,13 +558,13 @@ create table public.usage_logs (
   created_at timestamptz default now()
 );
 
-create index idx_usage_user_date on usage_logs(user_id, created_at desc);
+create index if not exists idx_usage_user_date on usage_logs(user_id, created_at desc);
 
 -- ============================================================================
 -- 15. ABONELİK (Stripe, Faz 7)
 -- ============================================================================
 
-create table public.subscriptions (
+create table if not exists public.subscriptions (
   user_id uuid primary key references profiles(id) on delete cascade,
   stripe_customer_id text,
   stripe_subscription_id text,
@@ -580,12 +587,16 @@ begin
   return new;
 end $$;
 
+drop trigger if exists trg_profiles_updated on profiles;
 create trigger trg_profiles_updated before update on profiles
   for each row execute function set_updated_at();
+drop trigger if exists trg_prefs_updated on user_preferences;
 create trigger trg_prefs_updated before update on user_preferences
   for each row execute function set_updated_at();
+drop trigger if exists trg_subjects_updated on subjects;
 create trigger trg_subjects_updated before update on subjects
   for each row execute function set_updated_at();
+drop trigger if exists trg_subs_updated on subscriptions;
 create trigger trg_subs_updated before update on subscriptions
   for each row execute function set_updated_at();
 
@@ -597,15 +608,20 @@ create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer as $$
 begin
   insert into public.profiles (id, email, full_name)
-  values (new.id, new.email, coalesce(new.raw_user_meta_data ->> 'full_name', ''));
+  values (new.id, new.email, coalesce(new.raw_user_meta_data ->> 'full_name', ''))
+  on conflict (id) do nothing;
 
-  insert into public.user_preferences (user_id) values (new.id);
-  insert into public.streaks (user_id) values (new.id);
-  insert into public.subscriptions (user_id) values (new.id);
+  insert into public.user_preferences (user_id) values (new.id)
+  on conflict (user_id) do nothing;
+  insert into public.streaks (user_id) values (new.id)
+  on conflict (user_id) do nothing;
+  insert into public.subscriptions (user_id) values (new.id)
+  on conflict (user_id) do nothing;
 
   return new;
 end $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function handle_new_user();

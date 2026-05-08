@@ -34,6 +34,16 @@ create table if not exists public.subscriptions (
   updated_at timestamptz default now()
 );
 
+-- Schema reconciliation: 0001 created a simpler subscriptions table.
+-- Add any missing columns expected by 0007+ code paths.
+alter table public.subscriptions add column if not exists tier text not null default 'free';
+alter table public.subscriptions add column if not exists stripe_price_id text;
+alter table public.subscriptions add column if not exists current_period_start timestamptz;
+alter table public.subscriptions add column if not exists canceled_at timestamptz;
+alter table public.subscriptions add column if not exists trial_end timestamptz;
+alter table public.subscriptions add column if not exists lifetime_purchased_at timestamptz;
+alter table public.subscriptions add column if not exists metadata jsonb default '{}'::jsonb;
+
 create index if not exists idx_subscriptions_stripe_customer on subscriptions(stripe_customer_id);
 create index if not exists idx_subscriptions_stripe_sub on subscriptions(stripe_subscription_id);
 

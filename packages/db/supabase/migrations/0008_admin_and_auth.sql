@@ -4,16 +4,38 @@
 -- ============================================================================
 
 -- ---- USER ROLES — Super admin / admin / user ----
+-- 0001 may have already created profiles.role with a stricter CHECK; reconcile here.
+alter table profiles add column if not exists role text;
+alter table profiles add column if not exists phone_number text;
+alter table profiles add column if not exists phone_verified_at timestamptz;
+alter table profiles add column if not exists auth_providers jsonb default '[]'::jsonb;
+
+-- Drop any prior CHECK on profiles.role and replace with the broader set.
+do $$
+declare
+  r record;
+begin
+  for r in
+    select conname from pg_constraint
+    where conrelid = 'public.profiles'::regclass
+      and contype = 'c'
+      and pg_get_constraintdef(oid) ilike '%role%'
+  loop
+    execute format('alter table public.profiles drop constraint %I', r.conname);
+  end loop;
+end $$;
+
+-- Migrate any legacy 'student' rows to the new 'user' bucket and set default.
+update profiles set role = 'user' where role is null or role = 'student';
+alter table profiles alter column role set default 'user';
+alter table profiles alter column role set not null;
 do $$
 begin
-  if not exists (select 1 from information_schema.columns
-                  where table_name = 'profiles' and column_name = 'role') then
-    alter table profiles add column if not exists role text not null default 'user'
-      check (role in ('super_admin', 'admin', 'user'));
-    alter table profiles add column if not exists phone_number text;
-    alter table profiles add column if not exists phone_verified_at timestamptz;
-    alter table profiles add column if not exists auth_providers jsonb default '[]'::jsonb;
-    -- Hangi providerlerden giriş yapmış: ['google', 'email', 'phone', 'facebook', 'magic_link']
+  if not exists (
+    select 1 from pg_constraint where conname = 'profiles_role_check'
+  ) then
+    alter table profiles
+      add constraint profiles_role_check check (role in ('super_admin', 'admin', 'user'));
   end if;
 end $$;
 
@@ -263,7 +285,7 @@ end $$;
 create table if not exists public.ai_images (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
-  conversation_id uuid references conversations(id) on delete cascade,
+  conversation_id uuid,  -- conversations table not defined; loose link only
   prompt text not null,
   refined_prompt text,                        -- AI'nın iyileştirdiği prompt
   model text not null,                        -- 'flux-schnell', 'sdxl', 'gpt-image' vb

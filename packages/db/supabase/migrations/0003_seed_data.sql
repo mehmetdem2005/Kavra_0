@@ -21,7 +21,8 @@ insert into modules (code, kind, name, name_en, description, icon, display_order
   ('M6', 'technique_module', 'Odaklanma ve Zihin Yönetimi', 'Focus & Mind Management',
    'Dikkat ve zaman yönetimi için 14 teknik.', 'zap', 6),
   ('M7', 'technique_module', 'Zihinsel Modeller ve Mantık', 'Mental Models & Logic',
-   'İleri düzey düşünme çerçeveleri için 10 teknik.', 'compass', 7);
+   'İleri düzey düşünme çerçeveleri için 10 teknik.', 'compass', 7)
+on conflict (code) do nothing;
 
 -- ---- AI KATEGORİLERİ (C1-C10) ----
 insert into modules (code, kind, name, name_en, description, icon, display_order) values
@@ -44,7 +45,8 @@ insert into modules (code, kind, name, name_en, description, icon, display_order
   ('C9', 'ai_category', 'Yaratıcılık ve Sentez', 'Creativity & Synthesis',
    'Rastgele girdi, Disney stratejisi, PMI, defamiliarization.', 'palette', 18),
   ('C10', 'ai_category', 'Değerlendirme ve Sınav', 'Assessment & Exam',
-   'Ön test, beyaz sayfa, mental contrasting, post-exam autopsy.', 'clipboard-check', 19);
+   'Ön test, beyaz sayfa, mental contrasting, post-exam autopsy.', 'clipboard-check', 19)
+on conflict (code) do nothing;
 
 -- ---- ÖRNEK TEKNİKLER (tam liste seed script'inde) ----
 -- M1 Hafıza ve Kodlama'dan 3 örnek
@@ -57,7 +59,8 @@ insert into techniques (module_id, code, name, name_en, short_description, kind,
    array['review'], 1, 10, 'flashcard'),
   ((select id from modules where code = 'M1'), 'M1-T05', 'Zihin Sarayı', 'Method of Loci',
    'Bilgiyi tanıdık bir mekandaki nesnelere bağlayarak hatırlama.', 'student_facing',
-   array['memorization'], 4, 30, 'chat');
+   array['memorization'], 4, 30, 'chat')
+on conflict (code) do nothing;
 
 -- M2 Üstbiliş'ten 2 örnek
 insert into techniques (module_id, code, name, name_en, short_description, kind, suitable_for, difficulty_level, estimated_duration_minutes, ui_component) values
@@ -66,21 +69,28 @@ insert into techniques (module_id, code, name, name_en, short_description, kind,
    array['first_exposure', 'practice'], 3, 20, 'chat'),
   ((select id from modules where code = 'M2'), 'M2-T02', 'SQ3R Metodu', 'SQ3R Method',
    'Oku, Sor, Oku, Anlat, Gözden Geçir adımlarıyla aktif okuma.', 'student_facing',
-   array['first_exposure'], 2, 45, 'chat');
+   array['first_exposure'], 2, 45, 'chat')
+on conflict (code) do nothing;
 
 -- C1'den 2 engine_behavior örneği
 insert into techniques (module_id, code, name, name_en, short_description, kind, ui_component) values
   ((select id from modules where code = 'C1'), 'C1-T01', 'Zorluk Seviyesi Dinamik Ayarı', 'Desirable Difficulty',
    'Engine: başarı oranına göre zorluğu mikro-ayarla.', 'engine_behavior', null),
   ((select id from modules where code = 'C1'), 'C1-T02', 'Niş Unutma Eğrisi', 'Niche Forgetting Curve',
-   'Engine: her kavrama özel unutma hızını ölç ve zamanlamayı kişiselleştir.', 'engine_behavior', null);
+   'Engine: her kavrama özel unutma hızını ölç ve zamanlamayı kişiselleştir.', 'engine_behavior', null)
+on conflict (code) do nothing;
 
 -- C10'dan 1 örnek
 insert into techniques (module_id, code, name, name_en, short_description, kind, ui_component) values
   ((select id from modules where code = 'C10'), 'C10-T01', 'Ön Test Etkisi', 'Pre-testing Effect',
-   'Engine: daha konu anlatılmadan soru sor; yanlış cevap sonraki öğrenmeyi %20 artırır.', 'engine_behavior', 'quiz');
+   'Engine: daha konu anlatılmadan soru sor; yanlış cevap sonraki öğrenmeyi %20 artırır.', 'engine_behavior', 'quiz')
+on conflict (code) do nothing;
 
 -- ---- AI KİŞİLİKLERİ (Preset) ----
+-- Add a unique constraint on preset names so re-running this migration is idempotent.
+create unique index if not exists idx_personalities_preset_name
+  on personalities(name) where is_preset = true;
+
 insert into personalities (name, system_prompt_fragment, recommended_temperature, recommended_voice, emoji, is_preset) values
   ('Profesör',
    'Sen resmi, akademik bir üniversite profesörüsün. Jargon kullanmaktan çekinme, öğrenciyi akademik seviyede ele al. Kaynak göster, nüansları vurgula.',
@@ -99,4 +109,5 @@ insert into personalities (name, system_prompt_fragment, recommended_temperature
    0.9, 'tr_TR-fettah-medium', '🎭', true),
   ('Minimalist',
    'Sen minimalist bir açıklayıcısın. Gereksiz tek kelime yok. Her cümle anlam taşımalı. Paragraf değil, net maddeler.',
-   0.3, 'tr_TR-dfki-medium', '◼️', true);
+   0.3, 'tr_TR-dfki-medium', '◼️', true)
+on conflict do nothing;

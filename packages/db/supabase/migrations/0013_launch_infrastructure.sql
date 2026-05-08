@@ -271,8 +271,9 @@ select
   true as is_pro,
   current_period_end as valid_until,
   'stripe' as source
-from premium_subscriptions
+from subscriptions
 where status = 'active'
+  and coalesce(tier, plan) in ('pro_monthly', 'pro_yearly', 'pro_lifetime')
 on conflict (user_id) do nothing;
 
 -- ============================================================================

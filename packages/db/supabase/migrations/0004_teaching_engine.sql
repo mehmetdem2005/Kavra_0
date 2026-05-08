@@ -4,7 +4,7 @@
 -- ============================================================================
 
 -- ---- BANDIT: Her kullanıcı-teknik çifti için arm state ----
-create table public.technique_arms (
+create table if not exists public.technique_arms (
   user_id uuid not null references profiles(id) on delete cascade,
   technique_id uuid not null references techniques(id) on delete cascade,
   alpha numeric(10, 4) not null default 1.0,          -- Beta distribution: başarılı kullanımlar + 1
@@ -18,7 +18,7 @@ create table public.technique_arms (
   primary key (user_id, technique_id)
 );
 
-create index idx_arms_user on technique_arms(user_id, last_used_at desc);
+create index if not exists idx_arms_user on technique_arms(user_id, last_used_at desc);
 
 alter table technique_arms enable row level security;
 drop policy if exists "users_own_arms" on technique_arms;
@@ -26,7 +26,7 @@ create policy "users_own_arms" on technique_arms
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ---- ENGINE DECISIONS: Her ders için engine'in aldığı kararı logla ----
-create table public.engine_decisions (
+create table if not exists public.engine_decisions (
   id uuid primary key default gen_random_uuid(),
   lesson_id uuid not null references lessons(id) on delete cascade,
   user_id uuid not null references profiles(id) on delete cascade,
@@ -40,8 +40,8 @@ create table public.engine_decisions (
   created_at timestamptz default now()
 );
 
-create index idx_decisions_lesson on engine_decisions(lesson_id, created_at desc);
-create index idx_decisions_user on engine_decisions(user_id, created_at desc);
+create index if not exists idx_decisions_lesson on engine_decisions(lesson_id, created_at desc);
+create index if not exists idx_decisions_user on engine_decisions(user_id, created_at desc);
 
 alter table engine_decisions enable row level security;
 drop policy if exists "users_own_decisions" on engine_decisions;
@@ -58,7 +58,7 @@ alter table subjects add column if not exists total_study_minutes int default 0;
 
 -- ---- INTENT CLASSIFICATION CACHE ----
 -- Kullanıcı mesajlarını sınıflandırırken Groq çağrısını cache'le
-create table public.intent_cache (
+create table if not exists public.intent_cache (
   message_hash text primary key,                       -- SHA256
   intent text not null,
   confidence numeric(3, 2),
@@ -66,7 +66,7 @@ create table public.intent_cache (
 );
 
 -- Cache 30 gün sonra temizlensin (cron)
-create index idx_intent_cache_cleanup on intent_cache(created_at);
+create index if not exists idx_intent_cache_cleanup on intent_cache(created_at);
 
 -- ---- SIMILAR-CONCEPTS FUNCTION (RAG için) ----
 create or replace function public.match_document_chunks(

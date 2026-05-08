@@ -208,6 +208,17 @@ create table if not exists public.achievements (
   created_at timestamptz default now()
 );
 
+-- 0006 already created `achievements` (text id, name, description, emoji, category, threshold);
+-- backfill the columns required by the seed insert below.
+alter table public.achievements
+  add column if not exists criteria_type text,
+  add column if not exists criteria_threshold int,
+  add column if not exists criteria_target text,
+  add column if not exists rarity text default 'common',
+  add column if not exists created_at timestamptz default now();
+-- 0006's `description` is NOT NULL; relax to allow seeded rows that omit it.
+alter table public.achievements alter column description drop not null;
+
 alter table public.achievements enable row level security;
 drop policy if exists "anyone_reads_achievements" on achievements;
 create policy "anyone_reads_achievements" on achievements for select using (is_active = true);
@@ -242,6 +253,7 @@ insert into achievements (id, name, description, emoji, category, criteria_type,
 on conflict (id) do nothing;
 
 -- ============== USER ACHIEVEMENTS (kazanılan rozetler) ===========
+-- 0006 created an earlier version of this table; backfill any new columns.
 create table if not exists public.user_achievements (
   user_id uuid not null references profiles(id) on delete cascade,
   achievement_id text not null references achievements(id) on delete cascade,
@@ -252,6 +264,12 @@ create table if not exists public.user_achievements (
 
   primary key (user_id, achievement_id)
 );
+
+-- Ensure 0006's slimmer schema picks up the newer columns
+alter table public.user_achievements
+  add column if not exists unlocked_at timestamptz default now(),
+  add column if not exists progress int default 0,
+  add column if not exists is_unlocked boolean default true;
 
 create index if not exists idx_user_ach_unlocked on user_achievements(user_id, unlocked_at desc) where is_unlocked = true;
 

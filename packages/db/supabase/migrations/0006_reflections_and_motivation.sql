@@ -18,6 +18,22 @@ create table if not exists public.reflections (
   unique(user_id, date)
 );
 
+-- 0001 had a slimmer reflections schema; backfill columns and relax NOT NULL on legacy `content`.
+alter table public.reflections
+  add column if not exists what_learned text,
+  add column if not exists what_struggled text,
+  add column if not exists tomorrow_focus text,
+  add column if not exists created_at timestamptz default now();
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'reflections' and column_name = 'content' and is_nullable = 'NO'
+  ) then
+    alter table public.reflections alter column content drop not null;
+  end if;
+end $$;
+
 create index if not exists idx_reflections_user_date on reflections(user_id, date desc);
 
 alter table public.reflections enable row level security;
@@ -44,6 +60,19 @@ create table if not exists public.weekly_reports (
   unique(user_id, week_start)
 );
 
+-- 0001 had a slimmer weekly_reports schema; backfill the columns this migration expects.
+alter table public.weekly_reports
+  add column if not exists total_minutes int default 0,
+  add column if not exists total_lessons int default 0,
+  add column if not exists total_reviews int default 0,
+  add column if not exists total_quiz_attempts int default 0,
+  add column if not exists quiz_accuracy numeric(3, 2),
+  add column if not exists most_used_technique_id uuid references techniques(id) on delete set null,
+  add column if not exists highlights jsonb,
+  add column if not exists ai_narrative text,
+  add column if not exists ai_recommendations jsonb,
+  add column if not exists created_at timestamptz default now();
+
 create index if not exists idx_reports_user on weekly_reports(user_id, week_start desc);
 
 alter table public.weekly_reports enable row level security;
@@ -52,6 +81,10 @@ create policy "users_own_reports" on weekly_reports
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ---- ACHIEVEMENTS (preset rozetler) ----
+-- 0001 created an older per-user achievements table; we replace it with the
+-- preset/catalog table the rest of the app expects. No data is preserved
+-- because the old table is unused at this point in the migration sequence.
+drop table if exists public.achievements cascade;
 create table if not exists public.achievements (
   id text primary key,                             -- 'streak_7', 'first_lesson' vb.
   name text not null,
@@ -120,6 +153,15 @@ create table if not exists public.focus_sessions (
   completed_at timestamptz
 );
 
+-- 0001 had a slimmer focus_sessions schema; backfill the columns this migration expects.
+alter table public.focus_sessions
+  add column if not exists type text,
+  add column if not exists planned_duration_minutes int,
+  add column if not exists actual_duration_minutes int,
+  add column if not exists interrupted_count int default 0,
+  add column if not exists notes text,
+  add column if not exists completed_at timestamptz;
+
 create index if not exists idx_focus_user on focus_sessions(user_id, started_at desc);
 
 alter table public.focus_sessions enable row level security;
@@ -176,6 +218,9 @@ create table if not exists public.streaks (
   last_activity_date date,
   updated_at timestamptz default now()
 );
+
+-- 0001 created streaks without updated_at; backfill it for the trigger below.
+alter table public.streaks add column if not exists updated_at timestamptz default now();
 
 alter table public.streaks enable row level security;
 drop policy if exists "users_own_streak" on streaks;

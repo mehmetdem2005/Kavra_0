@@ -140,6 +140,16 @@ end $$;
 create index if not exists idx_flashcards_due on flashcards(user_id, next_review_at)
   where next_review_at is not null;
 
+-- ---- FLASHCARD ek alanı: subject_id (concept yoksa direkt subject'e bağlanabilsin) ----
+-- (moved up so RPCs below can reference it)
+do $$
+begin
+  if not exists (select 1 from information_schema.columns
+                  where table_name = 'flashcards' and column_name = 'subject_id') then
+    alter table flashcards add column if not exists subject_id uuid references subjects(id) on delete set null;
+  end if;
+end $$;
+
 -- ---- DUE FLASHCARDS RPC — bugün/şu an bakılması gereken kartlar ----
 create or replace function public.get_due_flashcards(
   match_user_id uuid,
@@ -244,12 +254,3 @@ as $$
 $$;
 
 grant execute on function public.get_subject_stats to authenticated, service_role;
-
--- ---- FLASHCARD ek alanı: subject_id (concept yoksa direkt subject'e bağlanabilsin) ----
-do $$
-begin
-  if not exists (select 1 from information_schema.columns
-                  where table_name = 'flashcards' and column_name = 'subject_id') then
-    alter table flashcards add column if not exists subject_id uuid references subjects(id) on delete set null;
-  end if;
-end $$;

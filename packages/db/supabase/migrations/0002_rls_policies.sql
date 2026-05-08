@@ -126,9 +126,18 @@ drop policy if exists "users_own_streaks" on streaks;
 create policy "users_own_streaks" on streaks
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
-drop policy if exists "users_own_achievements" on achievements;
-create policy "users_own_achievements" on achievements
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- 0006 replaces this table with a preset/catalog schema (no user_id), so the
+-- per-user policy only makes sense while the original 0001 schema exists.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'achievements' and column_name = 'user_id'
+  ) then
+    execute 'drop policy if exists "users_own_achievements" on achievements';
+    execute 'create policy "users_own_achievements" on achievements for all using (auth.uid() = user_id) with check (auth.uid() = user_id)';
+  end if;
+end $$;
 
 drop policy if exists "users_own_documents" on documents;
 create policy "users_own_documents" on documents

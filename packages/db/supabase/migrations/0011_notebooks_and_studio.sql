@@ -6,6 +6,9 @@
 -- pgvector extension
 create extension if not exists vector;
 
+-- unaccent extension (used by hybrid search function below)
+create extension if not exists unaccent;
+
 -- ---- NOTEBOOKS (Kavra "Defter") ----
 create table if not exists public.notebooks (
   id uuid primary key default gen_random_uuid(),
@@ -357,6 +360,3 @@ as $$
 $$;
 
 grant execute on function public.search_chunks_hybrid to authenticated, service_role;
-
--- unaccent extension for Turkish-friendly FTS
-create extension if not exists unaccent;
