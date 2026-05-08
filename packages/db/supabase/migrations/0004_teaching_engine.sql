@@ -21,6 +21,7 @@ create table public.technique_arms (
 create index idx_arms_user on technique_arms(user_id, last_used_at desc);
 
 alter table technique_arms enable row level security;
+drop policy if exists "users_own_arms" on technique_arms;
 create policy "users_own_arms" on technique_arms
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
@@ -43,6 +44,7 @@ create index idx_decisions_lesson on engine_decisions(lesson_id, created_at desc
 create index idx_decisions_user on engine_decisions(user_id, created_at desc);
 
 alter table engine_decisions enable row level security;
+drop policy if exists "users_own_decisions" on engine_decisions;
 create policy "users_own_decisions" on engine_decisions
   for select using (auth.uid() = user_id);
 

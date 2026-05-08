@@ -18,7 +18,8 @@ create table if not exists public.quizzes (
 );
 
 alter table public.quizzes enable row level security;
-create policy if not exists "users_own_quizzes" on quizzes
+drop policy if exists "users_own_quizzes" on quizzes;
+create policy "users_own_quizzes" on quizzes
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ---- QUIZ_QUESTIONS ----
@@ -39,7 +40,8 @@ create table if not exists public.quiz_questions (
 create index if not exists idx_quiz_questions_quiz on quiz_questions(quiz_id, position);
 
 alter table public.quiz_questions enable row level security;
-create policy if not exists "users_own_quiz_questions" on quiz_questions
+drop policy if exists "users_own_quiz_questions" on quiz_questions;
+create policy "users_own_quiz_questions" on quiz_questions
   for all using (
     exists (
       select 1 from quizzes q
@@ -63,7 +65,8 @@ create index if not exists idx_quiz_attempts_user on quiz_attempts(user_id, crea
 create index if not exists idx_quiz_attempts_question on quiz_attempts(question_id);
 
 alter table public.quiz_attempts enable row level security;
-create policy if not exists "users_own_attempts" on quiz_attempts
+drop policy if exists "users_own_attempts" on quiz_attempts;
+create policy "users_own_attempts" on quiz_attempts
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ---- ERROR_PORTFOLIO ----
@@ -90,7 +93,8 @@ create index if not exists idx_errors_user_unresolved on error_portfolio(user_id
 create index if not exists idx_errors_concept on error_portfolio(concept_id) where concept_id is not null;
 
 alter table public.error_portfolio enable row level security;
-create policy if not exists "users_own_errors" on error_portfolio
+drop policy if exists "users_own_errors" on error_portfolio;
+create policy "users_own_errors" on error_portfolio
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ---- FLASHCARD_REVIEWS (SM-2 history) ----
@@ -114,7 +118,8 @@ create index if not exists idx_reviews_user_date on flashcard_reviews(user_id, c
 create index if not exists idx_reviews_flashcard on flashcard_reviews(flashcard_id, created_at desc);
 
 alter table public.flashcard_reviews enable row level security;
-create policy if not exists "users_own_reviews" on flashcard_reviews
+drop policy if exists "users_own_reviews" on flashcard_reviews;
+create policy "users_own_reviews" on flashcard_reviews
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ---- FLASHCARDS ek alanları (yoksa ekle) ----
@@ -122,13 +127,13 @@ do $$
 begin
   if not exists (select 1 from information_schema.columns
                   where table_name = 'flashcards' and column_name = 'ease_factor') then
-    alter table flashcards add column ease_factor numeric(4, 2) default 2.5;
-    alter table flashcards add column interval_days int default 0;
-    alter table flashcards add column repetitions int default 0;
-    alter table flashcards add column next_review_at timestamptz default now();
-    alter table flashcards add column last_reviewed_at timestamptz;
-    alter table flashcards add column total_reviews int default 0;
-    alter table flashcards add column lapses int default 0;
+    alter table flashcards add column if not exists ease_factor numeric(4, 2) default 2.5;
+    alter table flashcards add column if not exists interval_days int default 0;
+    alter table flashcards add column if not exists repetitions int default 0;
+    alter table flashcards add column if not exists next_review_at timestamptz default now();
+    alter table flashcards add column if not exists last_reviewed_at timestamptz;
+    alter table flashcards add column if not exists total_reviews int default 0;
+    alter table flashcards add column if not exists lapses int default 0;
   end if;
 end $$;
 
@@ -245,6 +250,6 @@ do $$
 begin
   if not exists (select 1 from information_schema.columns
                   where table_name = 'flashcards' and column_name = 'subject_id') then
-    alter table flashcards add column subject_id uuid references subjects(id) on delete set null;
+    alter table flashcards add column if not exists subject_id uuid references subjects(id) on delete set null;
   end if;
 end $$;

@@ -30,9 +30,12 @@ create index if not exists idx_follows_following on follows(following_id);
 create index if not exists idx_follows_follower on follows(follower_id);
 
 alter table public.follows enable row level security;
+drop policy if exists "anyone_reads_follows" on follows;
 create policy "anyone_reads_follows" on follows for select using (true);
+drop policy if exists "users_create_own_follows" on follows;
 create policy "users_create_own_follows" on follows for insert
   with check (auth.uid() = follower_id);
+drop policy if exists "users_delete_own_follows" on follows;
 create policy "users_delete_own_follows" on follows for delete
   using (auth.uid() = follower_id);
 
@@ -80,6 +83,7 @@ create index if not exists idx_saves_user on notebook_saves(user_id, created_at 
 create index if not exists idx_saves_notebook on notebook_saves(notebook_id);
 
 alter table public.notebook_saves enable row level security;
+drop policy if exists "users_own_saves" on notebook_saves;
 create policy "users_own_saves" on notebook_saves for all
   using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
@@ -111,12 +115,15 @@ create index if not exists idx_clans_public on clans(is_public, member_count) wh
 create index if not exists idx_clans_invite on clans(invite_code);
 
 alter table public.clans enable row level security;
+drop policy if exists "anyone_reads_public_clans" on clans;
 create policy "anyone_reads_public_clans" on clans for select
   using (is_public = true or exists (
     select 1 from clan_members where clan_id = clans.id and user_id = auth.uid()
   ));
+drop policy if exists "founders_update_clans" on clans;
 create policy "founders_update_clans" on clans for update
   using (auth.uid() = founder_id) with check (auth.uid() = founder_id);
+drop policy if exists "users_create_clans" on clans;
 create policy "users_create_clans" on clans for insert
   with check (auth.uid() = founder_id);
 
@@ -140,10 +147,12 @@ create index if not exists idx_members_user on clan_members(user_id);
 create index if not exists idx_members_clan on clan_members(clan_id, weekly_reviews desc);
 
 alter table public.clan_members enable row level security;
+drop policy if exists "members_read_clan_members" on clan_members;
 create policy "members_read_clan_members" on clan_members for select using (
   exists (select 1 from clan_members cm where cm.clan_id = clan_members.clan_id and cm.user_id = auth.uid())
   or exists (select 1 from clans where id = clan_members.clan_id and is_public = true)
 );
+drop policy if exists "users_join_leave" on clan_members;
 create policy "users_join_leave" on clan_members for all
   using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
@@ -165,13 +174,16 @@ create table if not exists public.clan_messages (
 create index if not exists idx_messages_clan on clan_messages(clan_id, created_at desc);
 
 alter table public.clan_messages enable row level security;
+drop policy if exists "members_read_messages" on clan_messages;
 create policy "members_read_messages" on clan_messages for select using (
   exists (select 1 from clan_members where clan_id = clan_messages.clan_id and user_id = auth.uid())
 );
+drop policy if exists "members_post_messages" on clan_messages;
 create policy "members_post_messages" on clan_messages for insert with check (
   auth.uid() = user_id
   and exists (select 1 from clan_members where clan_id = clan_messages.clan_id and user_id = auth.uid())
 );
+drop policy if exists "users_delete_own_messages" on clan_messages;
 create policy "users_delete_own_messages" on clan_messages for delete using (auth.uid() = user_id);
 
 -- ============== ACHIEVEMENTS (rozet sistemi) ===========
@@ -197,6 +209,7 @@ create table if not exists public.achievements (
 );
 
 alter table public.achievements enable row level security;
+drop policy if exists "anyone_reads_achievements" on achievements;
 create policy "anyone_reads_achievements" on achievements for select using (is_active = true);
 
 -- Seed achievements
@@ -243,8 +256,10 @@ create table if not exists public.user_achievements (
 create index if not exists idx_user_ach_unlocked on user_achievements(user_id, unlocked_at desc) where is_unlocked = true;
 
 alter table public.user_achievements enable row level security;
+drop policy if exists "anyone_reads_unlocked_achievements" on user_achievements;
 create policy "anyone_reads_unlocked_achievements" on user_achievements for select
   using (is_unlocked = true);
+drop policy if exists "service_writes_achievements" on user_achievements;
 create policy "service_writes_achievements" on user_achievements for all
   using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
 

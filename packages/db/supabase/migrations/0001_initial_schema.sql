@@ -245,8 +245,7 @@ create table public.progress (
   unique (user_id, concept_id)
 );
 
-create index idx_progress_due on progress(user_id, next_review_at)
-  where next_review_at <= now();
+create index idx_progress_due on progress(user_id, next_review_at);
 
 create table public.flashcards (
   id uuid primary key default gen_random_uuid(),

@@ -41,32 +41,41 @@ alter table modules enable row level security;
 alter table techniques enable row level security;
 alter table llm_models enable row level security;
 
+drop policy if exists "modules_read_all" on modules;
 create policy "modules_read_all" on modules for select using (true);
+drop policy if exists "techniques_read_all" on techniques;
 create policy "techniques_read_all" on techniques for select using (true);
+drop policy if exists "llm_models_read_active" on llm_models;
 create policy "llm_models_read_active" on llm_models for select using (is_active = true);
 
 -- ============================================================================
 -- Kullanıcı kendi verisine tam erişim
 -- ============================================================================
 
+drop policy if exists "users_own_profile" on profiles;
 create policy "users_own_profile" on profiles
   for all using (auth.uid() = id) with check (auth.uid() = id);
 
+drop policy if exists "users_own_prefs" on user_preferences;
 create policy "users_own_prefs" on user_preferences
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_keys" on api_keys;
 create policy "users_own_keys" on api_keys
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_subjects" on subjects;
 create policy "users_own_subjects" on subjects
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- Concepts: kullanıcının subject'ine ait
+drop policy if exists "users_own_concepts" on concepts;
 create policy "users_own_concepts" on concepts
   for all using (
     exists (select 1 from subjects s where s.id = concepts.subject_id and s.user_id = auth.uid())
   );
 
+drop policy if exists "users_own_concept_relations" on concept_relations;
 create policy "users_own_concept_relations" on concept_relations
   for all using (
     exists (select 1 from concepts c
@@ -74,92 +83,120 @@ create policy "users_own_concept_relations" on concept_relations
             where c.id = concept_relations.from_concept_id and s.user_id = auth.uid())
   );
 
+drop policy if exists "users_own_lessons" on lessons;
 create policy "users_own_lessons" on lessons
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- Messages: lesson'ın sahibi
+drop policy if exists "users_own_messages" on messages;
 create policy "users_own_messages" on messages
   for all using (
     exists (select 1 from lessons l where l.id = messages.lesson_id and l.user_id = auth.uid())
   );
 
+drop policy if exists "users_own_progress" on progress;
 create policy "users_own_progress" on progress
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_flashcards" on flashcards;
 create policy "users_own_flashcards" on flashcards
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_gen_flashcards" on generated_flashcards;
 create policy "users_own_gen_flashcards" on generated_flashcards
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_quiz" on quiz_attempts;
 create policy "users_own_quiz" on quiz_attempts
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_errors" on error_portfolio;
 create policy "users_own_errors" on error_portfolio
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_reflections" on reflections;
 create policy "users_own_reflections" on reflections
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_goals" on goals;
 create policy "users_own_goals" on goals
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_streaks" on streaks;
 create policy "users_own_streaks" on streaks
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_achievements" on achievements;
 create policy "users_own_achievements" on achievements
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_documents" on documents;
 create policy "users_own_documents" on documents
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_doc_chunks" on document_chunks;
 create policy "users_own_doc_chunks" on document_chunks
   for all using (
     exists (select 1 from documents d where d.id = document_chunks.document_id and d.user_id = auth.uid())
   );
 
+drop policy if exists "users_own_images" on images;
 create policy "users_own_images" on images
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_audio" on audio_recordings;
 create policy "users_own_audio" on audio_recordings
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- Personalities: preset'ler herkese açık, custom'lar sadece sahibine
+drop policy if exists "personalities_read" on personalities;
 create policy "personalities_read" on personalities
   for select using (is_preset = true or user_id = auth.uid());
+drop policy if exists "personalities_write_own" on personalities;
 create policy "personalities_write_own" on personalities
   for insert with check (auth.uid() = user_id);
+drop policy if exists "personalities_update_own" on personalities;
 create policy "personalities_update_own" on personalities
   for update using (auth.uid() = user_id and not is_preset);
+drop policy if exists "personalities_delete_own" on personalities;
 create policy "personalities_delete_own" on personalities
   for delete using (auth.uid() = user_id and not is_preset);
 
+drop policy if exists "users_own_plans" on study_plans;
 create policy "users_own_plans" on study_plans
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_sessions" on study_sessions;
 create policy "users_own_sessions" on study_sessions
   for all using (
     exists (select 1 from study_plans p where p.id = study_sessions.plan_id and p.user_id = auth.uid())
   );
 
+drop policy if exists "users_own_focus" on focus_sessions;
 create policy "users_own_focus" on focus_sessions
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_reports" on weekly_reports;
 create policy "users_own_reports" on weekly_reports
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_voice_clones" on voice_clones;
 create policy "users_own_voice_clones" on voice_clones
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_inbox" on inbox_items;
 create policy "users_own_inbox" on inbox_items
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_exports" on exports;
 create policy "users_own_exports" on exports
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "users_own_usage" on usage_logs;
 create policy "users_own_usage" on usage_logs
   for select using (auth.uid() = user_id);
 
+drop policy if exists "users_own_subscription" on subscriptions;
 create policy "users_own_subscription" on subscriptions
   for select using (auth.uid() = user_id);
 
@@ -177,39 +214,47 @@ insert into storage.buckets (id, name, public) values
 on conflict (id) do nothing;
 
 -- Storage policies: kullanıcı sadece kendi klasörüne yazar/okur
+drop policy if exists "users_upload_own_documents" on storage.objects;
 create policy "users_upload_own_documents" on storage.objects
   for insert with check (
     bucket_id = 'user-documents' and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "users_read_own_documents" on storage.objects;
 create policy "users_read_own_documents" on storage.objects
   for select using (
     bucket_id = 'user-documents' and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "users_upload_own_images" on storage.objects;
 create policy "users_upload_own_images" on storage.objects
   for insert with check (
     bucket_id = 'user-images' and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "users_read_own_images" on storage.objects;
 create policy "users_read_own_images" on storage.objects
   for select using (
     bucket_id = 'user-images' and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "users_upload_own_audio" on storage.objects;
 create policy "users_upload_own_audio" on storage.objects
   for insert with check (
     bucket_id = 'audio-input' and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "users_read_own_audio" on storage.objects;
 create policy "users_read_own_audio" on storage.objects
   for select using (
     bucket_id = 'audio-input' and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "avatars_public_read" on storage.objects;
 create policy "avatars_public_read" on storage.objects
   for select using (bucket_id = 'avatars');
 
+drop policy if exists "avatars_own_upload" on storage.objects;
 create policy "avatars_own_upload" on storage.objects
   for insert with check (
     bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text

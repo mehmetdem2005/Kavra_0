@@ -38,7 +38,8 @@ create index if not exists idx_subscriptions_stripe_customer on subscriptions(st
 create index if not exists idx_subscriptions_stripe_sub on subscriptions(stripe_subscription_id);
 
 alter table public.subscriptions enable row level security;
-create policy if not exists "users_read_own_subscription" on subscriptions
+drop policy if exists "users_read_own_subscription" on subscriptions;
+create policy "users_read_own_subscription" on subscriptions
   for select using (auth.uid() = user_id);
 -- Yazma sadece service_role'dan yapılır (webhook)
 
@@ -95,7 +96,8 @@ create table if not exists public.usage_quotas (
 );
 
 alter table public.usage_quotas enable row level security;
-create policy if not exists "users_read_own_quotas" on usage_quotas
+drop policy if exists "users_read_own_quotas" on usage_quotas;
+create policy "users_read_own_quotas" on usage_quotas
   for select using (auth.uid() = user_id);
 
 -- ---- VOICE CLONES — F5-TTS modeller ----
@@ -129,7 +131,8 @@ create index if not exists idx_voice_clones_user on voice_clones(user_id, create
 create unique index if not exists idx_voice_clones_default on voice_clones(user_id) where is_default = true;
 
 alter table public.voice_clones enable row level security;
-create policy if not exists "users_own_voice_clones" on voice_clones
+drop policy if exists "users_own_voice_clones" on voice_clones;
+create policy "users_own_voice_clones" on voice_clones
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ---- THEMES — Tema kişiselleştirme (free=3 / pro=hepsi) ----
@@ -167,10 +170,10 @@ do $$
 begin
   if not exists (select 1 from information_schema.columns
                   where table_name = 'user_preferences' and column_name = 'app_lock_enabled') then
-    alter table user_preferences add column app_lock_enabled boolean default false;
-    alter table user_preferences add column app_lock_method text check (app_lock_method in ('biometric', 'pin')) default 'biometric';
-    alter table user_preferences add column app_lock_timeout_seconds int default 0;  -- 0 = anında, >0 = N saniye sonra
-    alter table user_preferences add column theme_id text references themes(id) default 'indigo_amber';
+    alter table user_preferences add column if not exists app_lock_enabled boolean default false;
+    alter table user_preferences add column if not exists app_lock_method text check (app_lock_method in ('biometric', 'pin')) default 'biometric';
+    alter table user_preferences add column if not exists app_lock_timeout_seconds int default 0;  -- 0 = anında, >0 = N saniye sonra
+    alter table user_preferences add column if not exists theme_id text references themes(id) default 'indigo_amber';
   end if;
 end $$;
 
@@ -198,10 +201,10 @@ do $$
 begin
   if not exists (select 1 from information_schema.columns
                   where table_name = 'user_preferences' and column_name = 'notify_review_reminder') then
-    alter table user_preferences add column notify_review_reminder boolean default true;
-    alter table user_preferences add column notify_review_reminder_hour int default 20 check (notify_review_reminder_hour between 0 and 23);
-    alter table user_preferences add column notify_weekly_report boolean default true;
-    alter table user_preferences add column notify_streak_warning boolean default true;
+    alter table user_preferences add column if not exists notify_review_reminder boolean default true;
+    alter table user_preferences add column if not exists notify_review_reminder_hour int default 20 check (notify_review_reminder_hour between 0 and 23);
+    alter table user_preferences add column if not exists notify_weekly_report boolean default true;
+    alter table user_preferences add column if not exists notify_streak_warning boolean default true;
   end if;
 end $$;
 
@@ -226,19 +229,22 @@ insert into storage.buckets (id, name, public)
   on conflict (id) do nothing;
 
 -- RLS — kullanıcı sadece kendi klasörüne yazabilir/okuyabilir
-create policy if not exists "voice_references_user_read" on storage.objects
+drop policy if exists "voice_references_user_read" on storage.objects;
+create policy "voice_references_user_read" on storage.objects
   for select using (
     bucket_id = 'voice-references'
     and (storage.foldername(name))[1] = auth.uid()::text
   );
 
-create policy if not exists "voice_references_user_insert" on storage.objects
+drop policy if exists "voice_references_user_insert" on storage.objects;
+create policy "voice_references_user_insert" on storage.objects
   for insert with check (
     bucket_id = 'voice-references'
     and (storage.foldername(name))[1] = auth.uid()::text
   );
 
-create policy if not exists "voice_references_user_delete" on storage.objects
+drop policy if exists "voice_references_user_delete" on storage.objects;
+create policy "voice_references_user_delete" on storage.objects
   for delete using (
     bucket_id = 'voice-references'
     and (storage.foldername(name))[1] = auth.uid()::text
